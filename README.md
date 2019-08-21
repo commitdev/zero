@@ -9,6 +9,8 @@ Based on specified config it will generate:
   * Proto libraries [Done]
   * GraphQL files [In progress]
   * GraphQL libraries [In progress]
+  * Http grpc gateway [Later]
+  * grpc web [Later]
   * Layout [In progress]
   * Kubernetes manifests [In progress]
 
