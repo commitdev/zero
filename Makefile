@@ -12,3 +12,6 @@ run:
 build:
 	packr2
 	go build -o sprout
+
+clean:
+	packr2 clean
