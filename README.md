@@ -23,7 +23,7 @@ In order to use this you need ensure you have these installed.
 
 ## Building locally
 
-As the templates are embeded into the binary you will need to ensure packer2 is installed.
+As the templates are embeded into the binary you will need to ensure packr2 is installed.
 
 You can run `make deps` to install this.
 
