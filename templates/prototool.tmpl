@@ -1,0 +1,25 @@
+protoc:
+  version: 3.8.0
+lint:
+  group: uber2
+
+{{- $org := .Organization }}
+create:
+  packages: 
+    - directory: health
+      name: {{$org}}.health
+  {{- range .Services}}
+    - directory: {{ .Name }}
+      name: {{$org}}.{{ .Name }}
+  {{ end }}
+generate:
+  go_options:
+    import_path: {{ .GitRepo }}
+    extra_modifiers:
+      google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
+      google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations
+  plugins:
+    - name: go
+      type: go
+      flags: plugins=grpc
+      output: ../../gen/go

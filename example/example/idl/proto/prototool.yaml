@@ -1,0 +1,25 @@
+protoc:
+  version: 3.8.0
+lint:
+  group: uber2
+create:
+  packages: 
+    - directory: health
+      name: mycompany.health
+    - directory: helloworld
+      name: mycompany.helloworld
+  
+    - directory: helloworld2
+      name: mycompany.helloworld2
+  
+generate:
+  go_options:
+    import_path: github.com/mycompany/test
+    extra_modifiers:
+      google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
+      google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations
+  plugins:
+    - name: go
+      type: go
+      flags: plugins=grpc
+      output: ../../gen/go

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package mycompany.helloworld2;
+
+option csharp_namespace = "Mycompany.Helloworld2";
+option go_package = "helloworld2pb";
+option java_multiple_files = true;
+option java_outer_classname = "Helloworld2Proto";
+option java_package = "com.mycompany.helloworld2";
+option objc_class_prefix = "MHX";
+option php_namespace = "Mycompany\\Helloworld2";

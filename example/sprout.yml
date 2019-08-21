@@ -1,0 +1,19 @@
+organization: mycompany
+name: example
+description: This is a test project
+git-repo: github.com/mycompany/test
+docker-repo: test.com
+maintainers: 
+ - name: bob 
+   email: bob@test.com
+
+network:
+  http-port: 8080
+  grpc-port: 3000
+  graphql-port: 8082
+
+services:
+  - name: helloworld
+    description: Hello world!.
+  - name: helloworld2
+    description: Hello world again!.
