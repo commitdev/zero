@@ -2,7 +2,7 @@ package {{ .ServiceName }}
 
 import (
 	"context"
-	api "{{.GitRepo}}/gen/go/{{ .ServiceName }}"
+	api "{{.GitRepo}}/{{ .ProjectName }}-go/{{ .ServiceName }}"
 )
 
 type {{ .ServiceName | Title }}Server struct {

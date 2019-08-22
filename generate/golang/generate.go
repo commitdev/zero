@@ -17,7 +17,7 @@ func Generate(templator *templator.Templator, config *config.SproutConfig, outPa
 }
 
 func GenerateServers(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	serverDirPath := fmt.Sprintf("%s/%s/server", outPath, config.Name)
+	serverDirPath := fmt.Sprintf("%s/%s/%s/server", outPath, config.Name, config.Name)
 	err := util.CreateDirIfDoesNotExist(serverDirPath)
 	if err != nil {
 		log.Printf("Error creating server path: %v", err)
@@ -43,6 +43,7 @@ func GenerateServers(templator *templator.Templator, config *config.SproutConfig
 		}
 
 		data := map[string]string {
+			"ProjectName": config.Name,
 			"ServiceName": s.Name,
 			"GitRepo": config.GitRepo,
 		}
@@ -53,7 +54,7 @@ func GenerateServers(templator *templator.Templator, config *config.SproutConfig
 }
 
 func GenerateHealthServer(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	serverDirPath := fmt.Sprintf("%s/%s/server", outPath, config.Name)
+	serverDirPath := fmt.Sprintf("%s/%s/%s/server", outPath, config.Name, config.Name)
 	err := util.CreateDirIfDoesNotExist(serverDirPath)
 	if err != nil {
 		log.Printf("Error creating server path: %v", err)
@@ -72,7 +73,5 @@ func GenerateHealthServer(templator *templator.Templator, config *config.SproutC
 		log.Printf("Error: %v", err)
 	}
 
-	importPath := fmt.Sprintf("%s/gen/go/health", config.GitRepo)
-
-	templator.Go.GoHealthServer.Execute(f, importPath)
+	templator.Go.GoHealthServer.Execute(f, config)
 }

@@ -1,7 +1,7 @@
 organization: mycompany
-name: example
+name: sprout-example
 description: This is a test project
-git-repo: github.com/commitdev/example/example
+git-repo: github.com/commitdev
 docker-repo: test.com
 maintainers: 
  - name: bob 

@@ -11,7 +11,7 @@ create:
   
 generate:
   go_options:
-    import_path: github.com/commitdev/example/example
+    import_path: github.com/commitdev
     extra_modifiers:
       google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
       google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations
@@ -19,4 +19,4 @@ generate:
     - name: go
       type: go
       flags: plugins=grpc
-      output: ../../gen/go
+      output: ../../sprout-example-go

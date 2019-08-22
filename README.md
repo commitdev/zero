@@ -16,6 +16,24 @@ Based on specified config it will generate:
 
 It will also live with your project, when you add a new service to the config it will generate everything needed for that new service.
 
+The generation will create a folder with 3 repos within it.
+
+* A rep for the IDL's
+* A repo that has the generated artifacts from the IDL
+* A repo that implements the interfaces of the generated artifacts
+
+NOTE: It only creates the folders for these repos, you will still need to create the git repos on your respected platform. Aswell as initialise each folder as a git repo and push when there have been changes. (if there is a strong desire we can look at how to make this process easier.)
+
+The dev process:
+
+1) Setup sprout config & run generation
+2) Start adding your desired methods to the protobuf files generated
+3) Rerun generation
+4) Push the idl and the language generated repo
+5) Implement these methods on the main application repo
+6) When you feel the need to add more services add them to the sprout config
+7) Repeat steps 1 - 5
+
 ## Dependencies
 
 In order to use this you need ensure you have these installed.
