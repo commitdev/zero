@@ -1,6 +1,8 @@
 package util
 
 import (
+	"text/template"
+	"strings"
 	"os"
 )
 
@@ -10,4 +12,8 @@ func CreateDirIfDoesNotExist(path string) error {
 		return err
 	}
 	return nil
+}
+
+var FuncMap = template.FuncMap{
+	"Title": strings.Title,
 }

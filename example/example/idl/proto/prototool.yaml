@@ -9,12 +9,9 @@ create:
     - directory: helloworld
       name: mycompany.helloworld
   
-    - directory: helloworld2
-      name: mycompany.helloworld2
-  
 generate:
   go_options:
-    import_path: github.com/mycompany/test
+    import_path: github.com/commitdev/example/example
     extra_modifiers:
       google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
       google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations

@@ -1,7 +1,7 @@
 organization: mycompany
 name: example
 description: This is a test project
-git-repo: github.com/mycompany/test
+git-repo: github.com/commitdev/example/example
 docker-repo: test.com
 maintainers: 
  - name: bob 
@@ -15,5 +15,3 @@ network:
 services:
   - name: helloworld
     description: Hello world!.
-  - name: helloworld2
-    description: Hello world again!.

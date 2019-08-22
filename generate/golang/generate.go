@@ -8,73 +8,71 @@ import (
 	"github.com/commitdev/sprout/templator"
 	"log"
 	"os"
-	"os/exec"
 )
 
 func Generate(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	GenerateProtoToolConfig(templator, config, outPath)
-	GenerateProtoHealth(templator, config, outPath)
-	GenerateProtoServices(templator, config, outPath)
-	GenerateProtoServiceLibs(config, outPath)
+	GenerateHealthServer(templator, config, outPath)
+	GenerateServers(templator, config, outPath)
+
 }
 
-func GenerateProtoToolConfig(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	protoPath := fmt.Sprintf("%s/%s/idl/proto", outPath, config.Name)
-	protoToolOutput := fmt.Sprintf("%s/prototool.yaml", protoPath)
-
-	err := util.CreateDirIfDoesNotExist(protoPath)
+func GenerateServers(templator *templator.Templator, config *config.SproutConfig, outPath string) {
+	serverDirPath := fmt.Sprintf("%s/%s/server", outPath, config.Name)
+	err := util.CreateDirIfDoesNotExist(serverDirPath)
 	if err != nil {
-		log.Printf("Error generating prototool config: %v", err)
+		log.Printf("Error creating server path: %v", err)
 	}
 
-	f, err := os.Create(protoToolOutput)
-	if err != nil {
-		log.Printf("Error: %v", err)
-	}
-	templator.ProtoToolTemplate.Execute(f, config)
-}
-
-func GenerateProtoHealth(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	protoHealthPath := fmt.Sprintf("%s/%s/idl/proto/health", outPath, config.Name)
-	protoHealthOutput := fmt.Sprintf("%s/health.proto", protoHealthPath)
-
-	err := util.CreateDirIfDoesNotExist(protoHealthPath)
-	if err != nil {
-		log.Printf("Error: %v", err)
-	}
-
-	f, err := os.Create(protoHealthOutput)
-	if err != nil {
-		log.Printf("Error: %v", err)
-	}
-
-	templator.ProtoHealthTemplate.Execute(f, config)
-}
-
-func GenerateProtoServices(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	protoToolConfigPath := fmt.Sprintf("%s/%s/idl/proto", outPath, config.Name)
 	for _, s := range config.Services {
-		idlPath := fmt.Sprintf("%s/%s", protoToolConfigPath, s.Name)
-		err := util.CreateDirIfDoesNotExist(idlPath)
+		serverLibPath := fmt.Sprintf("%s/%s", serverDirPath, s.Name)
+		err := os.Mkdir(serverLibPath, os.ModePerm)
+		if os.IsExist(err) {
+			log.Printf("%s service exists skipping.", s.Name)
+			continue
+		}
+		log.Printf("generating %s", s.Name)
 		if err != nil {
-			log.Printf("Error generating service proto: %v", err)
+			log.Printf("Error generating server: %v", err)
 		}
 
-		//local paths
-		protoPath := fmt.Sprintf("%s/%s.proto", s.Name, s.Name)
-		cmd := exec.Command("prototool", "create", protoPath)
-		cmd.Dir = protoToolConfigPath
-		cmd.Run()
+		serverFilePath := fmt.Sprintf("%s/%s.go", serverLibPath, s.Name)
+		f, err := os.Create(serverFilePath)
+
+		if err != nil {
+			log.Printf("Error: %v", err)
+		}
+
+		data := map[string]string {
+			"ServiceName": s.Name,
+			"GitRepo": config.GitRepo,
+		}
+
+		templator.Go.GoServer.Execute(f, data)
 	}
 
 }
 
-func GenerateProtoServiceLibs(config *config.SproutConfig, outPath string) {
-	protoToolConfigPath := fmt.Sprintf("%s/%s/idl/proto", outPath, config.Name)
-	cmd := exec.Command("prototool", "generate")
-	cmd.Dir = protoToolConfigPath
-	err := cmd.Run()
+func GenerateHealthServer(templator *templator.Templator, config *config.SproutConfig, outPath string) {
+	serverDirPath := fmt.Sprintf("%s/%s/server", outPath, config.Name)
+	err := util.CreateDirIfDoesNotExist(serverDirPath)
 	if err != nil {
-		log.Printf("Error executing prototool generate: %v", err)
+		log.Printf("Error creating server path: %v", err)
 	}
+
+	serverLibPath := fmt.Sprintf("%s/%s", serverDirPath, "health")
+	err = util.CreateDirIfDoesNotExist(serverLibPath)
+	if err != nil {
+		log.Printf("Error generating server: %v", err)
+	}
+
+	serverFilePath := fmt.Sprintf("%s/%s.go", serverLibPath, "health")
+	f, err := os.Create(serverFilePath)
+
+	if err != nil {
+		log.Printf("Error: %v", err)
+	}
+
+	importPath := fmt.Sprintf("%s/gen/go/health", config.GitRepo)
+
+	templator.Go.GoHealthServer.Execute(f, importPath)
 }
