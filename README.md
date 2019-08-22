@@ -16,15 +16,17 @@ Based on specified config it will generate:
 
 It will also live with your project, when you add a new service to the config it will generate everything needed for that new service.
 
+## What does it generate?
+
 The generation will create a folder with 3 repos within it.
 
 * A rep for the IDL's
 * A repo that has the generated artifacts from the IDL
 * A repo that implements the interfaces of the generated artifacts
 
-NOTE: It only creates the folders for these repos, you will still need to create the git repos on your respected platform. Aswell as initialise each folder as a git repo and push when there have been changes. (if there is a strong desire we can look at how to make this process easier.)
+`NOTE: It only creates the folders for these repos, you will still need to create the git repos on your respected platform. Aswell as initialise each folder as a git repo and push when there have been changes. (if there is a strong desire we can look at how to make this process easier.)`
 
-The dev process:
+## The development cycle
 
 1) Setup sprout config & run generation
 2) Start adding your desired methods to the protobuf files generated
