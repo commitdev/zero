@@ -9,6 +9,8 @@ Based on specified config it will generate:
   * Proto libraries [Done]
   * GraphQL files [In progress]
   * GraphQL libraries [In progress]
+  * Http grpc gateway [Later]
+  * grpc web [Later]
   * Layout [In progress]
   * Kubernetes manifests [In progress]
 
@@ -23,7 +25,7 @@ In order to use this you need ensure you have these installed.
 
 ## Building locally
 
-As the templates are embeded into the binary you will need to ensure packer2 is installed.
+As the templates are embeded into the binary you will need to ensure packr2 is installed.
 
 You can run `make deps` to install this.
 
