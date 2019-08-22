@@ -8,9 +8,14 @@ maintainers:
    email: bob@test.com
 
 network:
-  http-port: 8080
-  grpc-port: 3000
-  graphql-port: 8082
+  grpc:
+    port: 3000
+  http:
+    enabled: true
+    port: 8080
+  graphql:
+    enabled: true
+    port: 8082
 
 services:
   - name: helloworld

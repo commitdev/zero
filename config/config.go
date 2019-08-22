@@ -12,10 +12,24 @@ type Maintainers struct {
 	Email string
 }
 
+type Grpc struct {
+	Port int
+}
+
+type Graphql struct {
+	Enabled bool
+	Port int
+}
+
+type Http struct {
+	Enabled bool
+	Port int
+}
+
 type Network struct {
-	HTTPPort    int `yaml:"http-port,omitempty"`
-	GrpcPort    int `yaml:"grpc-port,omitempty"`
-	GraphqlPort int `yaml:"graphql-port,omitempty"`
+	Grpc   Grpc
+	Http   Http
+	Graphql Graphql
 }
 
 type Service struct {
@@ -49,6 +63,6 @@ func LoadConfig(filePath string) *SproutConfig {
 }
 
 func (c *SproutConfig) Print() {
-	pp.Print(c)
+	pp.Println(c)
 
 }
