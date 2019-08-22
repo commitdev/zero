@@ -2,7 +2,7 @@
 
 Status: currently poc
 
-Sprout intends to be a multi-language service generator.
+Sprout intends to be a multi-language service generator. The intention is to create a modular monolith, which is easy to seperate at a later stage when the boundries are completely understood.
 
 Based on specified config it will generate:
   * Proto files [Done]
