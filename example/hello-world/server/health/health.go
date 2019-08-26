@@ -2,7 +2,7 @@ package health
 
 import (
 	"context"
-	api "github.com/commitdev/sprout-example-go/health"
+	api "github.com/yourrepo/hello-world-go/health"
 )
 
 type HealthServer struct {

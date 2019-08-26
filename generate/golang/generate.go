@@ -10,14 +10,24 @@ import (
 	"os"
 )
 
-func Generate(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	GenerateHealthServer(templator, config, outPath)
-	GenerateServers(templator, config, outPath)
-
+func Generate(templator *templator.Templator, config *config.SproutConfig) {
+	GenerateGoMod(templator, config)
+	GenerateHealthServer(templator, config)
+	GenerateServers(templator, config)
 }
 
-func GenerateServers(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	serverDirPath := fmt.Sprintf("%s/%s/%s/server", outPath, config.Name, config.Name)
+func GenerateGoMod(templator *templator.Templator, config *config.SproutConfig) {
+	f, err := os.Create("go.mod")
+
+	if err != nil {
+		log.Printf("Error: %v", err)
+	}
+
+	templator.Go.GoMod.Execute(f, config)
+}
+
+func GenerateServers(templator *templator.Templator, config *config.SproutConfig) {
+	serverDirPath := "server"
 	err := util.CreateDirIfDoesNotExist(serverDirPath)
 	if err != nil {
 		log.Printf("Error creating server path: %v", err)
@@ -53,8 +63,8 @@ func GenerateServers(templator *templator.Templator, config *config.SproutConfig
 
 }
 
-func GenerateHealthServer(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	serverDirPath := fmt.Sprintf("%s/%s/%s/server", outPath, config.Name, config.Name)
+func GenerateHealthServer(templator *templator.Templator, config *config.SproutConfig) {
+	serverDirPath := "server"
 	err := util.CreateDirIfDoesNotExist(serverDirPath)
 	if err != nil {
 		log.Printf("Error creating server path: %v", err)

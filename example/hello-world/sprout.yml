@@ -1,11 +1,11 @@
 organization: mycompany
-name: sprout-example
-description: This is a test project
-git-repo: github.com/commitdev
-docker-repo: test.com
+name: hello-world
+description: 
+git-repo: github.com/yourrepo
+docker-repo: 
 maintainers: 
- - name: bob 
-   email: bob@test.com
+# - name: bob 
+#   email: bob@test.com
 
 network:
   grpc:

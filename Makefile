@@ -14,7 +14,14 @@ build:
 	packr2 clean
 
 build-example:
-	./sprout generate -c example/sprout.yml -l go -o example
+	mkdir -p example
+	cd example && ../sprout create -p "hello-world"
+	cd example/hello-world && ../../sprout generate -l go
 
 clean-example:
-	rm -rf example/example
+	rm -rf example
+
+install-linux: build
+	mkdir -p ${HOME}/bin
+	cp sprout ${HOME}/bin/sprout
+	chmod +x ${HOME}/bin/sprout

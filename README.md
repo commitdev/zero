@@ -18,23 +18,23 @@ It will also live with your project, when you add a new service to the config it
 
 ## What does it generate?
 
-The generation will create a folder with 3 repos within it.
+The generation will create 2 folders.
 
-* A rep for the IDL's
-* A repo that has the generated artifacts from the IDL
+* A rep for the IDL's, this folder will also contain generated artifacts from the IDL under 'gen'
 * A repo that implements the interfaces of the generated artifacts
 
 `NOTE: It only creates the folders for these repos, you will still need to create the git repos on your respected platform. Aswell as initialise each folder as a git repo and push when there have been changes. (if there is a strong desire we can look at how to make this process easier.)`
 
 ## The development cycle
 
-1) Setup sprout config & run generation
-2) Start adding your desired methods to the protobuf files generated
-3) Rerun generation
-4) Push the idl and the language generated repo
-5) Implement these methods on the main application repo
-6) When you feel the need to add more services add them to the sprout config
-7) Repeat steps 1 - 5
+1) Make folder and within that folder execute `sprout create [PROJECT_NAME]`
+2) A folder will be created and within that update the `sprout.yml` and then run `sprout generate -l=[LANGUAGE OF CHOICE]`
+3) Move back to the root folder and you will see that there is now an idl folder created.
+4) Modify the the protobuf services generated with your desired methods
+5) Either run `prototool generate` or return to the application folder and re run `sprout generate`
+6) Push up the IDL repo
+6) Implement these methods on the main application repo
+7) When you feel the need to add more services add them to the sprout config and repeate the generation process
 
 ## Dependencies
 

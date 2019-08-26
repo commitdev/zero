@@ -10,7 +10,6 @@ import (
 )
 
 var configPath string
-var outputPath string
 var language string
 
 const (
@@ -22,7 +21,6 @@ var supportedLanguages = [...]string{Go}
 func init() {
 
 	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "sprout.yml", "config path")
-	generateCmd.PersistentFlags().StringVarP(&outputPath, "output-path", "o", "./", "config path")
 	generateCmd.PersistentFlags().StringVarP(&language, "language", "l", "", "language to generate project in")
 
 	rootCmd.AddCommand(generateCmd)
@@ -30,7 +28,7 @@ func init() {
 
 var generateCmd = &cobra.Command{
 	Use:   "generate",
-	Short: "Generate project from config.",
+	Short: "Generate idl & application folders",
 	Run: func(cmd *cobra.Command, args []string) {
 		if !ValidLanguage() {
 			log.Fatalf("'%s' is not a supported language.", language)
@@ -39,11 +37,11 @@ var generateCmd = &cobra.Command{
 		cfg := config.LoadConfig(configPath)
 		cfg.Print()
 
-		proto.Generate(Templator, cfg, outputPath)
+		proto.Generate(Templator, cfg)
 
 		switch language {
 		case Go:
-			golang.Generate(Templator, cfg, outputPath)
+			golang.Generate(Templator, cfg)
 
 		}
 	},

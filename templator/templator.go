@@ -7,12 +7,14 @@ import (
 )
 
 type GoTemplator struct {
+	GoMod *template.Template
 	GoServer *template.Template
 	GoHealthServer *template.Template
 
 }
 
 type Templator struct {
+	Sprout *template.Template
 	ProtoToolTemplate   *template.Template
 	ProtoHealthTemplate *template.Template
 	Go                  *GoTemplator
@@ -29,6 +31,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		ProtoToolTemplate:   protoToolTemplate,
 		ProtoHealthTemplate: protoHealthTemplate,
 		Go:                  NewGoTemplator(box),
+		Sprout: NewSproutTemplator(box),
 	}
 }
 
@@ -39,9 +42,21 @@ func NewGoTemplator(box *packr.Box) *GoTemplator {
 	goHealthTemplateSource, _ := box.FindString("golang/health_server.tmpl")
 	goHealthServerTemplate, _ := template.New("GoHealthServerTemplate").Parse(goHealthTemplateSource)
 
+	goModTemplateSource, _ := box.FindString("golang/go_mod.tmpl")
+	goModTemplate, _ := template.New("GoModTemplate").Parse(goModTemplateSource)
+
 	return &GoTemplator{
+		GoMod: goModTemplate,
 		GoServer: goServerTemplate,
 		GoHealthServer: goHealthServerTemplate,
 	}
 
 }
+
+func NewSproutTemplator(box *packr.Box) *template.Template {
+	templateSource, _ := box.FindString("sprout/sprout.tmpl")
+	template, _ := template.New("SproutTemplate").Funcs(util.FuncMap).Parse(templateSource)
+
+	return template
+}
+

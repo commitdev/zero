@@ -11,15 +11,15 @@ import (
 	"os/exec"
 )
 
-func Generate(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	GenerateProtoToolConfig(templator, config, outPath)
-	GenerateProtoHealth(templator, config, outPath)
-	GenerateProtoServices(templator, config, outPath)
-	GenerateProtoServiceLibs(config, outPath)
+func Generate(templator *templator.Templator, config *config.SproutConfig) {
+	GenerateProtoToolConfig(templator, config)
+	GenerateProtoHealth(templator, config)
+	GenerateProtoServices(templator, config)
+	GenerateProtoServiceLibs(config)
 }
 
-func GenerateProtoToolConfig(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	protoPath := fmt.Sprintf("%s/%s/%s-idl/proto", outPath, config.Name, config.Name)
+func GenerateProtoToolConfig(templator *templator.Templator, config *config.SproutConfig) {
+	protoPath := fmt.Sprintf("../%s-idl/proto", config.Name)
 	protoToolOutput := fmt.Sprintf("%s/prototool.yaml", protoPath)
 
 	err := util.CreateDirIfDoesNotExist(protoPath)
@@ -34,8 +34,8 @@ func GenerateProtoToolConfig(templator *templator.Templator, config *config.Spro
 	templator.ProtoToolTemplate.Execute(f, config)
 }
 
-func GenerateProtoHealth(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	protoHealthPath := fmt.Sprintf("%s/%s/%s-idl/proto/health", outPath, config.Name, config.Name)
+func GenerateProtoHealth(templator *templator.Templator, config *config.SproutConfig) {
+	protoHealthPath := fmt.Sprintf("../%s-idl/proto/health", config.Name)
 	protoHealthOutput := fmt.Sprintf("%s/health.proto", protoHealthPath)
 
 	err := util.CreateDirIfDoesNotExist(protoHealthPath)
@@ -51,8 +51,8 @@ func GenerateProtoHealth(templator *templator.Templator, config *config.SproutCo
 	templator.ProtoHealthTemplate.Execute(f, config)
 }
 
-func GenerateProtoServices(templator *templator.Templator, config *config.SproutConfig, outPath string) {
-	protoToolConfigPath := fmt.Sprintf("%s/%s/%s-idl/proto", outPath, config.Name, config.Name)
+func GenerateProtoServices(templator *templator.Templator, config *config.SproutConfig) {
+	protoToolConfigPath := fmt.Sprintf("../%s-idl/proto", config.Name)
 	for _, s := range config.Services {
 		idlPath := fmt.Sprintf("%s/%s", protoToolConfigPath, s.Name)
 		err := util.CreateDirIfDoesNotExist(idlPath)
@@ -69,12 +69,12 @@ func GenerateProtoServices(templator *templator.Templator, config *config.Sprout
 
 }
 
-func GenerateProtoServiceLibs(config *config.SproutConfig, outPath string) {
-	protoToolConfigPath := fmt.Sprintf("%s/%s/%s-idl/proto", outPath, config.Name, config.Name)
+func GenerateProtoServiceLibs(config *config.SproutConfig) {
+	protoToolConfigPath := fmt.Sprintf("../%s-idl/proto", config.Name)
 	cmd := exec.Command("prototool", "generate")
 	cmd.Dir = protoToolConfigPath
-	err := cmd.Run()
+	bytes, err := cmd.Output()
 	if err != nil {
-		log.Printf("Error executing prototool generate: %v", err)
+		log.Printf("Error executing prototool generate: %v", string(bytes))
 	}
 }
