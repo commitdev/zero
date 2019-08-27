@@ -8,3 +8,7 @@ import (
 type HelloworldServer struct {
 
 }
+
+func NewHelloworldServer() *HelloworldServer {
+	return &HelloworldServer{}
+}

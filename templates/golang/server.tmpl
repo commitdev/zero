@@ -8,3 +8,7 @@ import (
 type {{ .ServiceName | Title }}Server struct {
 
 }
+
+func New{{ .ServiceName | Title }}Server() *{{ .ServiceName | Title }}Server {
+	return &{{ .ServiceName | Title }}Server{}
+}

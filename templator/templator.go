@@ -7,6 +7,7 @@ import (
 )
 
 type GoTemplator struct {
+	GoMain *template.Template
 	GoMod *template.Template
 	GoServer *template.Template
 	GoHealthServer *template.Template
@@ -45,7 +46,11 @@ func NewGoTemplator(box *packr.Box) *GoTemplator {
 	goModTemplateSource, _ := box.FindString("golang/go_mod.tmpl")
 	goModTemplate, _ := template.New("GoModTemplate").Parse(goModTemplateSource)
 
+	goMainTemplateSource, _ := box.FindString("golang/main.tmpl")
+	goMainTemplate, _ := template.New("GoModTemplate").Parse(goMainTemplateSource)
+
 	return &GoTemplator{
+		GoMain: goMainTemplate,
 		GoMod: goModTemplate,
 		GoServer: goServerTemplate,
 		GoHealthServer: goHealthServerTemplate,

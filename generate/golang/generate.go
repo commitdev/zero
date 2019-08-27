@@ -11,10 +11,23 @@ import (
 )
 
 func Generate(templator *templator.Templator, config *config.SproutConfig) {
+	GenerateGoMain(templator, config)
 	GenerateGoMod(templator, config)
 	GenerateHealthServer(templator, config)
 	GenerateServers(templator, config)
 }
+
+func GenerateGoMain(templator *templator.Templator, config *config.SproutConfig) {
+	f, err := os.Create("main.go")
+
+	if err != nil {
+		log.Printf("Error: %v", err)
+	}
+
+	templator.Go.GoMain.Execute(f, config)
+}
+
+
 
 func GenerateGoMod(templator *templator.Templator, config *config.SproutConfig) {
 	f, err := os.Create("go.mod")
