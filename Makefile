@@ -25,3 +25,4 @@ install-linux: build
 	mkdir -p ${HOME}/bin
 	cp sprout ${HOME}/bin/sprout
 	chmod +x ${HOME}/bin/sprout
+	@printf "\n Please run 'source ~/.profile' to add this installation to the path."

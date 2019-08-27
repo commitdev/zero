@@ -34,7 +34,7 @@ The generation will create 2 folders.
 5) Either run `prototool generate` or return to the application folder and re run `sprout generate`
 6) Push up the IDL repo
 6) Implement these methods on the main application repo
-7) When you feel the need to add more services add them to the sprout config and repeate the generation process
+7) When you feel the need to add more services add them to the sprout config and re-run `sprout generate` and repeat steps 4 - 6.
 
 ## Dependencies
 
