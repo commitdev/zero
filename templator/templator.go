@@ -1,21 +1,21 @@
 package templator
 
 import (
-	"github.com/gobuffalo/packr/v2"
 	"github.com/commitdev/sprout/util"
+	"github.com/gobuffalo/packr/v2"
 	"text/template"
 )
 
 type GoTemplator struct {
-	GoMain *template.Template
-	GoMod *template.Template
-	GoServer *template.Template
+	GoMain         *template.Template
+	GoMod          *template.Template
+	GoModIDL       *template.Template
+	GoServer       *template.Template
 	GoHealthServer *template.Template
-
 }
 
 type Templator struct {
-	Sprout *template.Template
+	Sprout              *template.Template
 	ProtoToolTemplate   *template.Template
 	ProtoHealthTemplate *template.Template
 	Go                  *GoTemplator
@@ -32,7 +32,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		ProtoToolTemplate:   protoToolTemplate,
 		ProtoHealthTemplate: protoHealthTemplate,
 		Go:                  NewGoTemplator(box),
-		Sprout: NewSproutTemplator(box),
+		Sprout:              NewSproutTemplator(box),
 	}
 }
 
@@ -46,13 +46,17 @@ func NewGoTemplator(box *packr.Box) *GoTemplator {
 	goModTemplateSource, _ := box.FindString("golang/go_mod.tmpl")
 	goModTemplate, _ := template.New("GoModTemplate").Parse(goModTemplateSource)
 
+	goModIDLTemplateSource, _ := box.FindString("golang/go_mod_idl.tmpl")
+	goModIDLTemplate, _ := template.New("GoModTemplate").Parse(goModIDLTemplateSource)
+
 	goMainTemplateSource, _ := box.FindString("golang/main.tmpl")
-	goMainTemplate, _ := template.New("GoModTemplate").Parse(goMainTemplateSource)
+	goMainTemplate, _ := template.New("GoMainTemplate").Parse(goMainTemplateSource)
 
 	return &GoTemplator{
-		GoMain: goMainTemplate,
-		GoMod: goModTemplate,
-		GoServer: goServerTemplate,
+		GoMain:         goMainTemplate,
+		GoMod:          goModTemplate,
+		GoModIDL:       goModIDLTemplate,
+		GoServer:       goServerTemplate,
 		GoHealthServer: goHealthServerTemplate,
 	}
 
@@ -64,4 +68,3 @@ func NewSproutTemplator(box *packr.Box) *template.Template {
 
 	return template
 }
-

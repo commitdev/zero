@@ -13,22 +13,23 @@ type Maintainers struct {
 }
 
 type Grpc struct {
+	Host string
 	Port int
 }
 
 type Graphql struct {
 	Enabled bool
-	Port int
+	Port    int
 }
 
 type Http struct {
 	Enabled bool
-	Port int
+	Port    int
 }
 
 type Network struct {
-	Grpc   Grpc
-	Http   Http
+	Grpc    Grpc
+	Http    Http
 	Graphql Graphql
 }
 

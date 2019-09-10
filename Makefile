@@ -13,7 +13,7 @@ build:
 	packr2 build -o sprout
 	packr2 clean
 
-build-example:
+build-example: build clean-example
 	mkdir -p example
 	cd example && ../sprout create -p "hello-world"
 	cd example/hello-world && ../../sprout generate -l go

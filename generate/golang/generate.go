@@ -18,16 +18,19 @@ func Generate(templator *templator.Templator, config *config.SproutConfig) {
 }
 
 func GenerateGoMain(templator *templator.Templator, config *config.SproutConfig) {
-	f, err := os.Create("main.go")
+	if _, err := os.Stat("main.go"); os.IsNotExist(err) {
 
-	if err != nil {
-		log.Printf("Error: %v", err)
+		f, err := os.Create("main.go")
+
+		if err != nil {
+			log.Printf("Error: %v", err)
+		}
+
+		templator.Go.GoMain.Execute(f, config)
+	} else {
+		log.Printf("main.go already exists. skipping.")
 	}
-
-	templator.Go.GoMain.Execute(f, config)
 }
-
-
 
 func GenerateGoMod(templator *templator.Templator, config *config.SproutConfig) {
 	f, err := os.Create("go.mod")
@@ -50,7 +53,7 @@ func GenerateServers(templator *templator.Templator, config *config.SproutConfig
 		serverLibPath := fmt.Sprintf("%s/%s", serverDirPath, s.Name)
 		err := os.Mkdir(serverLibPath, os.ModePerm)
 		if os.IsExist(err) {
-			log.Printf("%s service exists skipping.", s.Name)
+			log.Printf("%s server exists skipping.", s.Name)
 			continue
 		}
 		log.Printf("generating %s", s.Name)
@@ -65,10 +68,10 @@ func GenerateServers(templator *templator.Templator, config *config.SproutConfig
 			log.Printf("Error: %v", err)
 		}
 
-		data := map[string]string {
+		data := map[string]string{
 			"ProjectName": config.Name,
 			"ServiceName": s.Name,
-			"GitRepo": config.GitRepo,
+			"GitRepo":     config.GitRepo,
 		}
 
 		templator.Go.GoServer.Execute(f, data)

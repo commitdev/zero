@@ -1,3 +1,9 @@
 module {{ .GitRepo }}/{{ .Name }}
 
 go 1.12
+
+replace {{ .GitRepo }}/{{ .Name }}-idl => ../{{ .Name }}-idl
+
+require (
+  {{ .GitRepo }}/{{ .Name }}-idl v0.0.0
+)

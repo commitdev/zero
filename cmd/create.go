@@ -1,10 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
-	"fmt"
-	
 
 	"github.com/spf13/cobra"
 )
@@ -23,9 +22,13 @@ var createCmd = &cobra.Command{
 	Short: "Create new project.",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		err := os.Mkdir(projectName, os.ModePerm)
-		if os.IsExist(err){
-			log.Fatalf("Directory %v already exists!", projectName)
+		rootDir := fmt.Sprintf("./%v", projectName)
+
+		err := os.Mkdir(rootDir, os.ModePerm)
+		if os.IsExist(err) {
+			log.Fatalf("Directory %v already exists! Error: %v", projectName, err)
+		} else if err != nil {
+			log.Fatalf("Error creating root: %v ", err)
 		}
 
 		sproutConfigPath := fmt.Sprintf("%v/sprout.yml", projectName)

@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	templates := packr.New("templates","./templates")
+	templates := packr.New("templates", "./templates")
 	templator := templator.NewTemplator(templates)
 	cmd.Execute(templator)
 }

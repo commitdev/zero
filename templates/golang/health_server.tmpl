@@ -2,11 +2,15 @@ package health
 
 import (
 	"context"
-	api "{{ .GitRepo }}/{{ .Name }}-go/health"
+	api "{{ .GitRepo }}/{{ .Name }}-idl/gen/go/health"
 )
 
 type HealthServer struct {
 
+}
+
+func NewHealthServer() *HealthServer {
+	return &HealthServer{}
 }
 
 func (s *HealthServer) Check(ctx context.Context, req *api.HealthCheckRequest) (*api.HealthCheckResponse, error) {

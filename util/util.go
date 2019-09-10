@@ -1,9 +1,9 @@
 package util
 
 import (
-	"text/template"
-	"strings"
 	"os"
+	"strings"
+	"text/template"
 )
 
 func CreateDirIfDoesNotExist(path string) error {
