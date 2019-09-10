@@ -8,21 +8,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var projectName string
-
 func init() {
-
-	createCmd.PersistentFlags().StringVarP(&projectName, "project-name", "p", "", "project name")
 
 	rootCmd.AddCommand(createCmd)
 }
 
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create new project.",
+	Short: "Create new project with provided name.",
 	Run: func(cmd *cobra.Command, args []string) {
+		projectName := args[0]
+		if projectName == "" {
+			log.Panicf("Project name cannot be empty!")
+		}
 
 		rootDir := fmt.Sprintf("./%v", projectName)
+
+		log.Printf("Creating project %s.", projectName)
 
 		err := os.Mkdir(rootDir, os.ModePerm)
 		if os.IsExist(err) {
