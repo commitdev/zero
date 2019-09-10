@@ -17,10 +17,12 @@ var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create new project with provided name.",
 	Run: func(cmd *cobra.Command, args []string) {
-		projectName := args[0]
-		if projectName == "" {
-			log.Panicf("Project name cannot be empty!")
+		if len(args) < 1 {
+			log.Fatalf("Project name cannot be empty!")
 		}
+
+		projectName := args[0]
+
 
 		rootDir := fmt.Sprintf("./%v", projectName)
 
