@@ -12,6 +12,12 @@ import (
 	"github.com/gobuffalo/packr/v2/file"
 )
 
+type CITemplator struct {
+	CircleCI *template.Template
+	TravisCI *template.Template
+	Jenkins  *template.Template
+}
+
 // DockerTemplator contains the templates relevent to docker
 type DockerTemplator struct {
 	ApplicationDocker *template.Template
@@ -42,6 +48,7 @@ type Templator struct {
 	Docker               *DockerTemplator
 	React                *DirectoryTemplator
 	Kubernetes           *DirectoryTemplator
+	CI                   *CITemplator
 }
 
 func NewTemplator(box *packr.Box) *Templator {
@@ -56,6 +63,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		Docker:               NewDockerFileTemplator(box),
 		React:                NewDirectoryTemplator(box, "react"),
 		Kubernetes:           NewDirectoryTemplator(box, "kubernetes"),
+		CI:                   NewCITemplator(box),
 	}
 }
 
@@ -93,6 +101,25 @@ func NewSingleFileTemplator(box *packr.Box, file string) *template.Template {
 	}
 
 	return t
+}
+
+// NewCITemplator creates a build pipeline config file in your repository.
+// Only supports CircleCI for now, eventually will add Jenkins, Travis, etc
+func NewCITemplator(box *packr.Box) *CITemplator {
+	circleciTemplateSource, _ := box.FindString("ci/circleci.tmpl")
+	circleciTemplate, _ := template.New("CIConfig").Parse(circleciTemplateSource)
+
+	travisciTemplateSource, _ := box.FindString("ci/travis.tmpl")
+	travisciTemplate, _ := template.New("CIConfig").Parse(travisciTemplateSource)
+
+	jenkinsTemplateSource, _ := box.FindString("ci/Jenkinsfile.tmpl")
+	jenkinsTemplate, _ := template.New("CIConfig").Parse(jenkinsTemplateSource)
+
+	return &CITemplator{
+		CircleCI: circleciTemplate,
+		TravisCI: travisciTemplate,
+		Jenkins:  jenkinsTemplate,
+	}
 }
 
 type DirectoryTemplator struct {

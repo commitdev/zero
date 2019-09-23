@@ -1,0 +1,29 @@
+pipeline {
+    agent none
+    stages {
+        stage('Build and Test') {
+            parallel {
+                stage('Build') {
+                    agent {
+                        docker {
+                            image '{{ .CI.BuildImage }}'
+                        }
+                    }
+                    steps {
+                        sh '{{ .CI.BuildCommand }}'
+                    }
+                }
+                stage('Test') {
+                    agent {
+                        docker {
+                            image '{{ .CI.BuildImage }}'
+                        }
+                    }
+                    steps {
+                        sh '{{ .CI.TestCommand }}'
+                    }
+                }
+            }
+        }
+    }
+}

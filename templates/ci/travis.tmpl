@@ -1,0 +1,7 @@
+language: {{ .Language }}
+{{ .Language }}:
+- {{ .CI.LanguageVersion}}
+
+scripts:
+- {{ .CI.BuildCommand }}
+- {{ .CI.TestCommand }}
