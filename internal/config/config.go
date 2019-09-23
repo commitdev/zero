@@ -45,6 +45,14 @@ type Service struct {
 	Description string
 }
 
+type CI struct {
+	System          string `yaml:"system"`
+	BuildImage      string `yaml:"build-image"`
+	BuildCommand    string `yaml:"build-command"`
+	TestCommand     string `yaml:"test-command"`
+	LanguageVersion string `yaml:"language-version"`
+}
+
 type Commit0Config struct {
 	Language     string        `yaml:"string"`
 	Organization string        `yaml:"organization"`
@@ -57,6 +65,7 @@ type Commit0Config struct {
 	Services     []Service     `yaml:"services"`
 	React        React         `yaml:"react"`
 	Kubernetes   Kubernetes    `yaml:"kubernetes"`
+	CI           CI            `yaml:"ci"`
 }
 
 type Kubernetes struct {

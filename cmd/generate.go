@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
+	"github.com/commitdev/commit0/internal/generate/ci"
 	"github.com/commitdev/commit0/internal/generate/docker"
 	"github.com/commitdev/commit0/internal/generate/golang"
 	"github.com/commitdev/commit0/internal/generate/http"
@@ -66,6 +67,10 @@ var generateCmd = &cobra.Command{
 		}
 
 		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, &wg, cfg)
+
+		if cfg.CI.System != "" {
+			ci.Generate(t.CI, cfg, ".", &wg)
+		}
 
 		if cfg.Network.Http.Enabled {
 			http.GenerateHTTPGW(t, cfg, &wg)
