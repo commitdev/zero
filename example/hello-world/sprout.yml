@@ -21,3 +21,9 @@ network:
 services:
   - name: helloworld
     description: Hello world!.
+
+ci:
+  system: circleci
+  build-image: circleci/golang:1.12
+  build-command: go build .
+  test-command: go test -v ./...

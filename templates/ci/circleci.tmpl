@@ -1,0 +1,28 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: {{ .BuildImage }}
+    steps:
+      - checkout
+      - run: 
+        name: Build
+        command: |
+          {{ .BuildCommand }}
+
+  test:
+    docker:
+      - image: {{ .BuildImage }}
+    steps:
+      - checkout
+      - run: 
+        name: Test
+        command: |
+          {{ .TestCommand }}
+
+workflow:
+  version: 2.1
+  build_and_test:
+    jobs:
+      - build
+      - test
