@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/k0kubun/pp"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+
+	"github.com/k0kubun/pp"
+	"gopkg.in/yaml.v2"
 )
 
 type Maintainers struct {
@@ -44,6 +45,13 @@ type Service struct {
 	Description string
 }
 
+type CI struct {
+	System       string `yaml:"system"`
+	BuildImage   string `yaml:"build-image"`
+	BuildCommand string `yaml:"build-command"`
+	TestCommand  string `yaml:"test-command"`
+}
+
 type Commit0Config struct {
 	Language     string        `yaml:"string"`
 	Organization string        `yaml:"organization"`
@@ -54,6 +62,7 @@ type Commit0Config struct {
 	Maintainers  []Maintainers `yaml:"maintainers"`
 	Network      Network       `yaml:"network"`
 	Services     []Service     `yaml:"services"`
+	CI           CI            `yaml:"ci"`
 }
 
 func LoadConfig(filePath string) *Commit0Config {
