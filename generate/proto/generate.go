@@ -12,9 +12,9 @@ import (
 )
 
 func Generate(templator *templator.Templator, config *config.SproutConfig) {
-	GenerateProtoToolConfig(templator, config)
+	GenerateIDLMakefile(templator, config)
 	GenerateProtoHealth(templator, config)
-	GenerateProtoServices(templator, config)
+	GenerateServiceProtobufFiles(templator, config)
 	GenerateProtoServiceLibs(config)
 	GenerateGoModIDL(templator, config)
 }
@@ -33,20 +33,20 @@ func GenerateGoModIDL(templator *templator.Templator, config *config.SproutConfi
 	templator.Go.GoModIDL.Execute(f, config)
 }
 
-func GenerateProtoToolConfig(templator *templator.Templator, config *config.SproutConfig) {
-	protoPath := fmt.Sprintf("../%s-idl/proto", config.Name)
-	protoToolOutput := fmt.Sprintf("%s/prototool.yaml", protoPath)
+func GenerateIDLMakefile(templator *templator.Templator, config *config.SproutConfig) {
+	makeFilePath := fmt.Sprintf("../%s-idl", config.Name)
+	makeFileOutput := fmt.Sprintf("%s/Makefile", makeFilePath)
 
-	err := util.CreateDirIfDoesNotExist(protoPath)
+	err := util.CreateDirIfDoesNotExist(makeFilePath)
 	if err != nil {
 		log.Printf("Error generating prototool config: %v", err)
 	}
 
-	f, err := os.Create(protoToolOutput)
+	f, err := os.Create(makeFileOutput)
 	if err != nil {
 		log.Printf("Error: %v", err)
 	}
-	templator.ProtoToolTemplate.Execute(f, config)
+	templator.MakefileTemplate.Execute(f, config)
 }
 
 func GenerateProtoHealth(templator *templator.Templator, config *config.SproutConfig) {
@@ -66,33 +66,39 @@ func GenerateProtoHealth(templator *templator.Templator, config *config.SproutCo
 	templator.ProtoHealthTemplate.Execute(f, config)
 }
 
-func GenerateProtoServices(templator *templator.Templator, config *config.SproutConfig) {
-	protoToolConfigPath := fmt.Sprintf("../%s-idl/proto", config.Name)
+func GenerateServiceProtobufFiles(templator *templator.Templator, config *config.SproutConfig) {
+	protoPath := fmt.Sprintf("../%s-idl/proto", config.Name)
 	for _, s := range config.Services {
-		idlPath := fmt.Sprintf("%s/%s", protoToolConfigPath, s.Name)
-		err := util.CreateDirIfDoesNotExist(idlPath)
-		if err != nil {
-			log.Printf("Error generating service proto: %v", err)
+		serviceProtoDir := fmt.Sprintf("%s/%s", protoPath, s.Name)
+		err := os.Mkdir(serviceProtoDir, os.ModePerm)
+		if os.IsExist(err) {
+			log.Printf("%s service proto exists skipping.", s.Name)
+			continue
 		}
 
-		//local paths
-		protoPath := fmt.Sprintf("%s/%s.proto", s.Name, s.Name)
-		cmd := exec.Command("prototool", "create", protoPath)
-		cmd.Dir = protoToolConfigPath
-		log.Printf("Generating %v", protoPath)
-		cmd.Run()
+		serviceProtoFilePath := fmt.Sprintf("%s/%s.proto", serviceProtoDir, s.Name)
+
+		f, err := os.Create(serviceProtoFilePath)
+
+		data := map[string]string{
+			"Organization": config.Organization,
+			"ServiceName":  s.Name,
+		}
+
+		templator.ProtoServiceTemplate.Execute(f, data)
 	}
 
 }
 
 func GenerateProtoServiceLibs(config *config.SproutConfig) {
-	protoToolConfigPath := fmt.Sprintf("../%s-idl/proto", config.Name)
-	cmd := exec.Command("prototool", "generate")
-	cmd.Dir = protoToolConfigPath
+	idlRoot := fmt.Sprintf("../%s-idl", config.Name)
+	cmd := exec.Command("make", "generate")
+	cmd.Dir = idlRoot
 	bytes, err := cmd.Output()
-	
+
 	log.Print("Generating proto service libs...")
 	if err != nil {
-		log.Printf("Error executing prototool generate: %v", string(bytes))
+		log.Printf("Failed running command in: %v", cmd.Dir)
+		log.Printf("Error executing protoc generation: %v %v", err, string(bytes))
 	}
 }

@@ -35,6 +35,7 @@ var generateCmd = &cobra.Command{
 		}
 
 		cfg := config.LoadConfig(configPath)
+		cfg.Language = language
 		cfg.Print()
 
 		proto.Generate(Templator, cfg)

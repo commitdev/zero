@@ -31,7 +31,7 @@ The generation will create 2 folders.
 2) A folder will be created and within that update the `sprout.yml` and then run `sprout generate -l=[LANGUAGE OF CHOICE]`
 3) Move back to the root folder and you will see that there is now an idl folder created.
 4) Modify the the protobuf services generated with your desired methods
-5) Either run `prototool generate` or return to the application folder and re run `sprout generate`
+5) Either run `make generate` or return to the application folder and re run `sprout generate`
 6) Push up the IDL repo
 6) Implement these methods on the main application repo
 7) When you feel the need to add more services add them to the sprout config and re-run `sprout generate` and repeat steps 4 - 6.
@@ -39,9 +39,8 @@ The generation will create 2 folders.
 ## Dependencies
 
 In order to use this you need ensure you have these installed.
-
-* prototool
-* protoc-gen-go
+* protoc
+* protoc-gen-go [Go]
 
 ## Building locally
 

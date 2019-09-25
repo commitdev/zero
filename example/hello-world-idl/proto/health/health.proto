@@ -2,14 +2,6 @@ syntax = "proto3";
 
 package mycompany.health;
 
-option csharp_namespace = "mycompany.Health";
-option go_package = "healthpb";
-option java_multiple_files = true;
-option java_outer_classname = "HealthProto";
-option java_package = "com.mycompany.health";
-option objc_class_prefix = "MHX";
-option php_namespace = "mycompany\\Health";
-
 message HealthCheckRequest {
   string service = 1;
 }
@@ -26,5 +18,6 @@ message HealthCheckResponse {
 
 service Health {
   rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
+
   rpc Watch(HealthCheckRequest) returns (stream HealthCheckResponse);
 }

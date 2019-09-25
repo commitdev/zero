@@ -23,7 +23,6 @@ var createCmd = &cobra.Command{
 
 		projectName := args[0]
 
-
 		rootDir := fmt.Sprintf("./%v", projectName)
 
 		log.Printf("Creating project %s.", projectName)

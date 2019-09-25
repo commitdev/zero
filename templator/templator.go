@@ -15,24 +15,29 @@ type GoTemplator struct {
 }
 
 type Templator struct {
-	Sprout              *template.Template
-	ProtoToolTemplate   *template.Template
-	ProtoHealthTemplate *template.Template
-	Go                  *GoTemplator
+	Sprout               *template.Template
+	MakefileTemplate     *template.Template
+	ProtoHealthTemplate  *template.Template
+	ProtoServiceTemplate *template.Template
+	Go                   *GoTemplator
 }
 
 func NewTemplator(box *packr.Box) *Templator {
-	protoToolTemplateSource, _ := box.FindString("proto/prototool.tmpl")
-	protoToolTemplate, _ := template.New("ProtoToolTemplate").Parse(protoToolTemplateSource)
+	makeFileTemplateSource, _ := box.FindString("proto/makefile.tmpl")
+	makeFileTemplate, _ := template.New("ProtoToolTemplate").Parse(makeFileTemplateSource)
 
 	protoHealthTemplateSource, _ := box.FindString("proto/health_proto.tmpl")
 	protoHealthTemplate, _ := template.New("ProtoHealthTemplate").Parse(protoHealthTemplateSource)
 
+	protoServiceTemplateSource, _ := box.FindString("proto/service_proto.tmpl")
+	protoServiceTemplate, _ := template.New("ProtoServiceTemplate").Parse(protoServiceTemplateSource)
+
 	return &Templator{
-		ProtoToolTemplate:   protoToolTemplate,
-		ProtoHealthTemplate: protoHealthTemplate,
-		Go:                  NewGoTemplator(box),
-		Sprout:              NewSproutTemplator(box),
+		MakefileTemplate:     makeFileTemplate,
+		ProtoHealthTemplate:  protoHealthTemplate,
+		ProtoServiceTemplate: protoServiceTemplate,
+		Go:                   NewGoTemplator(box),
+		Sprout:               NewSproutTemplator(box),
 	}
 }
 

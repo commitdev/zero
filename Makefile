@@ -15,7 +15,7 @@ build:
 
 build-example: build clean-example
 	mkdir -p example
-	cd example && ../sprout create -p "hello-world"
+	cd example && ../sprout create "hello-world"
 	cd example/hello-world && ../../sprout generate -l go
 
 clean-example:

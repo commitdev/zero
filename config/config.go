@@ -27,9 +27,15 @@ type Http struct {
 	Port    int
 }
 
+type Web struct {
+	Enabled bool
+	Port    int
+}
+
 type Network struct {
 	Grpc    Grpc
 	Http    Http
+	Web     Web
 	Graphql Graphql
 }
 
@@ -39,6 +45,7 @@ type Service struct {
 }
 
 type SproutConfig struct {
+	Language     string        `yaml:"string"`
 	Organization string        `yaml:"organization"`
 	Name         string        `yaml:"name"`
 	Description  string        `yaml:"description"`
