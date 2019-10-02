@@ -41,6 +41,9 @@ The generation will create 2 folders.
 In order to use this you need ensure you have these installed.
 * protoc
 * protoc-gen-go [Go]
+* protoc-gen-web [gRPC Web]
+* protoc-gen-gateway [Http]
+* prooc-gen-swagger [Swagger]
 
 ## Building locally
 
