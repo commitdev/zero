@@ -1,8 +1,5 @@
 import * as jspb from "google-protobuf"
 
-import * as google_api_annotations_pb from '../../google/api/annotations_pb';
-import * as protoc$gen$swagger_options_annotations_pb from '../../protoc-gen-swagger/options/annotations_pb';
-
 export class HealthCheckRequest extends jspb.Message {
   getService(): string;
   setService(value: string): void;

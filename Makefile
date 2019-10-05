@@ -14,8 +14,8 @@ deps-linux: deps-go deps-protoc-linux deps-grpc-web-linux
 deps-protoc-linux:
 	curl -OL https://github.com/google/protobuf/releases/download/v$(PROTOC_VERSION)/protoc-$(PROTOC_VERSION)-linux-x86_64.zip
 	unzip protoc-$(PROTOC_VERSION)-linux-x86_64.zip -d protoc3
-	sudo mv protoc3/bin/* /usr/local/bin/
-	sudo mv protoc3/include/* /usr/local/include/
+	sudo mv protoc3/bin/* /usr/local/bin
+	sudo mv protoc3/include/* /usr/local/include
 	rm -rf protoc3 protoc-$(PROTOC_VERSION)-linux-x86_64.zip
 
 deps-grpc-web-linux:
@@ -36,7 +36,7 @@ run:
 	go run main.go
 
 build:
-	packr2 build -o sprout
+	CGO_ENABLED=0 packr2 build -o sprout
 	packr2 clean
 
 build-example: build clean-example
@@ -44,11 +44,12 @@ build-example: build clean-example
 	cd example && ../sprout create "hello-world"
 	cd example/hello-world && ../../sprout generate -l go
 
+build-docker-local:
+	docker build . -t sprout:v0
+
 clean-example:
 	rm -rf example
 
-install-linux: build
-	mkdir -p ${HOME}/bin
-	cp sprout ${HOME}/bin/sprout
-	chmod +x ${HOME}/bin/sprout
-	@printf "\n Please run 'source ~/.profile' to add this installation to the path."
+install-go:
+	CGO_ENABLED=0 packr2 build -o ${GOPATH}/bin/sprout
+	packr2 clean

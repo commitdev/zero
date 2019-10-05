@@ -1,15 +1,6 @@
 syntax = "proto3";
 
 package mycompany.health;
-import "google/api/annotations.proto";
-import "protoc-gen-swagger/options/annotations.proto";
-
-option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
-	info: {
-		title: "Health Checks";
-		version: "1.0";
-	}
-};
 
 message HealthCheckRequest {
   string service = 1;
@@ -26,11 +17,7 @@ message HealthCheckResponse {
 }
 
 service Health {
-  rpc Check(HealthCheckRequest) returns (HealthCheckResponse){
-    option (google.api.http) = {
-			get: "/v1/health"
-		};
-  }
+  rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
 
   rpc Watch(HealthCheckRequest) returns (stream HealthCheckResponse);
 }

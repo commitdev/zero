@@ -16,6 +16,7 @@ type GoTemplator struct {
 
 type Templator struct {
 	Sprout               *template.Template
+	GitIgnore            *template.Template
 	MakefileTemplate     *template.Template
 	ProtoHealthTemplate  *template.Template
 	ProtoServiceTemplate *template.Template
@@ -38,6 +39,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		ProtoServiceTemplate: protoServiceTemplate,
 		Go:                   NewGoTemplator(box),
 		Sprout:               NewSproutTemplator(box),
+		GitIgnore:            NewGitIgnoreTemplator(box),
 	}
 }
 
@@ -71,5 +73,11 @@ func NewSproutTemplator(box *packr.Box) *template.Template {
 	templateSource, _ := box.FindString("sprout/sprout.tmpl")
 	template, _ := template.New("SproutTemplate").Funcs(util.FuncMap).Parse(templateSource)
 
+	return template
+}
+
+func NewGitIgnoreTemplator(box *packr.Box) *template.Template {
+	templateSource, _ := box.FindString("util/gitignore.tmpl")
+	template, _ := template.New("GitIgnore").Parse(templateSource)
 	return template
 }
