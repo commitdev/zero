@@ -1,3 +1,24 @@
 syntax = "proto3";
 
-package mycompany.helloworld;
+option go_package = "github.com/yourrepo/hello-world-idl/gen/go/helloworld";
+
+package helloworld;
+
+import "proto/health/health.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+	info: {
+		title: "Helloworld";
+		version: "1.0";
+	}
+};
+
+service Helloworld {
+  rpc Check(health.HealthCheckRequest) returns (health.HealthCheckResponse){
+    option (google.api.http) = {
+			get: "/v1/helloworld/health"
+		};
+  }
+}

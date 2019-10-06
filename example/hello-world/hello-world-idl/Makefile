@@ -30,21 +30,21 @@ generate: generate-grpc generate-web generate-http
 
 generate-grpc:	
 	mkdir -p gen/go
-	protoc ${PROTO_SOURCES} --go_out=plugins=grpc:./gen/go ./proto/health/*.proto
-	protoc ${PROTO_SOURCES} --go_out=plugins=grpc:./gen/go ./proto/helloworld/*.proto
-	cp -f -rv gen/go/proto/* gen/go
-	rm -rf gen/go/proto
+	protoc ${PROTO_SOURCES} --go_out=plugins=grpc,paths=source_relative:proto ./proto/health/*.proto
+	protoc ${PROTO_SOURCES} --go_out=plugins=grpc,paths=source_relative:proto ./proto/helloworld/*.proto
+	cp -f -rv proto/proto/* gen/go
+	rm -rf proto/proto
 generate-web:
 	mkdir -p gen/web
-	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:gen/web ./proto/health/*.proto
-	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:gen/web ./proto/helloworld/*.proto
-	cp -f -rv gen/web/proto/* gen/web
-	rm -rf gen/web/Proto gen/web/proto
+	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:proto ./proto/health/*.proto
+	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:proto ./proto/helloworld/*.proto
+	cp -f -rv proto/proto/* gen/web
+	cp -f -rv proto/Proto/* gen/web
+	rm -rf proto/proto proto/Proto
 generate-http:
-	mkdir -p gen/http gen/swagger
-	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true:gen/http --swagger_out=logtostderr=true:gen/swagger ./proto/health/*.proto
-	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true:gen/http --swagger_out=logtostderr=true:gen/swagger ./proto/helloworld/*.proto
-	cp -f -rv gen/http/proto/* gen/http
-	cp -f -rv gen/swagger/proto/* gen/swagger
-	rm -rf gen/swagger/proto
+	mkdir -p gen/http
+	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/health/*.proto
+	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/helloworld/*.proto
+	cp -f -rv proto/proto/* gen/http
+	rm -rf proto/proto
 
