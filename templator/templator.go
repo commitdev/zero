@@ -31,7 +31,7 @@ func NewTemplator(box *packr.Box) *Templator {
 	protoHealthTemplate, _ := template.New("ProtoHealthTemplate").Parse(protoHealthTemplateSource)
 
 	protoServiceTemplateSource, _ := box.FindString("proto/service_proto.tmpl")
-	protoServiceTemplate, _ := template.New("ProtoServiceTemplate").Parse(protoServiceTemplateSource)
+	protoServiceTemplate, _ := template.New("ProtoServiceTemplate").Funcs(util.FuncMap).Parse(protoServiceTemplateSource)
 
 	return &Templator{
 		MakefileTemplate:     makeFileTemplate,
@@ -57,7 +57,7 @@ func NewGoTemplator(box *packr.Box) *GoTemplator {
 	goModIDLTemplate, _ := template.New("GoModTemplate").Parse(goModIDLTemplateSource)
 
 	goMainTemplateSource, _ := box.FindString("golang/main.tmpl")
-	goMainTemplate, _ := template.New("GoMainTemplate").Parse(goMainTemplateSource)
+	goMainTemplate, _ := template.New("GoMainTemplate").Funcs(util.FuncMap).Parse(goMainTemplateSource)
 
 	return &GoTemplator{
 		GoMain:         goMainTemplate,

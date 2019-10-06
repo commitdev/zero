@@ -35,33 +35,33 @@ generate: generate-grpc {{ if .Network.Web.Enabled }}generate-web{{- end}} {{ if
 
 generate-grpc:	
 	mkdir -p gen/{{ $language }}
-	protoc ${PROTO_SOURCES} --{{ $language }}_out=plugins=grpc:./gen/{{ $language }} ./proto/health/*.proto
+	protoc ${PROTO_SOURCES} --{{ $language }}_out=plugins=grpc,paths=source_relative:proto ./proto/health/*.proto
 {{- range .Services}}
-	protoc ${PROTO_SOURCES} --{{ $language }}_out=plugins=grpc:./gen/{{ $language }} ./proto/{{ .Name }}/*.proto
+	protoc ${PROTO_SOURCES} --{{ $language }}_out=plugins=grpc,paths=source_relative:proto ./proto/{{ .Name }}/*.proto
 {{- end }}
-	cp -f -rv gen/go/proto/* gen/go
-	rm -rf gen/go/proto
+	cp -f -rv proto/proto/* gen/go
+	rm -rf proto/proto
 
 {{- if .Network.Web.Enabled }}
 generate-web:
 	mkdir -p gen/web
-	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:gen/web ./proto/health/*.proto
+	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:proto ./proto/health/*.proto
 {{- range .Services}}
-	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:gen/web ./proto/{{ .Name }}/*.proto
+	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:proto ./proto/{{ .Name }}/*.proto
 {{- end }}
-	cp -f -rv gen/web/proto/* gen/web
-	rm -rf gen/web/Proto gen/web/proto
+	cp -f -rv proto/proto/* gen/web
+	cp -f -rv proto/Proto/* gen/web
+	rm -rf proto/proto proto/Proto
 {{- end}}
 
 {{- if .Network.Http.Enabled }}
 generate-http:
-	mkdir -p gen/http gen/swagger
-	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true:gen/http --swagger_out=logtostderr=true:gen/swagger ./proto/health/*.proto
+	mkdir -p gen/http
+	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/health/*.proto
 {{- range .Services}}
-	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true:gen/http --swagger_out=logtostderr=true:gen/swagger ./proto/{{ .Name }}/*.proto
+	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/{{ .Name }}/*.proto
 {{- end }}
-	cp -f -rv gen/http/proto/* gen/http
-	cp -f -rv gen/swagger/proto/* gen/swagger
-	rm -rf gen/swagger/proto
+	cp -f -rv proto/proto/* gen/http
+	rm -rf proto/proto
 {{- end}}
 

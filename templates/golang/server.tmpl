@@ -2,7 +2,8 @@ package {{ .ServiceName }}
 
 import (
 	"context"
-	api "{{.GitRepo}}/{{ .ProjectName }}-idl/gen/go/{{ .ServiceName }}"
+	health_api "github.com/yourrepo/hello-world-idl/gen/go/health"
+	//api "{{.GitRepo}}/{{ .ProjectName }}-idl/gen/go/{{ .ServiceName }}"
 )
 
 type {{ .ServiceName | Title }}Server struct {
@@ -11,4 +12,11 @@ type {{ .ServiceName | Title }}Server struct {
 
 func New{{ .ServiceName | Title }}Server() *{{ .ServiceName | Title }}Server {
 	return &{{ .ServiceName | Title }}Server{}
+}
+
+func (s *{{ .ServiceName | Title }}Server) Check(ctx context.Context, req *health_api.HealthCheckRequest) (*health_api.HealthCheckResponse, error) {
+	resp := &health_api.HealthCheckResponse{
+		Status: health_api.HealthCheckResponse_SERVING,
+	}
+	return resp,nil
 }
