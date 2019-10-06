@@ -2,6 +2,7 @@ package proto
 
 import (
 	"fmt"
+	"bytes"
 	"github.com/commitdev/sprout/util"
 
 	"github.com/commitdev/sprout/config"
@@ -22,10 +23,9 @@ func Generate(templator *templator.Templator, config *config.SproutConfig) {
 func GenerateGoModIDL(templator *templator.Templator, config *config.SproutConfig) {
 	idlPath := fmt.Sprintf("%s-idl", config.Name)
 	idlOutput := fmt.Sprintf("%s/go.mod", idlPath)
-
+	err := util.CreateDirIfDoesNotExist(idlPath)
 	f, err := os.Create(idlOutput)
 
-	err = util.CreateDirIfDoesNotExist(idlPath)
 	if err != nil {
 		log.Printf("Error: %v", err)
 	}
@@ -94,11 +94,16 @@ func GenerateProtoServiceLibs(config *config.SproutConfig) {
 	idlRoot := fmt.Sprintf("%s-idl", config.Name)
 	cmd := exec.Command("make", "generate")
 	cmd.Dir = idlRoot
-	bytes, err := cmd.Output()
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
 
 	log.Print("Generating proto service libs...")
 	if err != nil {
 		log.Printf("Failed running command in: %v", cmd.Dir)
-		log.Printf("Error executing protoc generation: %v %v", err, string(bytes))
+		log.Printf("Error executing protoc generation: %v %v", err, stderr.String())
 	}
 }

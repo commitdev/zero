@@ -14,6 +14,10 @@ network:
   http:
     enabled: true
     port: 8080
+  web:
+    enabled: true
+    port: 8090
+
 
 services:
   - name: helloworld

@@ -20,11 +20,8 @@ It will also live with your project, when you add a new service to the config it
 
 The generation will create project folder, within this there will be your implementation and an IDL folder
 
-* A parrent directory that implements a skeleton and sets up your service implementation of the generated artifacts
+* A parent directory that implements a skeleton and sets up your service implementation of the generated artifacts
 * A child directory for the IDL's, this folder will also contain generated artifacts from the IDL under 'gen'
-
-
-`NOTE: You`
 
 ## The development cycle
 
@@ -41,7 +38,7 @@ The generation will create project folder, within this there will be your implem
 
 ## Usage & installation
 
-As there alot of dependencies it will be easier to use this tool within the provided image, clone the repo and then run `make build-docker-local`. The best way then to use this is to alias `docker run -v "$(pwd):/project" sprout:local` as sprout from then you can use the CLI as if it was installed as usual on your machine.
+As there alot of dependencies it will be easier to use this tool within the provided image, clone the repo and then run `make build-docker-local`. The best way then to use this is to alias `docker run -v "$(pwd):/project" --user $(id -u):$(id -g) sprout:v0` as sprout from then you can use the CLI as if it was installed as usual on your machine.
 
 ## Dependencies
 

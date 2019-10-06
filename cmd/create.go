@@ -24,18 +24,10 @@ var createCmd = &cobra.Command{
 		projectName := args[0]
 
 		rootDir := fmt.Sprintf("./%v", projectName)
-		idlDir := fmt.Sprintf("./%v-idl", rootDir)
 
 		log.Printf("Creating project %s.", projectName)
 
 		err := os.Mkdir(rootDir, os.ModePerm)
-		if os.IsExist(err) {
-			log.Fatalf("Directory %v already exists! Error: %v", projectName, err)
-		} else if err != nil {
-			log.Fatalf("Error creating root: %v ", err)
-		}
-
-		err = os.Mkdir(idlDir, os.ModePerm)
 		if os.IsExist(err) {
 			log.Fatalf("Directory %v already exists! Error: %v", projectName, err)
 		} else if err != nil {
