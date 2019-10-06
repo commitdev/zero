@@ -3,8 +3,8 @@ package proto
 import (
 	"fmt"
 	"bytes"
-	"github.com/commitdev/sprout/util"
 
+	"github.com/commitdev/sprout/util"
 	"github.com/commitdev/sprout/config"
 	"github.com/commitdev/sprout/templator"
 	"log"
@@ -66,9 +66,9 @@ func GenerateProtoHealth(templator *templator.Templator, config *config.SproutCo
 	templator.ProtoHealthTemplate.Execute(f, config)
 }
 
-func GenerateServiceProtobufFiles(templator *templator.Templator, config *config.SproutConfig) {
-	protoPath := fmt.Sprintf("%s-idl/proto", config.Name)
-	for _, s := range config.Services {
+func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.SproutConfig) {
+	protoPath := fmt.Sprintf("%s-idl/proto", cfg.Name)
+	for _, s := range cfg.Services {
 		serviceProtoDir := fmt.Sprintf("%s/%s", protoPath, s.Name)
 		err := os.Mkdir(serviceProtoDir, os.ModePerm)
 		if os.IsExist(err) {
@@ -80,9 +80,12 @@ func GenerateServiceProtobufFiles(templator *templator.Templator, config *config
 
 		f, err := os.Create(serviceProtoFilePath)
 
-		data := map[string]string{
-			"Organization": config.Organization,
-			"ServiceName":  s.Name,
+		data:=  struct {
+			*config.SproutConfig
+			ServiceName string
+		} {
+			cfg,
+			s.Name,
 		}
 
 		templator.ProtoServiceTemplate.Execute(f, data)

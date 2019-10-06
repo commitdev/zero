@@ -26,7 +26,9 @@ github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghf
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/commitdev/sprout/example/hello-world v0.0.0-20190827182108-cfad4c3d94cc h1:zBLjQxkC2LT1e9eMs0I2k26NXXZVT/XGrnuqdAsFt3A=
 github.com/commitdev/sprout/example/hello-world v0.0.0-20190827183525-9eeb1651f4f4 h1:pQw2XR8va971sW7QIX18I7FWft54TjLdQex5MHCcVtg=
+github.com/commitdev/sprout/example/hello-world v0.0.0-20191006174419-73168768419f h1:zfmpI6udrSYU1Ly4YYqEvE3WyoGrgzqLgevS6FHWlsw=
 github.com/commitdev/sprout/example/hello-world-idl v0.0.0-20190910021125-8ac64211bb19 h1:ULmWBQ848cHxodGxtQWas0lWPAh/ZntpV1QsobbasMA=
+github.com/commitdev/sprout/example/hello-world/hello-world-idl v0.0.0-20191006174419-73168768419f h1:yT3SIhGDFr+Pf7uW0wllWwp+HFeRvObO2s++6upn8g4=
 github.com/coreos/bbolt v1.3.2/go.mod h1:iRUV2dpdMOn7Bo10OQBFzIJO9kkE559Wcmn+qkEiiKk=
 github.com/coreos/bbolt v1.3.3/go.mod h1:iRUV2dpdMOn7Bo10OQBFzIJO9kkE559Wcmn+qkEiiKk=
 github.com/coreos/etcd v3.3.10+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=

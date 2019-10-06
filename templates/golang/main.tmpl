@@ -3,9 +3,15 @@ import (
 	"log"
 	"net"
 
-	health "{{ .GitRepo }}/{{ .Name }}/server/health"
 	healthpb "{{ .GitRepo }}/{{ .Name }}-idl/gen/go/health"
-
+	{{- range .Services}}
+	{{ .Name }}pb "{{ $.GitRepo }}/{{ $.Name }}-idl/gen/go/{{ .Name }}"
+	{{- end}}
+	
+	health "{{ .GitRepo }}/{{ .Name }}/server/health"
+	{{- range .Services}}
+	{{ .Name }} "{{ $.GitRepo }}/{{ $.Name }}/server/{{ .Name }}"
+	{{- end}}
 
 	"google.golang.org/grpc"
 )
@@ -16,11 +22,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
 	s := grpc.NewServer()
 
-	//TODO: Register your servers here
+	//Server initialization & registration
 	healthServer := health.NewHealthServer()
 	healthpb.RegisterHealthServer(s, healthServer)
+	{{- range .Services}}
+	{{ .Name }}Server := {{ .Name }}.New{{ .Name | Title}}Server()
+	{{ .Name }}pb.Register{{ .Name | Title}}Server(s, {{ .Name }}Server)
+	{{- end}}
+
 
 	log.Printf("Starting grpc server on %v...", grpcAddr)
 	

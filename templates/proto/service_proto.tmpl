@@ -1,3 +1,29 @@
 syntax = "proto3";
 
-package {{ .Organization }}.{{ .ServiceName }};
+option go_package = "{{ .GitRepo }}/{{ .Name }}-idl/gen/go/{{ .ServiceName }}";
+
+package {{ .ServiceName }};
+
+import "proto/health/health.proto";
+
+{{- if .Network.Http.Enabled}}
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+	info: {
+		title: "{{ .ServiceName | Title }}";
+		version: "1.0";
+	}
+};
+{{- end}}
+
+service {{ .ServiceName | Title }} {
+  rpc Check(health.HealthCheckRequest) returns (health.HealthCheckResponse){
+  {{- if .Network.Http.Enabled }}
+    option (google.api.http) = {
+			get: "/v1/{{ .ServiceName }}/health"
+		};
+  {{- end}}
+  }
+}

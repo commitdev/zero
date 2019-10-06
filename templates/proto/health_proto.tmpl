@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-package {{ .Organization }}.health;
+option go_package = "{{ .GitRepo }}/{{ .Name }}-idl/gen/go/health";
+
+package health;
 
 {{- if .Network.Http.Enabled }}
 import "google/api/annotations.proto";
@@ -30,9 +32,11 @@ message HealthCheckResponse {
 
 service Health {
   rpc Check(HealthCheckRequest) returns (HealthCheckResponse){
+  {{- if .Network.Http.Enabled }}
     option (google.api.http) = {
 			get: "/v1/health"
 		};
+  {{- end}}
   }
 
   rpc Watch(HealthCheckRequest) returns (stream HealthCheckResponse);
