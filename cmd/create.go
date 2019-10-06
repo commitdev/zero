@@ -34,13 +34,19 @@ var createCmd = &cobra.Command{
 			log.Fatalf("Error creating root: %v ", err)
 		}
 
-		sproutConfigPath := fmt.Sprintf("%v/sprout.yml", projectName)
+		sproutConfigPath := fmt.Sprintf("%v/sprout.yml", rootDir)
 
 		f, err := os.Create(sproutConfigPath)
 		if err != nil {
 			log.Printf("Error creating sprout config: %v", err)
 		}
-
 		Templator.Sprout.Execute(f, projectName)
+
+		gitIgnorePath := fmt.Sprintf("%v/.gitignore", rootDir)
+		f, err = os.Create(gitIgnorePath)
+		if err != nil {
+			log.Printf("Error creating sprout config: %v", err)
+		}
+		Templator.GitIgnore.Execute(f, projectName)
 	},
 }

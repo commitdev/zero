@@ -15,7 +15,7 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/google/pprof v0.0.0-20190908185732-236ed259b199 // indirect
-	github.com/grpc-ecosystem/grpc-gateway v1.11.2 // indirect
+	github.com/grpc-ecosystem/grpc-gateway v1.11.2
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/k0kubun/pp v3.0.1+incompatible
 	github.com/kisielk/errcheck v1.2.0 // indirect
@@ -51,7 +51,7 @@ require (
 	golang.org/x/tools v0.0.0-20190923195354-c85f9fa9581e // indirect
 	google.golang.org/api v0.10.0 // indirect
 	google.golang.org/appengine v1.6.3 // indirect
-	google.golang.org/genproto v0.0.0-20190916214212-f660b8655731 // indirect
+	google.golang.org/genproto v0.0.0-20190916214212-f660b8655731
 	google.golang.org/grpc v1.23.1
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.2

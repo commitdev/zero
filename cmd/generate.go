@@ -39,7 +39,6 @@ var generateCmd = &cobra.Command{
 		cfg.Print()
 
 		proto.Generate(Templator, cfg)
-
 		switch language {
 		case Go:
 			golang.Generate(Templator, cfg)

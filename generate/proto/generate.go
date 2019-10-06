@@ -2,6 +2,7 @@ package proto
 
 import (
 	"fmt"
+	"bytes"
 	"github.com/commitdev/sprout/util"
 
 	"github.com/commitdev/sprout/config"
@@ -20,12 +21,11 @@ func Generate(templator *templator.Templator, config *config.SproutConfig) {
 }
 
 func GenerateGoModIDL(templator *templator.Templator, config *config.SproutConfig) {
-	idlPath := fmt.Sprintf("../%s-idl", config.Name)
+	idlPath := fmt.Sprintf("%s-idl", config.Name)
 	idlOutput := fmt.Sprintf("%s/go.mod", idlPath)
-
+	err := util.CreateDirIfDoesNotExist(idlPath)
 	f, err := os.Create(idlOutput)
 
-	err = util.CreateDirIfDoesNotExist(idlPath)
 	if err != nil {
 		log.Printf("Error: %v", err)
 	}
@@ -34,7 +34,7 @@ func GenerateGoModIDL(templator *templator.Templator, config *config.SproutConfi
 }
 
 func GenerateIDLMakefile(templator *templator.Templator, config *config.SproutConfig) {
-	makeFilePath := fmt.Sprintf("../%s-idl", config.Name)
+	makeFilePath := fmt.Sprintf("%s-idl", config.Name)
 	makeFileOutput := fmt.Sprintf("%s/Makefile", makeFilePath)
 
 	err := util.CreateDirIfDoesNotExist(makeFilePath)
@@ -50,7 +50,7 @@ func GenerateIDLMakefile(templator *templator.Templator, config *config.SproutCo
 }
 
 func GenerateProtoHealth(templator *templator.Templator, config *config.SproutConfig) {
-	protoHealthPath := fmt.Sprintf("../%s-idl/proto/health", config.Name)
+	protoHealthPath := fmt.Sprintf("%s-idl/proto/health", config.Name)
 	protoHealthOutput := fmt.Sprintf("%s/health.proto", protoHealthPath)
 
 	err := util.CreateDirIfDoesNotExist(protoHealthPath)
@@ -67,7 +67,7 @@ func GenerateProtoHealth(templator *templator.Templator, config *config.SproutCo
 }
 
 func GenerateServiceProtobufFiles(templator *templator.Templator, config *config.SproutConfig) {
-	protoPath := fmt.Sprintf("../%s-idl/proto", config.Name)
+	protoPath := fmt.Sprintf("%s-idl/proto", config.Name)
 	for _, s := range config.Services {
 		serviceProtoDir := fmt.Sprintf("%s/%s", protoPath, s.Name)
 		err := os.Mkdir(serviceProtoDir, os.ModePerm)
@@ -91,14 +91,19 @@ func GenerateServiceProtobufFiles(templator *templator.Templator, config *config
 }
 
 func GenerateProtoServiceLibs(config *config.SproutConfig) {
-	idlRoot := fmt.Sprintf("../%s-idl", config.Name)
+	idlRoot := fmt.Sprintf("%s-idl", config.Name)
 	cmd := exec.Command("make", "generate")
 	cmd.Dir = idlRoot
-	bytes, err := cmd.Output()
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
 
 	log.Print("Generating proto service libs...")
 	if err != nil {
 		log.Printf("Failed running command in: %v", cmd.Dir)
-		log.Printf("Error executing protoc generation: %v %v", err, string(bytes))
+		log.Printf("Error executing protoc generation: %v %v", err, stderr.String())
 	}
 }
