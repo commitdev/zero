@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-package mycompany.health;
+option go_package = "github.com/yourrepo/hello-world-idl/gen/go/health";
+
+package health;
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 

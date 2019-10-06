@@ -3,9 +3,11 @@ import (
 	"log"
 	"net"
 
-	health "github.com/yourrepo/hello-world/server/health"
 	healthpb "github.com/yourrepo/hello-world-idl/gen/go/health"
-
+	helloworldpb "github.com/yourrepo/hello-world-idl/gen/go/helloworld"
+	
+	health "github.com/yourrepo/hello-world/server/health"
+	helloworld "github.com/yourrepo/hello-world/server/helloworld"
 
 	"google.golang.org/grpc"
 )
@@ -16,11 +18,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
 	s := grpc.NewServer()
 
-	//TODO: Register your servers here
+	//Server initialization & registration
 	healthServer := health.NewHealthServer()
 	healthpb.RegisterHealthServer(s, healthServer)
+	helloworldServer := helloworld.NewHelloworldServer()
+	helloworldpb.RegisterHelloworldServer(s, helloworldServer)
+
 
 	log.Printf("Starting grpc server on %v...", grpcAddr)
 	
