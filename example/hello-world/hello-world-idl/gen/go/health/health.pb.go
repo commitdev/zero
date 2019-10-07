@@ -10,8 +10,6 @@ import (
 	_ "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -238,17 +236,6 @@ func (x *healthWatchClient) Recv() (*HealthCheckResponse, error) {
 type HealthServer interface {
 	Check(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
 	Watch(*HealthCheckRequest, Health_WatchServer) error
-}
-
-// UnimplementedHealthServer can be embedded to have forward compatible implementations.
-type UnimplementedHealthServer struct {
-}
-
-func (*UnimplementedHealthServer) Check(ctx context.Context, req *HealthCheckRequest) (*HealthCheckResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
-}
-func (*UnimplementedHealthServer) Watch(req *HealthCheckRequest, srv Health_WatchServer) error {
-	return status.Errorf(codes.Unimplemented, "method Watch not implemented")
 }
 
 func RegisterHealthServer(s *grpc.Server, srv HealthServer) {

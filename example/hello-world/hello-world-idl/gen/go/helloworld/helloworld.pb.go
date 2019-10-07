@@ -11,8 +11,6 @@ import (
 	health "github.com/yourrepo/hello-world-idl/gen/go/health"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -83,14 +81,6 @@ func (c *helloworldClient) Check(ctx context.Context, in *health.HealthCheckRequ
 // HelloworldServer is the server API for Helloworld service.
 type HelloworldServer interface {
 	Check(context.Context, *health.HealthCheckRequest) (*health.HealthCheckResponse, error)
-}
-
-// UnimplementedHelloworldServer can be embedded to have forward compatible implementations.
-type UnimplementedHelloworldServer struct {
-}
-
-func (*UnimplementedHelloworldServer) Check(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
 }
 
 func RegisterHelloworldServer(s *grpc.Server, srv HelloworldServer) {
