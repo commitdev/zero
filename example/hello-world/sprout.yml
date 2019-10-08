@@ -20,5 +20,3 @@ network:
 
 
 services:
-  - name: helloworld
-    description: Hello world!.

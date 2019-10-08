@@ -9,7 +9,6 @@ import (
   "google.golang.org/grpc"
 
 	health "github.com/yourrepo/hello-world-idl/gen/go/health"
-	helloworld "github.com/yourrepo/hello-world-idl/gen/go/helloworld"
 )
 
 func run(endpoint string, listening string) error {
@@ -21,7 +20,6 @@ func run(endpoint string, listening string) error {
   mux := runtime.NewServeMux()
   opts := []grpc.DialOption{grpc.WithInsecure()}
   err := health.RegisterHealthHandlerFromEndpoint(ctx, mux,  endpoint, opts)
-	err = helloworld.RegisterHelloworldHandlerFromEndpoint(ctx, mux,  endpoint, opts)
 
   if err != nil {
     return err

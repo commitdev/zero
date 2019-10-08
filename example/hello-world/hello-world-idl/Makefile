@@ -31,20 +31,17 @@ generate: generate-grpc generate-web generate-http
 generate-grpc:	
 	mkdir -p gen/go
 	protoc ${PROTO_SOURCES} --go_out=plugins=grpc,paths=source_relative:proto ./proto/health/*.proto
-	protoc ${PROTO_SOURCES} --go_out=plugins=grpc,paths=source_relative:proto ./proto/helloworld/*.proto
 	cp -f -rv proto/proto/* gen/go
 	rm -rf proto/proto
 generate-web:
 	mkdir -p gen/web
 	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:proto ./proto/health/*.proto
-	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:proto ./proto/helloworld/*.proto
 	cp -f -rv proto/proto/* gen/web
 	cp -f -rv proto/Proto/* gen/web
 	rm -rf proto/proto proto/Proto
 generate-http:
 	mkdir -p gen/go
 	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/health/*.proto
-	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/helloworld/*.proto
 	cp -f -rv proto/proto/* gen/go
 	rm -rf proto/proto
 
