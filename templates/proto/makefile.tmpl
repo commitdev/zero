@@ -56,12 +56,12 @@ generate-web:
 
 {{- if .Network.Http.Enabled }}
 generate-http:
-	mkdir -p gen/http
+	mkdir -p gen/go
 	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/health/*.proto
 {{- range .Services}}
 	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/{{ .Name }}/*.proto
 {{- end }}
-	cp -f -rv proto/proto/* gen/http
+	cp -f -rv proto/proto/* gen/go
 	rm -rf proto/proto
 {{- end}}
 

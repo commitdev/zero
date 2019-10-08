@@ -42,9 +42,9 @@ generate-web:
 	cp -f -rv proto/Proto/* gen/web
 	rm -rf proto/proto proto/Proto
 generate-http:
-	mkdir -p gen/http
+	mkdir -p gen/go
 	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/health/*.proto
 	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/helloworld/*.proto
-	cp -f -rv proto/proto/* gen/http
+	cp -f -rv proto/proto/* gen/go
 	rm -rf proto/proto
 
