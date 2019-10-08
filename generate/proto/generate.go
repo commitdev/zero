@@ -1,12 +1,12 @@
 package proto
 
 import (
-	"fmt"
 	"bytes"
+	"fmt"
 
-	"github.com/commitdev/sprout/util"
 	"github.com/commitdev/sprout/config"
 	"github.com/commitdev/sprout/templator"
+	"github.com/commitdev/sprout/util"
 	"log"
 	"os"
 	"os/exec"
@@ -80,10 +80,10 @@ func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Sp
 
 		f, err := os.Create(serviceProtoFilePath)
 
-		data:=  struct {
+		data := struct {
 			*config.SproutConfig
 			ServiceName string
-		} {
+		}{
 			cfg,
 			s.Name,
 		}

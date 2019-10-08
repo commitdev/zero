@@ -1,0 +1,45 @@
+package main
+
+import (
+  "log"
+  "context"
+  "net/http"
+
+  "github.com/grpc-ecosystem/grpc-gateway/runtime"
+  "google.golang.org/grpc"
+
+	health "{{ $.GitRepo }}/{{ $.Name }}-idl/gen/go/health"
+  {{- range .Services}}
+	{{ .Name }} "{{ $.GitRepo }}/{{ $.Name }}-idl/gen/go/{{ .Name }}"
+	{{- end}}
+)
+
+func run(endpoint string, listening string) error {
+
+  ctx := context.Background()
+  ctx, cancel := context.WithCancel(ctx)
+  defer cancel()
+
+  mux := runtime.NewServeMux()
+  opts := []grpc.DialOption{grpc.WithInsecure()}
+  err := health.RegisterHealthHandlerFromEndpoint(ctx, mux,  endpoint, opts)
+  {{- range .Services}}
+	err = {{ .Name }}.Register{{ .Name | Title }}HandlerFromEndpoint(ctx, mux,  endpoint, opts)
+	{{- end}}
+
+  if err != nil {
+    return err
+  }
+
+  return http.ListenAndServe(listening, mux)
+}
+
+func main() {
+  endpoint := "0.0.0.0:{{ .Network.Grpc.Port }}"
+  listening := "0.0.0.0:{{ .Network.Http.Port }}"
+  log.Printf("Starting http grpc gateway server on %v...", listening)
+
+  if err := run(endpoint, listening); err != nil {
+    log.Fatal(err)
+  }
+}

@@ -6,12 +6,19 @@ import (
 	"text/template"
 )
 
+type DockerTemplator struct {
+	ApplicationDocker *template.Template
+	HttpGatewayDocker *template.Template
+	DockerIgnore *template.Template
+}
+
 type GoTemplator struct {
 	GoMain         *template.Template
 	GoMod          *template.Template
 	GoModIDL       *template.Template
 	GoServer       *template.Template
 	GoHealthServer *template.Template
+	GoHttpGW       *template.Template
 }
 
 type Templator struct {
@@ -21,6 +28,7 @@ type Templator struct {
 	ProtoHealthTemplate  *template.Template
 	ProtoServiceTemplate *template.Template
 	Go                   *GoTemplator
+	Docker               *DockerTemplator
 }
 
 func NewTemplator(box *packr.Box) *Templator {
@@ -40,6 +48,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		Go:                   NewGoTemplator(box),
 		Sprout:               NewSproutTemplator(box),
 		GitIgnore:            NewGitIgnoreTemplator(box),
+		Docker:               NewDockerFileTemplator(box),
 	}
 }
 
@@ -59,12 +68,16 @@ func NewGoTemplator(box *packr.Box) *GoTemplator {
 	goMainTemplateSource, _ := box.FindString("golang/main.tmpl")
 	goMainTemplate, _ := template.New("GoMainTemplate").Funcs(util.FuncMap).Parse(goMainTemplateSource)
 
+	goHttpTemplateSource, _ := box.FindString("golang/http_gw.tmpl")
+	goHttpTemplate, _ := template.New("GoHttpGWTemplate").Funcs(util.FuncMap).Parse(goHttpTemplateSource)
+
 	return &GoTemplator{
 		GoMain:         goMainTemplate,
 		GoMod:          goModTemplate,
 		GoModIDL:       goModIDLTemplate,
 		GoServer:       goServerTemplate,
 		GoHealthServer: goHealthServerTemplate,
+		GoHttpGW:       goHttpTemplate,
 	}
 
 }
@@ -80,4 +93,21 @@ func NewGitIgnoreTemplator(box *packr.Box) *template.Template {
 	templateSource, _ := box.FindString("util/gitignore.tmpl")
 	template, _ := template.New("GitIgnore").Parse(templateSource)
 	return template
+}
+
+func NewDockerFileTemplator(box *packr.Box) *DockerTemplator {
+	appTemplateSource, _ := box.FindString("docker/dockerfile_app.tmpl")
+	appTemplate, _ := template.New("AppDockerfile").Parse(appTemplateSource)
+
+	httpTemplateSource, _ := box.FindString("docker/dockerfile_http.tmpl")
+	httpTemplate, _ := template.New("HttpDockerfile").Parse(httpTemplateSource)
+
+	ignoreTemplateSource, _ := box.FindString("docker/dockerignore.tmpl")
+	ignoreTemplate, _ := template.New("Dockerignore").Parse(ignoreTemplateSource)
+
+	return &DockerTemplator{
+		ApplicationDocker: appTemplate,
+		HttpGatewayDocker: httpTemplate,
+		DockerIgnore: ignoreTemplate,
+	}
 }

@@ -4,6 +4,10 @@ import (
 	"github.com/commitdev/sprout/config"
 	"github.com/commitdev/sprout/generate/golang"
 	"github.com/commitdev/sprout/generate/proto"
+	"github.com/commitdev/sprout/generate/docker"
+	"github.com/commitdev/sprout/generate/http"
+
+
 	"log"
 
 	"github.com/spf13/cobra"
@@ -42,7 +46,13 @@ var generateCmd = &cobra.Command{
 		switch language {
 		case Go:
 			golang.Generate(Templator, cfg)
+			docker.GenerateGoAppDockerFile(Templator, cfg)
 
+		}
+
+		if cfg.Network.Http.Enabled {
+			http.GenerateHttpGW(Templator, cfg)
+			docker.GenerateGoHttpGWDockerFile(Templator, cfg)
 		}
 	},
 }
