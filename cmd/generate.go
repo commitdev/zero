@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"github.com/commitdev/sprout/config"
-	"github.com/commitdev/sprout/generate/golang"
-	"github.com/commitdev/sprout/generate/proto"
-	"github.com/commitdev/sprout/generate/docker"
-	"github.com/commitdev/sprout/generate/http"
+	"github.com/commitdev/commit0/config"
+	"github.com/commitdev/commit0/generate/golang"
+	"github.com/commitdev/commit0/generate/proto"
+	"github.com/commitdev/commit0/generate/docker"
+	"github.com/commitdev/commit0/generate/http"
 
 
 	"log"
@@ -24,7 +24,7 @@ var supportedLanguages = [...]string{Go}
 
 func init() {
 
-	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "sprout.yml", "config path")
+	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "commit0.yml", "config path")
 	generateCmd.PersistentFlags().StringVarP(&language, "language", "l", "", "language to generate project in")
 
 	rootCmd.AddCommand(generateCmd)

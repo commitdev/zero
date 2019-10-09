@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/commitdev/sprout/config"
-	"github.com/commitdev/sprout/templator"
-	"github.com/commitdev/sprout/util"
+	"github.com/commitdev/commit0/config"
+	"github.com/commitdev/commit0/templator"
+	"github.com/commitdev/commit0/util"
 	"log"
 	"os"
 	"os/exec"
 )
 
-func Generate(templator *templator.Templator, config *config.SproutConfig) {
+func Generate(templator *templator.Templator, config *config.Commit0Config) {
 	GenerateIDLMakefile(templator, config)
 	GenerateProtoHealth(templator, config)
 	GenerateServiceProtobufFiles(templator, config)
@@ -20,7 +20,7 @@ func Generate(templator *templator.Templator, config *config.SproutConfig) {
 	GenerateGoModIDL(templator, config)
 }
 
-func GenerateGoModIDL(templator *templator.Templator, config *config.SproutConfig) {
+func GenerateGoModIDL(templator *templator.Templator, config *config.Commit0Config) {
 	idlPath := fmt.Sprintf("%s-idl", config.Name)
 	idlOutput := fmt.Sprintf("%s/go.mod", idlPath)
 	err := util.CreateDirIfDoesNotExist(idlPath)
@@ -33,7 +33,7 @@ func GenerateGoModIDL(templator *templator.Templator, config *config.SproutConfi
 	templator.Go.GoModIDL.Execute(f, config)
 }
 
-func GenerateIDLMakefile(templator *templator.Templator, config *config.SproutConfig) {
+func GenerateIDLMakefile(templator *templator.Templator, config *config.Commit0Config) {
 	makeFilePath := fmt.Sprintf("%s-idl", config.Name)
 	makeFileOutput := fmt.Sprintf("%s/Makefile", makeFilePath)
 
@@ -49,7 +49,7 @@ func GenerateIDLMakefile(templator *templator.Templator, config *config.SproutCo
 	templator.MakefileTemplate.Execute(f, config)
 }
 
-func GenerateProtoHealth(templator *templator.Templator, config *config.SproutConfig) {
+func GenerateProtoHealth(templator *templator.Templator, config *config.Commit0Config) {
 	protoHealthPath := fmt.Sprintf("%s-idl/proto/health", config.Name)
 	protoHealthOutput := fmt.Sprintf("%s/health.proto", protoHealthPath)
 
@@ -66,7 +66,7 @@ func GenerateProtoHealth(templator *templator.Templator, config *config.SproutCo
 	templator.ProtoHealthTemplate.Execute(f, config)
 }
 
-func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.SproutConfig) {
+func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Commit0Config) {
 	protoPath := fmt.Sprintf("%s-idl/proto", cfg.Name)
 	for _, s := range cfg.Services {
 		serviceProtoDir := fmt.Sprintf("%s/%s", protoPath, s.Name)
@@ -81,7 +81,7 @@ func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Sp
 		f, err := os.Create(serviceProtoFilePath)
 
 		data := struct {
-			*config.SproutConfig
+			*config.Commit0Config
 			ServiceName string
 		}{
 			cfg,
@@ -93,7 +93,7 @@ func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Sp
 
 }
 
-func GenerateProtoServiceLibs(config *config.SproutConfig) {
+func GenerateProtoServiceLibs(config *config.Commit0Config) {
 	idlRoot := fmt.Sprintf("%s-idl", config.Name)
 	cmd := exec.Command("make", "generate")
 	cmd.Dir = idlRoot

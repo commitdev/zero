@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/commitdev/sprout/cmd"
-	"github.com/commitdev/sprout/templator"
+	"github.com/commitdev/commit0/cmd"
+	"github.com/commitdev/commit0/templator"
 	"github.com/gobuffalo/packr/v2"
 )
 

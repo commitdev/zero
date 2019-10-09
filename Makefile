@@ -37,25 +37,25 @@ run:
 	go run main.go
 
 build:
-	CGO_ENABLED=0 packr2 build -o sprout
+	CGO_ENABLED=0 packr2 build -o commit0
 	packr2 clean
 
 build-example: build clean-example
 	mkdir -p example
-	cd example && ../sprout create "hello-world"
-	cd example/hello-world && ../../sprout generate -l go
+	cd example && ../commit0 create "hello-world"
+	cd example/hello-world && ../../commit0 generate -l go
 
 build-example-docker: clean-example
 	mkdir -p example
-	docker run -v "$(shell pwd)/example:/project" --user $(shell id -u):$(shell id -g) sprout:v0 create "hello-world"
-	docker run -v "$(shell pwd)/example/hello-world:/project" --user $(shell id -u):$(shell id -g) sprout:v0 generate -l go
+	docker run -v "$(shell pwd)/example:/project" --user $(shell id -u):$(shell id -g) commit0:v0 create "hello-world"
+	docker run -v "$(shell pwd)/example/hello-world:/project" --user $(shell id -u):$(shell id -g) commit0:v0 generate -l go
 
 build-docker-local:
-	docker build . -t sprout:v0
+	docker build . -t commit0:v0
 
 clean-example:
 	rm -rf example
 
 install-go:
-	CGO_ENABLED=0 packr2 build -o ${GOPATH}/bin/sprout
+	CGO_ENABLED=0 packr2 build -o ${GOPATH}/bin/commit0
 	packr2 clean

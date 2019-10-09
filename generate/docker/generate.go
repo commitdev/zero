@@ -1,18 +1,16 @@
 package docker
 
 import (
-	"github.com/commitdev/sprout/util"
+	"github.com/commitdev/commit0/util"
 
-	"github.com/commitdev/sprout/config"
-	"github.com/commitdev/sprout/templator"
+	"github.com/commitdev/commit0/config"
+	"github.com/commitdev/commit0/templator"
 )
 
-func GenerateGoAppDockerFile(templator *templator.Templator, config *config.SproutConfig) {
+func GenerateGoAppDockerFile(templator *templator.Templator, config *config.Commit0Config) {
 	util.TemplateFileIfDoesNotExist("docker/app", "Dockerfile", templator.Docker.ApplicationDocker, config)
-	util.TemplateFileIfDoesNotExist("./", ".dockerignore", templator.Docker.DockerIgnore, config)
-
 }
 
-func GenerateGoHttpGWDockerFile(templator *templator.Templator, config *config.SproutConfig) {
+func GenerateGoHttpGWDockerFile(templator *templator.Templator, config *config.Commit0Config) {
 	util.TemplateFileIfDoesNotExist("docker/http", "Dockerfile", templator.Docker.HttpGatewayDocker, config)
 }

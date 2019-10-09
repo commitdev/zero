@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/commitdev/sprout/templator"
+	"github.com/commitdev/commit0/templator"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -10,8 +10,8 @@ import (
 var Templator *templator.Templator
 
 var rootCmd = &cobra.Command{
-	Use:   "sprout",
-	Short: "Sprout a moduler service generator.",
+	Use:   "commit0",
+	Short: "Commit0 is a moduler service generator.",
 	Long:  `TODO`,
 	Run: func(cmd *cobra.Command, args []string) {
 	},

@@ -37,13 +37,10 @@ RUN mkdir -p /tmp/protoc && \
 
 RUN GO111MODULE=off go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 
-WORKDIR tmp/sprout
-COPY go.mod .
-COPY go.sum .
-RUN go mod tidy && go mod download
+WORKDIR tmp/commit0
 COPY . .
 RUN make build-deps && make build && \
-  mv sprout /usr/local/bin
+  mv commit0 /usr/local/bin
 RUN upx --lzma /usr/local/bin/*
 
 FROM alpine:edge
@@ -60,4 +57,4 @@ COPY --from=builder /go/src/github.com/grpc-ecosystem/grpc-gateway ${GOPATH}/src
 WORKDIR /project
 RUN apk add --update --no-cache make protobuf=${PROTOBUF_VERSION}-${ALPINE_PROTOBUF_VERSION_SUFFIX} && \
   rm -rf /var/cache/apk/*
-ENTRYPOINT ["sprout"]
+ENTRYPOINT ["commit0"]

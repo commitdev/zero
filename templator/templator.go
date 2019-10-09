@@ -1,7 +1,7 @@
 package templator
 
 import (
-	"github.com/commitdev/sprout/util"
+	"github.com/commitdev/commit0/util"
 	"github.com/gobuffalo/packr/v2"
 	"text/template"
 )
@@ -22,7 +22,7 @@ type GoTemplator struct {
 }
 
 type Templator struct {
-	Sprout               *template.Template
+	Commit0               *template.Template
 	GitIgnore            *template.Template
 	MakefileTemplate     *template.Template
 	ProtoHealthTemplate  *template.Template
@@ -46,7 +46,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		ProtoHealthTemplate:  protoHealthTemplate,
 		ProtoServiceTemplate: protoServiceTemplate,
 		Go:                   NewGoTemplator(box),
-		Sprout:               NewSproutTemplator(box),
+		Commit0:               NewCommit0Templator(box),
 		GitIgnore:            NewGitIgnoreTemplator(box),
 		Docker:               NewDockerFileTemplator(box),
 	}
@@ -82,9 +82,9 @@ func NewGoTemplator(box *packr.Box) *GoTemplator {
 
 }
 
-func NewSproutTemplator(box *packr.Box) *template.Template {
-	templateSource, _ := box.FindString("sprout/sprout.tmpl")
-	template, _ := template.New("SproutTemplate").Funcs(util.FuncMap).Parse(templateSource)
+func NewCommit0Templator(box *packr.Box) *template.Template {
+	templateSource, _ := box.FindString("commit0/commit0.tmpl")
+	template, _ := template.New("Commit0Template").Funcs(util.FuncMap).Parse(templateSource)
 
 	return template
 }

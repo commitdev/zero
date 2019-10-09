@@ -2,22 +2,22 @@ package golang
 
 import (
 	"fmt"
-	"github.com/commitdev/sprout/util"
+	"github.com/commitdev/commit0/util"
 
-	"github.com/commitdev/sprout/config"
-	"github.com/commitdev/sprout/templator"
+	"github.com/commitdev/commit0/config"
+	"github.com/commitdev/commit0/templator"
 	"log"
 	"os"
 )
 
-func Generate(templator *templator.Templator, config *config.SproutConfig) {
+func Generate(templator *templator.Templator, config *config.Commit0Config) {
 	GenerateGoMain(templator, config)
 	GenerateGoMod(templator, config)
 	GenerateHealthServer(templator, config)
 	GenerateServers(templator, config)
 }
 
-func GenerateGoMain(templator *templator.Templator, config *config.SproutConfig) {
+func GenerateGoMain(templator *templator.Templator, config *config.Commit0Config) {
 	if _, err := os.Stat("main.go"); os.IsNotExist(err) {
 
 		f, err := os.Create("main.go")
@@ -32,7 +32,7 @@ func GenerateGoMain(templator *templator.Templator, config *config.SproutConfig)
 	}
 }
 
-func GenerateGoMod(templator *templator.Templator, config *config.SproutConfig) {
+func GenerateGoMod(templator *templator.Templator, config *config.Commit0Config) {
 	f, err := os.Create("go.mod")
 
 	if err != nil {
@@ -42,7 +42,7 @@ func GenerateGoMod(templator *templator.Templator, config *config.SproutConfig) 
 	templator.Go.GoMod.Execute(f, config)
 }
 
-func GenerateServers(templator *templator.Templator, config *config.SproutConfig) {
+func GenerateServers(templator *templator.Templator, config *config.Commit0Config) {
 	serverDirPath := "server"
 	err := util.CreateDirIfDoesNotExist(serverDirPath)
 	if err != nil {
@@ -79,7 +79,7 @@ func GenerateServers(templator *templator.Templator, config *config.SproutConfig
 
 }
 
-func GenerateHealthServer(templator *templator.Templator, config *config.SproutConfig) {
+func GenerateHealthServer(templator *templator.Templator, config *config.Commit0Config) {
 	serverDirPath := "server"
 	err := util.CreateDirIfDoesNotExist(serverDirPath)
 	if err != nil {

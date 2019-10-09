@@ -44,7 +44,7 @@ type Service struct {
 	Description string
 }
 
-type SproutConfig struct {
+type Commit0Config struct {
 	Language     string        `yaml:"string"`
 	Organization string        `yaml:"organization"`
 	Name         string        `yaml:"name"`
@@ -56,8 +56,8 @@ type SproutConfig struct {
 	Services     []Service     `yaml:"services"`
 }
 
-func LoadConfig(filePath string) *SproutConfig {
-	config := &SproutConfig{}
+func LoadConfig(filePath string) *Commit0Config {
+	config := &Commit0Config{}
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Panicf("failed to read config: %v", err)
@@ -70,7 +70,7 @@ func LoadConfig(filePath string) *SproutConfig {
 	return config
 }
 
-func (c *SproutConfig) Print() {
+func (c *Commit0Config) Print() {
 	pp.Println(c)
 
 }
