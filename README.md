@@ -29,8 +29,8 @@ The generation will create project folder, within this there will be your implem
 2) A folder will be created and within that update the `commit0.yml` and then run `commit0 generate -l=[LANGUAGE OF CHOICE] eg. go`
 3) You will see that there is now an idl folder created.
 4) Within the idl folder modify the the protobuf services generated with your desired methods
-5) Go up to the parrent directory and re run `commit0 generate -l=[LANGUAGE OF CHOICE]`
-6) Return back to the parent directory and implement the methods
+5) Go up to the parent directory and re run `commit0 generate -l=[LANGUAGE OF CHOICE]`
+6) You will now see a `servers` folder navigate to your service folder within that directory and implement the methods generated for it
 7) Once you have tested your implementation and are happy with it return to the idl repo push that directory up to git
 8) Return to the parent directory and check the depency file, for go it will be the go.mod file remove the lines that point it to your local directory, this will now point it to the version on git that was pushed up previously
 10) Test and push up your implementation!
