@@ -22,7 +22,7 @@ type GoTemplator struct {
 }
 
 type Templator struct {
-	Commit0               *template.Template
+	Commit0              *template.Template
 	GitIgnore            *template.Template
 	MakefileTemplate     *template.Template
 	ProtoHealthTemplate  *template.Template
