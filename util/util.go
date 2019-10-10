@@ -20,19 +20,37 @@ var FuncMap = template.FuncMap{
 	"Title": strings.Title,
 }
 
+func createTemplatedFile(fullFilePath string, template *template.Template, data interface{}) {
+	f, err := os.Create(fullFilePath)
+	if err != nil {
+		log.Printf("Error creating file: %v", err)
+	}
+	err = template.Execute(f, data)
+	if err != nil {
+		log.Printf("Error templating: %v", err)
+	}
+}
+
+
+func TemplateFileAndOverwrite(fileDir string, fileName string, template *template.Template, data interface{}) {
+	fullFilePath := fmt.Sprintf("%v/%v", fileDir, fileName)
+	err := os.MkdirAll(fileDir, os.ModePerm)
+	if err != nil {
+		log.Printf("Error creating directory %v: %v", fullFilePath, err)
+	}
+	createTemplatedFile(fullFilePath, template, data)
+
+}
+
 func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *template.Template, data interface{}) {
 	fullFilePath := fmt.Sprintf("%v/%v", fileDir, fileName)
 
 	if _, err := os.Stat(fullFilePath); os.IsNotExist(err) {
 		err := CreateDirIfDoesNotExist(fileDir)
-		f, err := os.Create(fullFilePath)
 		if err != nil {
-			log.Printf("Error creating file: %v", err)
+			log.Printf("Error creating directory %v: %v", fullFilePath, err)
 		}
-		err = template.Execute(f, data)
-		if err != nil {
-			log.Printf("Error templating: %v", err)
-		}
+		createTemplatedFile(fullFilePath, template, data)
 	} else {
 		log.Printf("%v already exists. skipping.", fullFilePath)
 	}

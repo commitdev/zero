@@ -8,5 +8,5 @@ import (
 )
 
 func GenerateHttpGW(templator *templator.Templator, config *config.Commit0Config) {
-	util.TemplateFileIfDoesNotExist("http", "main.go", templator.Go.GoHttpGW, config)
+	util.TemplateFileAndOverwrite("http", "main.go", templator.Go.GoHttpGW, config)
 }

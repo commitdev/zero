@@ -2,7 +2,7 @@ package {{ .ServiceName }}
 
 import (
 	"context"
-	health_api "github.com/yourrepo/hello-world-idl/gen/go/health"
+	health_api "{{.GitRepo}}/{{ .ProjectName }}-idl/gen/go/health"
 	//api "{{.GitRepo}}/{{ .ProjectName }}-idl/gen/go/{{ .ServiceName }}"
 )
 
