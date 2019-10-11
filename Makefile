@@ -30,6 +30,9 @@ deps-go:
 build-deps:
 	go install github.com/gobuffalo/packr/v2/packr2
 
+check:
+	go test ./test
+
 fmt:
 	go fmt ./...
 

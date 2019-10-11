@@ -1,5 +1,7 @@
 # Commit0 [POC]
 
+[![Build Status](https://travis-ci.org/commitdev/commit0.svg)](https://travis-ci.org/commitdev/commit0)
+
 Status: currently poc
 
 Commit0 intends to be a multi-language service generator. The intention is to create a modular monolith, which is easy to seperate at a later stage when the boundries are completely understood.
