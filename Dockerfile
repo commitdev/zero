@@ -9,6 +9,8 @@ ENV PROTOBUF_VERSION=3.9.2
 RUN apk add --update --no-cache build-base curl git upx && \
   rm -rf /var/cache/apk/*
 
+RUN apk add --update nodejs npm
+
 RUN go get \
   github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION} &&\
   mv /go/bin/protoc-gen-go* /usr/local/bin/

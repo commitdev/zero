@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"github.com/commitdev/commit0/config"
-	"github.com/commitdev/commit0/generate/golang"
-	"github.com/commitdev/commit0/generate/proto"
 	"github.com/commitdev/commit0/generate/docker"
+	"github.com/commitdev/commit0/generate/golang"
 	"github.com/commitdev/commit0/generate/http"
-
+	"github.com/commitdev/commit0/generate/proto"
+	"github.com/commitdev/commit0/generate/react"
 
 	"log"
 
@@ -17,10 +17,11 @@ var configPath string
 var language string
 
 const (
-	Go = "go"
+	Go    = "go"
+	React = "react"
 )
 
-var supportedLanguages = [...]string{Go}
+var supportedLanguages = [...]string{Go, React}
 
 func init() {
 
@@ -42,12 +43,13 @@ var generateCmd = &cobra.Command{
 		cfg.Language = language
 		cfg.Print()
 
-		proto.Generate(Templator, cfg)
 		switch language {
 		case Go:
+			proto.Generate(Templator, cfg)
 			golang.Generate(Templator, cfg)
 			docker.GenerateGoAppDockerFile(Templator, cfg)
-
+		case React:
+			react.Generate(Templator, cfg)
 		}
 
 		if cfg.Network.Http.Enabled {

@@ -1,10 +1,10 @@
 package util
 
 import (
-	"os"
-	"strings"
 	"fmt"
 	"log"
+	"os"
+	"strings"
 	"text/template"
 )
 
@@ -30,7 +30,6 @@ func createTemplatedFile(fullFilePath string, template *template.Template, data 
 		log.Printf("Error templating: %v", err)
 	}
 }
-
 
 func TemplateFileAndOverwrite(fileDir string, fileName string, template *template.Template, data interface{}) {
 	fullFilePath := fmt.Sprintf("%v/%v", fileDir, fileName)
