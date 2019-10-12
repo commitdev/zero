@@ -6,5 +6,5 @@ RUN go build -o hello-world-http http/main.go
 FROM alpine
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 RUN apk update && apk add ca-certificates
-COPY --from=build /cache/hello-world /app/
+COPY --from=build /cache/hello-world-http /app/
 ENTRYPOINT /app/hello-world-http
