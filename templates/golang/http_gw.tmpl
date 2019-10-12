@@ -1,6 +1,8 @@
 package main
 
 import (
+  "os"
+  "fmt"
   "log"
   "context"
   "net/http"
@@ -35,11 +37,20 @@ func run(endpoint string, listening string) error {
 }
 
 func main() {
-  endpoint := "0.0.0.0:{{ .Network.Grpc.Port }}"
-  listening := "0.0.0.0:{{ .Network.Http.Port }}"
+
+  endpoint := fmt.Sprintf("%s:%s", getEnv("APP_HOST", "0.0.0.0"), getEnv("APP_PORT", "{{ .Network.Grpc.Port }}"))
+  listening := fmt.Sprintf("%s:%s", getEnv("HTTP_HOST", "0.0.0.0"), getEnv("HTTP_PORT", "{{ .Network.Http.Port }}"))
+
   log.Printf("Starting http grpc gateway server on %v...", listening)
 
   if err := run(endpoint, listening); err != nil {
     log.Fatal(err)
   }
+}
+
+func getEnv(key, fallback string) string {
+    if value, ok := os.LookupEnv(key); ok {
+        return value
+    }
+    return fallback
 }
