@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: docker/app/Dockerfile
+    ports:
+      - "{{ .Network.Grpc.Port }}:{{ .Network.Grpc.Port }}"
+  {{ if .Network.Http.Enabled }}
+  http:
+    build:
+      context: .
+      dockerfile: docker/http/Dockerfile
+    environment:
+      - APP_HOST=app
+      - APP_PORT={{ .Network.Grpc.Port }}
+    ports:
+      - "{{ .Network.Http.Port }}:{{ .Network.Http.Port }}"
+  {{- end}}

@@ -42,12 +42,20 @@ func TemplateFileAndOverwrite(fileDir string, fileName string, template *templat
 }
 
 func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *template.Template, data interface{}) {
-	fullFilePath := fmt.Sprintf("%v/%v", fileDir, fileName)
+	var fullFilePath string
+	
+	if fileDir == "" {
+		fullFilePath = fmt.Sprintf("%v", fileName)
+	} else {
+		fullFilePath = fmt.Sprintf("%v/%v", fileDir, fileName)
+	}
 
 	if _, err := os.Stat(fullFilePath); os.IsNotExist(err) {
-		err := CreateDirIfDoesNotExist(fileDir)
-		if err != nil {
-			log.Printf("Error creating directory %v: %v", fullFilePath, err)
+		if (fileDir != "") {
+			err := CreateDirIfDoesNotExist(fileDir)
+			if err != nil {
+				log.Printf("Error creating directory %v: %v", fullFilePath, err)
+			}
 		}
 		createTemplatedFile(fullFilePath, template, data)
 	} else {
