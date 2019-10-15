@@ -1,0 +1,15 @@
+export default {
+  app: {
+    name: '{{ .React.App.Name }}',
+  },
+  account: {
+    enabled: {{ .React.Account.Enabled }},
+    required: {{ .React.Account.Required }},
+  },
+  header: {
+    enabled: {{ .React.Header.Enabled }},
+  },
+  sidenav: {
+    enabled: {{ .React.Sidenav.Enabled }},
+  }
+}
