@@ -2,6 +2,7 @@ package templator
 
 import (
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/commitdev/commit0/config"
@@ -125,6 +126,9 @@ type DirectoryTemplator struct {
 func (d *DirectoryTemplator) TemplateFiles(config *config.Commit0Config, overwrite bool) {
 	for _, template := range d.Templates {
 		d, f := filepath.Split(template.Name())
+		if strings.HasSuffix(f, ".tmpl") {
+			f = strings.Replace(f, ".tmpl", "", -1)
+		}
 		if overwrite {
 			util.TemplateFileAndOverwrite(d, f, template, config)
 		} else {
@@ -137,7 +141,10 @@ func NewDirectoryTemplator(box *packr.Box, dir string) *DirectoryTemplator {
 	templates := []*template.Template{}
 	for _, file := range getFileNames(box, dir) {
 		templateSource, _ := box.FindString(file)
-		template, _ := template.New(file).Funcs(util.FuncMap).Parse(templateSource)
+		template, err := template.New(file).Funcs(util.FuncMap).Parse(templateSource)
+		if err != nil {
+			panic(err)
+		}
 		templates = append(templates, template)
 	}
 	return &DirectoryTemplator{
@@ -157,5 +164,24 @@ func getFileNames(box *packr.Box, dir string) []string {
 		}
 		return nil
 	})
-	return keys
+	return removeTmplDuplicates(keys)
+}
+
+func removeTmplDuplicates(keys []string) []string {
+	filteredKeys := []string{}
+	for _, key := range keys {
+		if !containsStr(keys, key+".tmpl") {
+			filteredKeys = append(filteredKeys, key)
+		}
+	}
+	return filteredKeys
+}
+
+func containsStr(arr []string, key string) bool {
+	for _, val := range arr {
+		if val == key {
+			return true
+		}
+	}
+	return false
 }
