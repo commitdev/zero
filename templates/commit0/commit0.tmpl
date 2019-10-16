@@ -1,10 +1,10 @@
 organization: mycompany
 name: {{.}}
-description: 
+description:
 git-repo: github.com/yourrepo
-docker-repo: 
-maintainers: 
-# - name: bob 
+docker-repo:
+maintainers:
+# - name: bob
 #   email: bob@test.com
 
 network:
@@ -18,5 +18,15 @@ network:
     enabled: true
     port: 8090
 
+react:
+  app:
+    name: {{.}}
+  header:
+    enabled: true
+  account:
+    enabled: true
+    required: false
+  sidenav:
+    enabled: true
 
 services:
