@@ -11,5 +11,15 @@ export default {
   },
   sidenav: {
     enabled: true,
-  }
+  },
+  views: [
+    {
+      path: '/account',
+      component: 'account',
+    },
+    {
+      path: '/',
+      component: 'home',
+    },
+  ],
 }
