@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: docker/app/Dockerfile
+    ports:
+      - "3000:3000"
+  http:
+    build:  
+      context: .
+      dockerfile: docker/http/Dockerfile
+    environment:
+      - APP_HOST=app
+      - APP_PORT=3000
+    ports:
+      - "8080:8080"

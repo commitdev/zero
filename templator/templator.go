@@ -15,6 +15,7 @@ type DockerTemplator struct {
 	ApplicationDocker *template.Template
 	HttpGatewayDocker *template.Template
 	DockerIgnore      *template.Template
+	DockerCompose     *template.Template
 }
 
 type GoTemplator struct {
@@ -112,10 +113,14 @@ func NewDockerFileTemplator(box *packr.Box) *DockerTemplator {
 	ignoreTemplateSource, _ := box.FindString("docker/dockerignore.tmpl")
 	ignoreTemplate, _ := template.New("Dockerignore").Parse(ignoreTemplateSource)
 
+	composeTemplateSource, _ := box.FindString("docker/dockercompose.tmpl")
+	composeTemplate, _ := template.New("Dockercompose").Parse(composeTemplateSource)
+
 	return &DockerTemplator{
 		ApplicationDocker: appTemplate,
 		HttpGatewayDocker: httpTemplate,
 		DockerIgnore:      ignoreTemplate,
+		DockerCompose:     composeTemplate,
 	}
 }
 
