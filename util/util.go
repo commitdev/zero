@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"strings"
 	"text/template"
 )
@@ -42,13 +43,7 @@ func TemplateFileAndOverwrite(fileDir string, fileName string, template *templat
 }
 
 func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *template.Template, data interface{}) {
-	var fullFilePath string
-	
-	if fileDir == "" {
-		fullFilePath = fmt.Sprintf("%v", fileName)
-	} else {
-		fullFilePath = fmt.Sprintf("%v/%v", fileDir, fileName)
-	}
+	fullFilePath := path.Join(fileDir, fileName)
 
 	if _, err := os.Stat(fullFilePath); os.IsNotExist(err) {
 		if (fileDir != "") {
