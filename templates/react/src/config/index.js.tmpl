@@ -11,6 +11,15 @@ export default {
   },
   sidenav: {
     enabled: {{ .React.Sidenav.Enabled }},
+    items: [
+      {{ range .React.Sidenav.Items }}
+      {
+        path: '{{ .Path }}',
+        label: '{{ .Label }}',
+        icon: '{{ .Icon }}',
+      },
+      {{ end }}
+    ]
   },
   views: [
     {{ range .React.Views }}

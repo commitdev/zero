@@ -11,6 +11,18 @@ export default {
   },
   sidenav: {
     enabled: true,
+    items: [
+      {
+        path: '/',
+        label: 'Home',
+        icon: 'home',
+      },
+      {
+        path: '/account',
+        label: 'Account',
+        icon: 'account_circle',
+      },
+    ],
   },
   views: [
     {

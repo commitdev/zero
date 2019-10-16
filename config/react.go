@@ -8,8 +8,14 @@ type reactHeader struct {
 	Enabled bool
 }
 
+type reactSidenavItem struct {
+	Path  string
+	Label string
+	Icon  string
+}
 type reactSidenav struct {
 	Enabled bool
+	Items   []reactSidenavItem
 }
 
 type reactAccount struct {
