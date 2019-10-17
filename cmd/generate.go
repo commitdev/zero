@@ -1,15 +1,16 @@
 package cmd
 
 import (
+
 	"log"
 	"sync"
-
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/generate/docker"
 	"github.com/commitdev/commit0/internal/generate/golang"
 	"github.com/commitdev/commit0/internal/generate/http"
 	"github.com/commitdev/commit0/internal/generate/proto"
 	"github.com/commitdev/commit0/internal/generate/react"
+	"github.com/commitdev/commit0/internal/generate/kubernetes"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
@@ -22,9 +23,10 @@ var language string
 const (
 	Go    = "go"
 	React = "react"
+	Kubernetes = "kubernetes"
 )
 
-var supportedLanguages = [...]string{Go, React}
+var supportedLanguages = [...]string{Go, React, Kubernetes}
 
 func init() {
 
@@ -59,6 +61,8 @@ var generateCmd = &cobra.Command{
 			docker.GenerateGoDockerCompose(t, cfg, &wg)
 		case React:
 			react.Generate(t, cfg, &wg)
+		case Kubernetes:
+			kubernetes.Generate(Templator, cfg)
 		}
 
 		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, &wg, cfg)

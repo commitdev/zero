@@ -55,7 +55,13 @@ type Commit0Config struct {
 	Maintainers  []Maintainers `yaml:"maintainers"`
 	Network      Network       `yaml:"network"`
 	Services     []Service     `yaml:"services"`
-	React        React         `yaml:react`
+	React        React         `yaml:"react"`
+	Kubernetes   Kubernetes    `yaml:"kubernetes"`	 
+}
+
+type Kubernetes struct {
+	ClusterName string
+	DNSName string
 }
 
 func LoadConfig(filePath string) *Commit0Config {
