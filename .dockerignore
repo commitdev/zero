@@ -1,7 +1,7 @@
 Dockerfile
 README.md
-.history
+.history/
 .travis.yml
 .gitignore
 .git
-test
+example/
