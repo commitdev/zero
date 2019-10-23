@@ -32,7 +32,7 @@ The generation will create project folder, within this there will be your implem
 3) You will see that there is now an idl folder created.
 4) Within the idl folder modify the the protobuf services generated with your desired methods
 5) Go up to the parent directory and re run `commit0 generate -l=[LANGUAGE OF CHOICE]`
-6) You will now see a `servers` folder navigate to your service folder within that directory and implement the methods generated for it
+6) You will now see a `server` folder navigate to your service folder within that directory and implement the methods generated for it
 7) Once you have tested your implementation and are happy with it return to the idl repo push that directory up to git
 8) Return to the parent directory and check the depency file, for go it will be the go.mod file remove the lines that point it to your local directory, this will now point it to the version on git that was pushed up previously
 10) Test and push up your implementation!
@@ -40,7 +40,9 @@ The generation will create project folder, within this there will be your implem
 
 ## Usage & installation
 
-As there alot of dependencies it will be easier to use this tool within the provided image, clone the repo and then run `make build-docker-local`. The best way then to use this is to alias `docker run -v "$(pwd):/project" --user $(id -u):$(id -g) commit0:v0` as commit0 from then you can use the CLI as if it was installed as usual on your machine.
+As there alot of dependencies it will be easier to use this tool within the provided image, clone the repo and then run `make build-docker-local`.
+The best way then to use this is to add an alias, then you can use the CLI as if it was installed as usual on your machine:
+`alias commit0='docker run -v "$(pwd):/project" commit0:v0'`
 
 ## Dependencies
 
@@ -49,11 +51,11 @@ In order to use this you need ensure you have these installed.
 * protoc-gen-go [Go]
 * protoc-gen-web [gRPC Web]
 * protoc-gen-gateway [Http]
-* prooc-gen-swagger [Swagger]
+* protoc-gen-swagger [Swagger]
 
 ## Building locally
 
 As the templates are embeded into the binary you will need to ensure packr2 is installed.
 
-You can run `make deps` to install this.
+You can run `make deps-go` to install this.
 

@@ -49,6 +49,7 @@ var generateCmd = &cobra.Command{
 			proto.Generate(Templator, cfg)
 			golang.Generate(Templator, cfg)
 			docker.GenerateGoAppDockerFile(Templator, cfg)
+			docker.GenerateGoDockerCompose(Templator, cfg)
 		case React:
 			react.Generate(Templator, cfg)
 		}

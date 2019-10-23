@@ -63,6 +63,7 @@ type Commit0Config struct {
 	Network      Network       `yaml:"network"`
 	Services     []Service     `yaml:"services"`
 	CI           CI            `yaml:"ci"`
+	React        React         `yaml:react`
 }
 
 func LoadConfig(filePath string) *Commit0Config {
@@ -73,7 +74,7 @@ func LoadConfig(filePath string) *Commit0Config {
 	}
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		log.Panicf("failed to unmarshall config: %v", err)
+		log.Panicf("failed to parse config: %v", err)
 	}
 
 	return config

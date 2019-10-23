@@ -1,0 +1,32 @@
+export default {
+  app: {
+    name: '{{ .React.App.Name }}',
+  },
+  account: {
+    enabled: {{ .React.Account.Enabled }},
+    required: {{ .React.Account.Required }},
+  },
+  header: {
+    enabled: {{ .React.Header.Enabled }},
+  },
+  sidenav: {
+    enabled: {{ .React.Sidenav.Enabled }},
+    items: [
+      {{ range .React.Sidenav.Items }}
+      {
+        path: '{{ .Path }}',
+        label: '{{ .Label }}',
+        icon: '{{ .Icon }}',
+      },
+      {{ end }}
+    ]
+  },
+  views: [
+    {{ range .React.Views }}
+    {
+      path: '{{ .Path }}',
+      component: '{{ .Component }}',
+    },
+    {{ end }}
+  ],
+}
