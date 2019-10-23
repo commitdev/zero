@@ -34,6 +34,7 @@ type Templator struct {
 	Go                   *GoTemplator
 	Docker               *DockerTemplator
 	React                *DirectoryTemplator
+	CI                   *template.Template
 }
 
 func NewTemplator(box *packr.Box) *Templator {
@@ -55,6 +56,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		GitIgnore:            NewGitIgnoreTemplator(box),
 		Docker:               NewDockerFileTemplator(box),
 		React:                NewDirectoryTemplator(box, "react"),
+		CI:                   NewCITemplator(box),
 	}
 }
 
@@ -116,6 +118,15 @@ func NewDockerFileTemplator(box *packr.Box) *DockerTemplator {
 		HttpGatewayDocker: httpTemplate,
 		DockerIgnore:      ignoreTemplate,
 	}
+}
+
+// NewCITemplator creates a build pipeline config file in your repository.
+// Only supports CircleCI for now, eventually will add Jenkins, Travis, etc
+func NewCITemplator(box *packr.Box) *template.Template {
+	appTemplateSource, _ := box.FindString("ci/circleci.tmpl")
+	template, _ := template.New("CIConfig").Parse(appTemplateSource)
+
+	return template
 }
 
 type DirectoryTemplator struct {

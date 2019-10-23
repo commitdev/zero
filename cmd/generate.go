@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/commitdev/commit0/config"
+	"github.com/commitdev/commit0/generate/ci"
 	"github.com/commitdev/commit0/generate/docker"
 	"github.com/commitdev/commit0/generate/golang"
 	"github.com/commitdev/commit0/generate/http"
@@ -50,6 +51,10 @@ var generateCmd = &cobra.Command{
 			docker.GenerateGoAppDockerFile(Templator, cfg)
 		case React:
 			react.Generate(Templator, cfg)
+		}
+
+		if cfg.CI.System != "" {
+			ci.Generate(Templator, cfg)
 		}
 
 		if cfg.Network.Http.Enabled {
