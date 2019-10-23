@@ -2,13 +2,13 @@ version: 2.1
 jobs:
   build:
     docker:
-    {{ if .CI.BuildImage }}- image: {{ .CI.BuildImage }}{{ else if eq .CI.BuildImage "go" }}- image: circleci/golang:1.12-node{{ end }}
+      - image: {{ .CI.BuildImage }}
     steps:
       - checkout
       - run: 
         name: Build
         command: |
-          {{ if .CI.BuildCommand }}{{ .CI.BuildCommand }}{{ else }}make build{{ end }}
+          {{ .CI.BuildCommand }}
 
   test:
     docker:
@@ -17,7 +17,7 @@ jobs:
       - run: 
         name: Test
         command: |
-          {{ if .CI.BuildCommand }}{{ .CI.BuildCommand }}{{ else }}make test{{ end }}
+          {{ .CI.BuildCommand }}
 
 
 workflow:

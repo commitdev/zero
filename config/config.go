@@ -46,10 +46,11 @@ type Service struct {
 }
 
 type CI struct {
-	System       string `yaml:"system"`
-	BuildImage   string `yaml:"build-image"`
-	BuildCommand string `yaml:"build-command"`
-	TestCommand  string `yaml:"test-command"`
+	System          string `yaml:"system"`
+	BuildImage      string `yaml:"build-image"`
+	BuildCommand    string `yaml:"build-command"`
+	TestCommand     string `yaml:"test-command"`
+	LanguageVersion string `yaml:"language-version"`
 }
 
 type Commit0Config struct {

@@ -8,9 +8,37 @@ import (
 	"github.com/commitdev/commit0/util"
 )
 
-func Generate(templator *templator.Templator, config *config.Commit0Config) {
-	fmt.Printf("%v\n\n", config.CI.System)
-	fmt.Printf("%v\n\n", templator.CI)
+const (
+	defaultGoDockerImage = "golang/golang"
+	defaultGoVersion     = "1.12"
+	defaultBuildCommand  = "make build"
+	defaultTestCommand   = "make test"
+)
 
-	util.TemplateFileIfDoesNotExist(".circleci", "circleci.yml", templator.CI, config)
+// Generate a CI configuration file based on your language and CI system
+func Generate(templator *templator.CITemplator, config *config.Commit0Config) {
+	switch config.Language {
+	case "go":
+		if config.CI.LanguageVersion == "" {
+			config.CI.LanguageVersion = defaultGoVersion
+		}
+		if config.CI.BuildImage == "" {
+			config.CI.BuildImage = fmt.Sprintf("%s:%s", defaultGoDockerImage, config.CI.LanguageVersion)
+		}
+		if config.CI.BuildCommand == "" {
+			config.CI.BuildCommand = defaultBuildCommand
+		}
+		if config.CI.TestCommand == "" {
+			config.CI.TestCommand = defaultTestCommand
+		}
+	}
+
+	switch config.CI.System {
+	case "jenkins":
+		util.TemplateFileIfDoesNotExist(".", "Jenkinsfile", templator.Jenkins, config)
+	case "circleci":
+		util.TemplateFileIfDoesNotExist(".circleci", "config.yml", templator.CircleCI, config)
+	case "travisci":
+		util.TemplateFileIfDoesNotExist(".", ".travis.yml", templator.TravisCI, config)
+	}
 }

@@ -6,21 +6,21 @@ pipeline {
                 stage('Build') {
                     agent {
                         docker {
-                            image '{{ .BuildImage }}'
+                            image '{{ .CI.BuildImage }}'
                         }
                     }
                     steps {
-                        sh '{{ .BuildCommand }}'
+                        sh '{{ .CI.BuildCommand }}'
                     }
                 }
                 stage('Test') {
                     agent {
                         docker {
-                            image '{{ .BuildImage }}'
+                            image '{{ .CI.BuildImage }}'
                         }
                     }
                     steps {
-                        sh '{{ .TestCommand }}'
+                        sh '{{ .CI.TestCommand }}'
                     }
                 }
             }
