@@ -66,7 +66,7 @@ func LoadConfig(filePath string) *Commit0Config {
 	}
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		log.Panicf("failed to unmarshall config: %v", err)
+		log.Panicf("failed to parse config: %v", err)
 	}
 
 	return config
