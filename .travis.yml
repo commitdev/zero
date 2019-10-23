@@ -1,7 +1,7 @@
 language: go
 
 script:
-  - make build-deps && make build
+  - GO111MODULE=on make build-deps && make build
   - make check
 
 go:
