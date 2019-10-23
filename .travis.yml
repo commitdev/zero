@@ -1,8 +1,9 @@
 language: go
 
 script:
-  - GO111MODULE=on make build-deps && make build
-  - make check
+  - GO111MODULE=on make build-deps
+  - GO111MODULE=on make build
+  - GO111MODULE=on make check
 
 go:
   - 1.12.x
