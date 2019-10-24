@@ -21,8 +21,8 @@ var configPath string
 var language string
 
 const (
-	Go    = "go"
-	React = "react"
+	Go         = "go"
+	React      = "react"
 	Kubernetes = "kubernetes"
 )
 

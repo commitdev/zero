@@ -3,19 +3,18 @@ package kubernetes
 import (
 	"bytes"
 	"fmt"
-	"io"
-	"sync"
-    "log"
-	"os"
-	"os/exec"
-    "path/filepath"
 	"github.com/commitdev/commit0/config"
 	"github.com/commitdev/commit0/templator"
+	"io"
+	"log"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"sync"
 )
 
 func Generate(templator *templator.Templator, config *config.Commit0Config) {
 	templator.Kubernetes.TemplateFiles(config, false)
-	
 
 	if config.Kubernetes.Deploy {
 		_tf_init := tf_init()
@@ -23,30 +22,29 @@ func Generate(templator *templator.Templator, config *config.Commit0Config) {
 		execute(_tf_init)
 		execute(_tf_plan)
 	}
-	
+
 }
 
 // Terraform init cmd
 func tf_init() *exec.Cmd {
-	
-	return exec.Command("terraform","init") 
+
+	return exec.Command("terraform", "init")
 }
 
 // Terraform plan cmd
 func tf_plan() *exec.Cmd {
-	
-	return exec.Command("terraform","plan") 
+
+	return exec.Command("terraform", "plan")
 }
 
-// Executes cmd passed in 
-func execute( cmd *exec.Cmd){	
+// Executes cmd passed in
+func execute(cmd *exec.Cmd) {
 	dir, err1 := filepath.Abs(filepath.Dir(os.Args[0]))
-    if err1 != nil {
-            log.Fatal(err1)
+	if err1 != nil {
+		log.Fatal(err1)
 	}
 
 	cmd.Dir = dir + "/kubernetes/terraform"
-
 
 	var errStdout, errStderr error
 	stdoutIn, _ := cmd.StdoutPipe()
