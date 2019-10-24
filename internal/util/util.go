@@ -46,7 +46,7 @@ func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *templ
 	fullFilePath := path.Join(fileDir, fileName)
 
 	if _, err := os.Stat(fullFilePath); os.IsNotExist(err) {
-		if (fileDir != "") {
+		if fileDir != "" {
 			err := CreateDirIfDoesNotExist(fileDir)
 			if err != nil {
 				log.Printf("Error creating directory %v: %v", fullFilePath, err)
