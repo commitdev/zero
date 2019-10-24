@@ -5,15 +5,16 @@ import (
 	"os"
 	"path"
 
+	"github.com/commitdev/commit0/internal/templator"
+	"github.com/gobuffalo/packr/v2"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-
 	rootCmd.AddCommand(createCmd)
 }
 
-func Create(projectName string, outDir string) string {
+func Create(projectName string, outDir string, t *templator.Templator) string {
 	rootDir := path.Join(outDir, projectName)
 	log.Printf("Creating project %s.", projectName)
 	err := os.MkdirAll(rootDir, os.ModePerm)
@@ -31,14 +32,14 @@ func Create(projectName string, outDir string) string {
 	if err != nil {
 		log.Printf("Error creating commit0 config: %v", err)
 	}
-	Templator.Commit0.Execute(f, projectName)
+	t.Commit0.Execute(f, projectName)
 
 	gitIgnorePath := path.Join(rootDir, ".gitignore")
 	f, err = os.Create(gitIgnorePath)
 	if err != nil {
 		log.Printf("Error creating commit0 config: %v", err)
 	}
-	Templator.GitIgnore.Execute(f, projectName)
+	t.GitIgnore.Execute(f, projectName)
 
 	return rootDir
 }
@@ -51,8 +52,11 @@ var createCmd = &cobra.Command{
 			log.Fatalf("Project name cannot be empty!")
 		}
 
+		templates := packr.New("templates", "../templates")
+		t := templator.NewTemplator(templates)
+
 		projectName := args[0]
 
-		Create(projectName, "./")
+		Create(projectName, "./", t)
 	},
 }

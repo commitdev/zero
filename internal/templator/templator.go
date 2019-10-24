@@ -5,8 +5,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/commitdev/commit0/config"
-	"github.com/commitdev/commit0/util"
+	"github.com/commitdev/commit0/internal/config"
+	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/packr/v2/file"
 )

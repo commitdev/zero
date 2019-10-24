@@ -1,16 +1,15 @@
 package cmd_test
 
 import (
-	"github.com/commitdev/commit0/cmd"
 	"io/ioutil"
 	"os"
 	"path"
 	"testing"
-)
 
-func TestInitWorks(t *testing.T) {
-	cmd.Init()
-}
+	"github.com/commitdev/commit0/cmd"
+	"github.com/commitdev/commit0/internal/templator"
+	"github.com/gobuffalo/packr/v2"
+)
 
 func TestCreateWorks(t *testing.T) {
 	tmpdir, err := ioutil.TempDir("", "commit0-")
@@ -20,7 +19,10 @@ func TestCreateWorks(t *testing.T) {
 
 	projectName := "test-project"
 
-	root := cmd.Create(projectName, tmpdir)
+	templates := packr.New("templates", "../templates")
+	templator := templator.NewTemplator(templates)
+
+	root := cmd.Create(projectName, tmpdir, templator)
 	defer os.RemoveAll(tmpdir)
 
 	st, err := os.Stat(path.Join(root, "commit0.yml"))

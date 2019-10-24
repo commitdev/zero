@@ -1,10 +1,9 @@
 package docker
 
 import (
-	"github.com/commitdev/commit0/util"
-
-	"github.com/commitdev/commit0/config"
-	"github.com/commitdev/commit0/templator"
+	"github.com/commitdev/commit0/internal/config"
+	"github.com/commitdev/commit0/internal/templator"
+	"github.com/commitdev/commit0/internal/util"
 )
 
 func GenerateGoAppDockerFile(templator *templator.Templator, config *config.Commit0Config) {

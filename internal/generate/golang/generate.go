@@ -2,12 +2,12 @@ package golang
 
 import (
 	"fmt"
-	"github.com/commitdev/commit0/util"
-
-	"github.com/commitdev/commit0/config"
-	"github.com/commitdev/commit0/templator"
 	"log"
 	"os"
+
+	"github.com/commitdev/commit0/internal/config"
+	"github.com/commitdev/commit0/internal/templator"
+	"github.com/commitdev/commit0/internal/util"
 )
 
 func Generate(templator *templator.Templator, config *config.Commit0Config) {
