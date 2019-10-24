@@ -2,7 +2,6 @@ package kubernetes
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/commitdev/commit0/config"
 	"github.com/commitdev/commit0/templator"
 	"io"
@@ -44,7 +43,7 @@ func execute(cmd *exec.Cmd) {
 		log.Fatal(err1)
 	}
 
-	cmd.Dir = dir + "/kubernetes/terraform"
+	cmd.Dir = dir + "/kubernetes/terraform/environments/staging"
 
 	var errStdout, errStderr error
 	stdoutIn, _ := cmd.StdoutPipe()
@@ -74,9 +73,6 @@ func execute(cmd *exec.Cmd) {
 	if errStdout != nil || errStderr != nil {
 		log.Fatal("failed to capture stdout or stderr\n")
 	}
-	outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
-	fmt.Printf("\nout:\n%s\nerr:\n%s\n", outStr, errStr)
-
 }
 
 // CapturingPassThroughWriter is a writer that remembers

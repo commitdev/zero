@@ -60,9 +60,10 @@ type Commit0Config struct {
 }
 
 type Kubernetes struct {
-	ClusterName string
-	DNSName     string
-	Deploy      bool
+	ClusterName  string
+	Deploy       bool
+	AWSAccountId string
+	AWSRegion    string
 }
 
 func LoadConfig(filePath string) *Commit0Config {
