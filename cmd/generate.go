@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"log"
+	"os"
 
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/generate/docker"
@@ -51,15 +52,22 @@ var generateCmd = &cobra.Command{
 		case Go:
 			proto.Generate(t, cfg)
 			golang.Generate(t, cfg)
+
 			docker.GenerateGoAppDockerFile(t, cfg)
 			docker.GenerateGoDockerCompose(t, cfg)
 		case React:
 			react.Generate(t, cfg)
 		}
 
+		f, err := os.Create("README.md")
+		if err != nil {
+			log.Printf("Error creating commit0 config: %v", err)
+		}
+		go t.Readme.Execute(f, cfg)
+
 		if cfg.Network.Http.Enabled {
-			http.GenerateHttpGW(t, cfg)
-			docker.GenerateGoHttpGWDockerFile(t, cfg)
+			http.GenerateHTTPGW(t, cfg)
+			docker.GenerateGoHTTPGWDockerFile(t, cfg)
 		}
 	},
 }

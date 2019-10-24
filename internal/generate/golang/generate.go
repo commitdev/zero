@@ -26,7 +26,7 @@ func GenerateGoMain(templator *templator.Templator, config *config.Commit0Config
 			log.Printf("Error: %v", err)
 		}
 
-		templator.Go.GoMain.Execute(f, config)
+		go templator.Go.GoMain.Execute(f, config)
 	} else {
 		log.Printf("main.go already exists. skipping.")
 	}
@@ -39,7 +39,7 @@ func GenerateGoMod(templator *templator.Templator, config *config.Commit0Config)
 		log.Printf("Error: %v", err)
 	}
 
-	templator.Go.GoMod.Execute(f, config)
+	go templator.Go.GoMod.Execute(f, config)
 }
 
 func GenerateServers(templator *templator.Templator, config *config.Commit0Config) {
@@ -74,7 +74,7 @@ func GenerateServers(templator *templator.Templator, config *config.Commit0Confi
 			"GitRepo":     config.GitRepo,
 		}
 
-		templator.Go.GoServer.Execute(f, data)
+		go templator.Go.GoServer.Execute(f, data)
 	}
 
 }
@@ -99,5 +99,5 @@ func GenerateHealthServer(templator *templator.Templator, config *config.Commit0
 		log.Printf("Error: %v", err)
 	}
 
-	templator.Go.GoHealthServer.Execute(f, config)
+	go templator.Go.GoHealthServer.Execute(f, config)
 }

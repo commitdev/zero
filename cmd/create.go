@@ -32,14 +32,14 @@ func Create(projectName string, outDir string, t *templator.Templator) string {
 	if err != nil {
 		log.Printf("Error creating commit0 config: %v", err)
 	}
-	t.Commit0.Execute(f, projectName)
+	go t.Commit0.Execute(f, projectName)
 
 	gitIgnorePath := path.Join(rootDir, ".gitignore")
 	f, err = os.Create(gitIgnorePath)
 	if err != nil {
 		log.Printf("Error creating commit0 config: %v", err)
 	}
-	t.GitIgnore.Execute(f, projectName)
+	go t.GitIgnore.Execute(f, projectName)
 
 	return rootDir
 }

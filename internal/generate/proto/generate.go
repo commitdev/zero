@@ -30,7 +30,7 @@ func GenerateGoModIDL(templator *templator.Templator, config *config.Commit0Conf
 		log.Printf("Error: %v", err)
 	}
 
-	templator.Go.GoModIDL.Execute(f, config)
+	go templator.Go.GoModIDL.Execute(f, config)
 }
 
 func GenerateIDLMakefile(templator *templator.Templator, config *config.Commit0Config) {
@@ -46,7 +46,7 @@ func GenerateIDLMakefile(templator *templator.Templator, config *config.Commit0C
 	if err != nil {
 		log.Printf("Error: %v", err)
 	}
-	templator.MakefileTemplate.Execute(f, config)
+	go templator.MakefileTemplate.Execute(f, config)
 }
 
 func GenerateProtoHealth(templator *templator.Templator, config *config.Commit0Config) {
@@ -63,7 +63,7 @@ func GenerateProtoHealth(templator *templator.Templator, config *config.Commit0C
 		log.Printf("Error: %v", err)
 	}
 
-	templator.ProtoHealthTemplate.Execute(f, config)
+	go templator.ProtoHealthTemplate.Execute(f, config)
 }
 
 func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Commit0Config) {
@@ -88,9 +88,8 @@ func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Co
 			s.Name,
 		}
 
-		templator.ProtoServiceTemplate.Execute(f, data)
+		go templator.ProtoServiceTemplate.Execute(f, data)
 	}
-
 }
 
 func GenerateProtoServiceLibs(config *config.Commit0Config) {

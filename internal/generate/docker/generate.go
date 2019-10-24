@@ -10,7 +10,7 @@ func GenerateGoAppDockerFile(templator *templator.Templator, config *config.Comm
 	util.TemplateFileIfDoesNotExist("docker/app", "Dockerfile", templator.Docker.ApplicationDocker, config)
 }
 
-func GenerateGoHttpGWDockerFile(templator *templator.Templator, config *config.Commit0Config) {
+func GenerateGoHTTPGWDockerFile(templator *templator.Templator, config *config.Commit0Config) {
 	util.TemplateFileIfDoesNotExist("docker/http", "Dockerfile", templator.Docker.HttpGatewayDocker, config)
 }
 
