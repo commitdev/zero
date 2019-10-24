@@ -6,21 +6,22 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
 )
 
-func Generate(templator *templator.Templator, config *config.Commit0Config) {
-	GenerateIDLMakefile(templator, config)
-	GenerateProtoHealth(templator, config)
-	GenerateServiceProtobufFiles(templator, config)
+func Generate(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
+	GenerateIDLMakefile(templator, config, wg)
+	GenerateProtoHealth(templator, config, wg)
+	GenerateServiceProtobufFiles(templator, config, wg)
+	GenerateGoModIDL(templator, config, wg)
 	GenerateProtoServiceLibs(config)
-	GenerateGoModIDL(templator, config)
 }
 
-func GenerateGoModIDL(templator *templator.Templator, config *config.Commit0Config) {
+func GenerateGoModIDL(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
 	idlPath := fmt.Sprintf("%s-idl", config.Name)
 	idlOutput := fmt.Sprintf("%s/go.mod", idlPath)
 	err := util.CreateDirIfDoesNotExist(idlPath)
@@ -30,10 +31,11 @@ func GenerateGoModIDL(templator *templator.Templator, config *config.Commit0Conf
 		log.Printf("Error: %v", err)
 	}
 
+	wg.Add(1)
 	go templator.Go.GoModIDL.Execute(f, config)
 }
 
-func GenerateIDLMakefile(templator *templator.Templator, config *config.Commit0Config) {
+func GenerateIDLMakefile(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
 	makeFilePath := fmt.Sprintf("%s-idl", config.Name)
 	makeFileOutput := fmt.Sprintf("%s/Makefile", makeFilePath)
 
@@ -46,10 +48,12 @@ func GenerateIDLMakefile(templator *templator.Templator, config *config.Commit0C
 	if err != nil {
 		log.Printf("Error: %v", err)
 	}
+
+	wg.Add(1)
 	go templator.MakefileTemplate.Execute(f, config)
 }
 
-func GenerateProtoHealth(templator *templator.Templator, config *config.Commit0Config) {
+func GenerateProtoHealth(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
 	protoHealthPath := fmt.Sprintf("%s-idl/proto/health", config.Name)
 	protoHealthOutput := fmt.Sprintf("%s/health.proto", protoHealthPath)
 
@@ -63,10 +67,11 @@ func GenerateProtoHealth(templator *templator.Templator, config *config.Commit0C
 		log.Printf("Error: %v", err)
 	}
 
+	wg.Add(1)
 	go templator.ProtoHealthTemplate.Execute(f, config)
 }
 
-func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Commit0Config) {
+func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Commit0Config, wg sync.WaitGroup) {
 	protoPath := fmt.Sprintf("%s-idl/proto", cfg.Name)
 	for _, s := range cfg.Services {
 		serviceProtoDir := fmt.Sprintf("%s/%s", protoPath, s.Name)
@@ -88,6 +93,7 @@ func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Co
 			s.Name,
 		}
 
+		wg.Add(1)
 		go templator.ProtoServiceTemplate.Execute(f, data)
 	}
 }

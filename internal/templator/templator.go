@@ -3,6 +3,7 @@ package templator
 import (
 	"path/filepath"
 	"strings"
+	"sync"
 	"text/template"
 
 	"github.com/commitdev/commit0/internal/config"
@@ -96,16 +97,16 @@ type DirectoryTemplator struct {
 	Templates []*template.Template
 }
 
-func (d *DirectoryTemplator) TemplateFiles(config *config.Commit0Config, overwrite bool) {
+func (d *DirectoryTemplator) TemplateFiles(config *config.Commit0Config, overwrite bool, wg sync.WaitGroup) {
 	for _, template := range d.Templates {
 		d, f := filepath.Split(template.Name())
 		if strings.HasSuffix(f, ".tmpl") {
 			f = strings.Replace(f, ".tmpl", "", -1)
 		}
 		if overwrite {
-			util.TemplateFileAndOverwrite(d, f, template, config)
+			util.TemplateFileAndOverwrite(d, f, template, wg, config)
 		} else {
-			util.TemplateFileIfDoesNotExist(d, f, template, config)
+			util.TemplateFileIfDoesNotExist(d, f, template, wg, config)
 		}
 	}
 }

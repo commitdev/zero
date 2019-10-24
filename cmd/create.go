@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/gobuffalo/packr/v2"
@@ -28,19 +29,31 @@ func Create(projectName string, outDir string, t *templator.Templator) string {
 	commit0ConfigPath := path.Join(rootDir, "commit0.yml")
 	log.Printf("%s", commit0ConfigPath)
 
-	f, err := os.Create(commit0ConfigPath)
-	if err != nil {
-		log.Printf("Error creating commit0 config: %v", err)
-	}
-	go t.Commit0.Execute(f, projectName)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		f, err := os.Create(commit0ConfigPath)
+		if err != nil {
+			log.Printf("Error creating commit0 config: %v", err)
+		}
 
-	gitIgnorePath := path.Join(rootDir, ".gitignore")
-	f, err = os.Create(gitIgnorePath)
-	if err != nil {
-		log.Printf("Error creating commit0 config: %v", err)
-	}
-	go t.GitIgnore.Execute(f, projectName)
+		t.Commit0.Execute(f, projectName)
+		wg.Done()
+	}()
 
+	wg.Add(1)
+	go func() {
+		gitIgnorePath := path.Join(rootDir, ".gitignore")
+		f, err := os.Create(gitIgnorePath)
+		if err != nil {
+			log.Printf("Error creating commit0 config: %v", err)
+		}
+
+		t.GitIgnore.Execute(f, projectName)
+		wg.Done()
+	}()
+
+	wg.Wait()
 	return rootDir
 }
 

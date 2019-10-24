@@ -4,20 +4,21 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
 )
 
-func Generate(templator *templator.Templator, config *config.Commit0Config) {
-	GenerateGoMain(templator, config)
-	GenerateGoMod(templator, config)
-	GenerateHealthServer(templator, config)
-	GenerateServers(templator, config)
+func Generate(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
+	GenerateGoMain(templator, config, wg)
+	GenerateGoMod(templator, config, wg)
+	GenerateHealthServer(templator, config, wg)
+	GenerateServers(templator, config, wg)
 }
 
-func GenerateGoMain(templator *templator.Templator, config *config.Commit0Config) {
+func GenerateGoMain(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
 	if _, err := os.Stat("main.go"); os.IsNotExist(err) {
 
 		f, err := os.Create("main.go")
@@ -26,23 +27,25 @@ func GenerateGoMain(templator *templator.Templator, config *config.Commit0Config
 			log.Printf("Error: %v", err)
 		}
 
+		wg.Add(1)
 		go templator.Go.GoMain.Execute(f, config)
 	} else {
 		log.Printf("main.go already exists. skipping.")
 	}
 }
 
-func GenerateGoMod(templator *templator.Templator, config *config.Commit0Config) {
+func GenerateGoMod(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
 	f, err := os.Create("go.mod")
 
 	if err != nil {
 		log.Printf("Error: %v", err)
 	}
 
+	wg.Add(1)
 	go templator.Go.GoMod.Execute(f, config)
 }
 
-func GenerateServers(templator *templator.Templator, config *config.Commit0Config) {
+func GenerateServers(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
 	serverDirPath := "server"
 	err := util.CreateDirIfDoesNotExist(serverDirPath)
 	if err != nil {
@@ -74,12 +77,13 @@ func GenerateServers(templator *templator.Templator, config *config.Commit0Confi
 			"GitRepo":     config.GitRepo,
 		}
 
+		wg.Add(1)
 		go templator.Go.GoServer.Execute(f, data)
 	}
 
 }
 
-func GenerateHealthServer(templator *templator.Templator, config *config.Commit0Config) {
+func GenerateHealthServer(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
 	serverDirPath := "server"
 	err := util.CreateDirIfDoesNotExist(serverDirPath)
 	if err != nil {
@@ -99,5 +103,6 @@ func GenerateHealthServer(templator *templator.Templator, config *config.Commit0
 		log.Printf("Error: %v", err)
 	}
 
+	wg.Add(1)
 	go templator.Go.GoHealthServer.Execute(f, config)
 }

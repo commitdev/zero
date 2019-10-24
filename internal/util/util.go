@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"text/template"
 )
 
@@ -21,28 +22,32 @@ var FuncMap = template.FuncMap{
 	"Title": strings.Title,
 }
 
-func createTemplatedFile(fullFilePath string, template *template.Template, data interface{}) {
+func createTemplatedFile(fullFilePath string, template *template.Template, wg sync.WaitGroup, data interface{}) {
 	f, err := os.Create(fullFilePath)
 	if err != nil {
 		log.Printf("Error creating file: %v", err)
 	}
-	err = template.Execute(f, data)
-	if err != nil {
-		log.Printf("Error templating: %v", err)
-	}
+	wg.Add(1)
+	go func() {
+		err = template.Execute(f, data)
+		if err != nil {
+			log.Printf("Error templating: %v", err)
+		}
+		wg.Done()
+	}()
 }
 
-func TemplateFileAndOverwrite(fileDir string, fileName string, template *template.Template, data interface{}) {
+func TemplateFileAndOverwrite(fileDir string, fileName string, template *template.Template, wg sync.WaitGroup, data interface{}) {
 	fullFilePath := fmt.Sprintf("%v/%v", fileDir, fileName)
 	err := os.MkdirAll(fileDir, os.ModePerm)
 	if err != nil {
 		log.Printf("Error creating directory %v: %v", fullFilePath, err)
 	}
-	createTemplatedFile(fullFilePath, template, data)
+	createTemplatedFile(fullFilePath, template, wg, data)
 
 }
 
-func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *template.Template, data interface{}) {
+func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *template.Template, wg sync.WaitGroup, data interface{}) {
 	fullFilePath := path.Join(fileDir, fileName)
 
 	if _, err := os.Stat(fullFilePath); os.IsNotExist(err) {
@@ -52,7 +57,7 @@ func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *templ
 				log.Printf("Error creating directory %v: %v", fullFilePath, err)
 			}
 		}
-		createTemplatedFile(fullFilePath, template, data)
+		createTemplatedFile(fullFilePath, template, wg, data)
 	} else {
 		log.Printf("%v already exists. skipping.", fullFilePath)
 	}
