@@ -55,7 +55,7 @@ var generateCmd = &cobra.Command{
 		}
 
 		if cfg.CI.System != "" {
-			ci.Generate(Templator.CI, cfg)
+			ci.Generate(Templator.CI, cfg, ".")
 		}
 
 		if cfg.Network.Http.Enabled {
