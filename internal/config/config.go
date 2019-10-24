@@ -62,6 +62,7 @@ type Commit0Config struct {
 type Kubernetes struct {
 	ClusterName string
 	DNSName string
+	Deploy bool
 }
 
 func LoadConfig(filePath string) *Commit0Config {
