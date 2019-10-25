@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"log"
+	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/generate/docker"
@@ -10,6 +11,7 @@ import (
 	"github.com/commitdev/commit0/internal/generate/proto"
 	"github.com/commitdev/commit0/internal/generate/react"
 	"github.com/commitdev/commit0/internal/templator"
+	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/spf13/cobra"
 )
@@ -47,20 +49,26 @@ var generateCmd = &cobra.Command{
 		cfg.Language = language
 		cfg.Print()
 
+		var wg sync.WaitGroup
 		switch language {
 		case Go:
-			proto.Generate(t, cfg)
-			golang.Generate(t, cfg)
-			docker.GenerateGoAppDockerFile(t, cfg)
-			docker.GenerateGoDockerCompose(t, cfg)
+			proto.Generate(t, cfg, &wg)
+			golang.Generate(t, cfg, &wg)
+
+			docker.GenerateGoAppDockerFile(t, cfg, &wg)
+			docker.GenerateGoDockerCompose(t, cfg, &wg)
 		case React:
-			react.Generate(t, cfg)
+			react.Generate(t, cfg, &wg)
 		}
 
+		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, &wg, cfg)
+
 		if cfg.Network.Http.Enabled {
-			http.GenerateHttpGW(t, cfg)
-			docker.GenerateGoHttpGWDockerFile(t, cfg)
+			http.GenerateHTTPGW(t, cfg, &wg)
+			docker.GenerateGoHTTPGWDockerFile(t, cfg, &wg)
 		}
+
+		wg.Wait()
 	},
 }
 

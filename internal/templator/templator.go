@@ -3,6 +3,7 @@ package templator
 import (
 	"path/filepath"
 	"strings"
+	"sync"
 	"text/template"
 
 	"github.com/commitdev/commit0/internal/config"
@@ -11,6 +12,7 @@ import (
 	"github.com/gobuffalo/packr/v2/file"
 )
 
+// DockerTemplator contains the templates relevent to docker
 type DockerTemplator struct {
 	ApplicationDocker *template.Template
 	HttpGatewayDocker *template.Template
@@ -18,18 +20,21 @@ type DockerTemplator struct {
 	DockerCompose     *template.Template
 }
 
+// GoTemplator contains the templates relevant to a go project
 type GoTemplator struct {
 	GoMain         *template.Template
 	GoMod          *template.Template
 	GoModIDL       *template.Template
 	GoServer       *template.Template
 	GoHealthServer *template.Template
-	GoHttpGW       *template.Template
+	GoHTTPGW       *template.Template
 }
 
+// Templator contains all the templates
 type Templator struct {
 	Commit0              *template.Template
 	GitIgnore            *template.Template
+	Readme               *template.Template
 	MakefileTemplate     *template.Template
 	ProtoHealthTemplate  *template.Template
 	ProtoServiceTemplate *template.Template
@@ -39,105 +44,69 @@ type Templator struct {
 }
 
 func NewTemplator(box *packr.Box) *Templator {
-	makeFileTemplateSource, _ := box.FindString("proto/makefile.tmpl")
-	makeFileTemplate, _ := template.New("ProtoToolTemplate").Parse(makeFileTemplateSource)
-
-	protoHealthTemplateSource, _ := box.FindString("proto/health_proto.tmpl")
-	protoHealthTemplate, _ := template.New("ProtoHealthTemplate").Parse(protoHealthTemplateSource)
-
-	protoServiceTemplateSource, _ := box.FindString("proto/service_proto.tmpl")
-	protoServiceTemplate, _ := template.New("ProtoServiceTemplate").Funcs(util.FuncMap).Parse(protoServiceTemplateSource)
-
 	return &Templator{
-		MakefileTemplate:     makeFileTemplate,
-		ProtoHealthTemplate:  protoHealthTemplate,
-		ProtoServiceTemplate: protoServiceTemplate,
+		MakefileTemplate:     NewSingleFileTemplator(box, "proto/makefile.tmpl"),
+		ProtoHealthTemplate:  NewSingleFileTemplator(box, "proto/health_proto.tmpl"),
+		ProtoServiceTemplate: NewSingleFileTemplator(box, "proto/service_proto.tmpl"),
 		Go:                   NewGoTemplator(box),
-		Commit0:              NewCommit0Templator(box),
-		GitIgnore:            NewGitIgnoreTemplator(box),
+		Commit0:              NewSingleFileTemplator(box, "commit0/commit0.tmpl"),
+		GitIgnore:            NewSingleFileTemplator(box, "util/gitignore.tmpl"),
+		Readme:               NewSingleFileTemplator(box, "util/README.tmpl"),
 		Docker:               NewDockerFileTemplator(box),
 		React:                NewDirectoryTemplator(box, "react"),
 	}
 }
 
 func NewGoTemplator(box *packr.Box) *GoTemplator {
-	goServerTemplateSource, _ := box.FindString("golang/server.tmpl")
-	goServerTemplate, _ := template.New("GoServerTemplate").Funcs(util.FuncMap).Parse(goServerTemplateSource)
-
-	goHealthTemplateSource, _ := box.FindString("golang/health_server.tmpl")
-	goHealthServerTemplate, _ := template.New("GoHealthServerTemplate").Parse(goHealthTemplateSource)
-
-	goModTemplateSource, _ := box.FindString("golang/go_mod.tmpl")
-	goModTemplate, _ := template.New("GoModTemplate").Parse(goModTemplateSource)
-
-	goModIDLTemplateSource, _ := box.FindString("golang/go_mod_idl.tmpl")
-	goModIDLTemplate, _ := template.New("GoModTemplate").Parse(goModIDLTemplateSource)
-
-	goMainTemplateSource, _ := box.FindString("golang/main.tmpl")
-	goMainTemplate, _ := template.New("GoMainTemplate").Funcs(util.FuncMap).Parse(goMainTemplateSource)
-
-	goHttpTemplateSource, _ := box.FindString("golang/http_gw.tmpl")
-	goHttpTemplate, _ := template.New("GoHttpGWTemplate").Funcs(util.FuncMap).Parse(goHttpTemplateSource)
-
 	return &GoTemplator{
-		GoMain:         goMainTemplate,
-		GoMod:          goModTemplate,
-		GoModIDL:       goModIDLTemplate,
-		GoServer:       goServerTemplate,
-		GoHealthServer: goHealthServerTemplate,
-		GoHttpGW:       goHttpTemplate,
+		GoMain:         NewSingleFileTemplator(box, "golang/main.tmpl"),
+		GoMod:          NewSingleFileTemplator(box, "golang/go_mod.tmpl"),
+		GoModIDL:       NewSingleFileTemplator(box, "golang/go_mod_idl.tmpl"),
+		GoServer:       NewSingleFileTemplator(box, "golang/server.tmpl"),
+		GoHealthServer: NewSingleFileTemplator(box, "golang/health_server.tmpl"),
+		GoHTTPGW:       NewSingleFileTemplator(box, "golang/http_gw.tmpl"),
 	}
 
-}
-
-func NewCommit0Templator(box *packr.Box) *template.Template {
-	templateSource, _ := box.FindString("commit0/commit0.tmpl")
-	template, _ := template.New("Commit0Template").Funcs(util.FuncMap).Parse(templateSource)
-
-	return template
-}
-
-func NewGitIgnoreTemplator(box *packr.Box) *template.Template {
-	templateSource, _ := box.FindString("util/gitignore.tmpl")
-	template, _ := template.New("GitIgnore").Parse(templateSource)
-	return template
 }
 
 func NewDockerFileTemplator(box *packr.Box) *DockerTemplator {
-	appTemplateSource, _ := box.FindString("docker/dockerfile_app.tmpl")
-	appTemplate, _ := template.New("AppDockerfile").Parse(appTemplateSource)
-
-	httpTemplateSource, _ := box.FindString("docker/dockerfile_http.tmpl")
-	httpTemplate, _ := template.New("HttpDockerfile").Parse(httpTemplateSource)
-
-	ignoreTemplateSource, _ := box.FindString("docker/dockerignore.tmpl")
-	ignoreTemplate, _ := template.New("Dockerignore").Parse(ignoreTemplateSource)
-
-	composeTemplateSource, _ := box.FindString("docker/dockercompose.tmpl")
-	composeTemplate, _ := template.New("Dockercompose").Parse(composeTemplateSource)
-
 	return &DockerTemplator{
-		ApplicationDocker: appTemplate,
-		HttpGatewayDocker: httpTemplate,
-		DockerIgnore:      ignoreTemplate,
-		DockerCompose:     composeTemplate,
+		ApplicationDocker: NewSingleFileTemplator(box, "docker/dockerfile_app.tmpl"),
+		HttpGatewayDocker: NewSingleFileTemplator(box, "docker/dockerfile_http.tmpl"),
+		DockerIgnore:      NewSingleFileTemplator(box, "docker/dockerignore.tmpl"),
+		DockerCompose:     NewSingleFileTemplator(box, "docker/dockercompose.tmpl"),
 	}
+}
+
+// NewSingleFileTemplator returns a template struct for a given template file
+func NewSingleFileTemplator(box *packr.Box, file string) *template.Template {
+	source, err := box.FindString(file)
+	if err != nil {
+		panic(err)
+	}
+
+	t, err := template.New(file).Funcs(util.FuncMap).Parse(source)
+	if err != nil {
+		panic(err)
+	}
+
+	return t
 }
 
 type DirectoryTemplator struct {
 	Templates []*template.Template
 }
 
-func (d *DirectoryTemplator) TemplateFiles(config *config.Commit0Config, overwrite bool) {
+func (d *DirectoryTemplator) TemplateFiles(config *config.Commit0Config, overwrite bool, wg *sync.WaitGroup) {
 	for _, template := range d.Templates {
 		d, f := filepath.Split(template.Name())
 		if strings.HasSuffix(f, ".tmpl") {
 			f = strings.Replace(f, ".tmpl", "", -1)
 		}
 		if overwrite {
-			util.TemplateFileAndOverwrite(d, f, template, config)
+			util.TemplateFileAndOverwrite(d, f, template, wg, config)
 		} else {
-			util.TemplateFileIfDoesNotExist(d, f, template, config)
+			util.TemplateFileIfDoesNotExist(d, f, template, wg, config)
 		}
 	}
 }
