@@ -28,8 +28,8 @@ func Create(projectName string, outDir string, t *templator.Templator) string {
 	}
 	var wg sync.WaitGroup
 
-	util.TemplateFileIfDoesNotExist(rootDir, "commit0.yml", t.Commit0, wg, projectName)
-	util.TemplateFileIfDoesNotExist(rootDir, ".gitignore", t.GitIgnore, wg, projectName)
+	util.TemplateFileIfDoesNotExist(rootDir, "commit0.yml", t.Commit0, &wg, projectName)
+	util.TemplateFileIfDoesNotExist(rootDir, ".gitignore", t.GitIgnore, &wg, projectName)
 
 	wg.Wait()
 	return rootDir

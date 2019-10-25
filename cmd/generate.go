@@ -52,20 +52,20 @@ var generateCmd = &cobra.Command{
 		var wg sync.WaitGroup
 		switch language {
 		case Go:
-			proto.Generate(t, cfg, wg)
-			golang.Generate(t, cfg, wg)
+			proto.Generate(t, cfg, &wg)
+			golang.Generate(t, cfg, &wg)
 
-			docker.GenerateGoAppDockerFile(t, cfg, wg)
-			docker.GenerateGoDockerCompose(t, cfg, wg)
+			docker.GenerateGoAppDockerFile(t, cfg, &wg)
+			docker.GenerateGoDockerCompose(t, cfg, &wg)
 		case React:
-			react.Generate(t, cfg, wg)
+			react.Generate(t, cfg, &wg)
 		}
 
-		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, wg, cfg)
+		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, &wg, cfg)
 
 		if cfg.Network.Http.Enabled {
-			http.GenerateHTTPGW(t, cfg, wg)
-			docker.GenerateGoHTTPGWDockerFile(t, cfg, wg)
+			http.GenerateHTTPGW(t, cfg, &wg)
+			docker.GenerateGoHTTPGWDockerFile(t, cfg, &wg)
 		}
 
 		wg.Wait()

@@ -12,7 +12,7 @@ import (
 	"github.com/commitdev/commit0/internal/util"
 )
 
-func Generate(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
+func Generate(templator *templator.Templator, config *config.Commit0Config, wg *sync.WaitGroup) {
 	idlPath := fmt.Sprintf("%s-idl", config.Name)
 	idlHealthPath := fmt.Sprintf("%s/proto/health", idlPath)
 
@@ -24,7 +24,7 @@ func Generate(templator *templator.Templator, config *config.Commit0Config, wg s
 	GenerateProtoServiceLibs(config)
 }
 
-func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Commit0Config, wg sync.WaitGroup) {
+func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup) {
 	protoPath := fmt.Sprintf("%s-idl/proto", cfg.Name)
 	for _, s := range cfg.Services {
 		serviceProtoDir := fmt.Sprintf("%s/%s", protoPath, s.Name)

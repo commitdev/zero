@@ -97,7 +97,7 @@ type DirectoryTemplator struct {
 	Templates []*template.Template
 }
 
-func (d *DirectoryTemplator) TemplateFiles(config *config.Commit0Config, overwrite bool, wg sync.WaitGroup) {
+func (d *DirectoryTemplator) TemplateFiles(config *config.Commit0Config, overwrite bool, wg *sync.WaitGroup) {
 	for _, template := range d.Templates {
 		d, f := filepath.Split(template.Name())
 		if strings.HasSuffix(f, ".tmpl") {

@@ -22,7 +22,7 @@ var FuncMap = template.FuncMap{
 	"Title": strings.Title,
 }
 
-func createTemplatedFile(fullFilePath string, template *template.Template, wg sync.WaitGroup, data interface{}) {
+func createTemplatedFile(fullFilePath string, template *template.Template, wg *sync.WaitGroup, data interface{}) {
 	f, err := os.Create(fullFilePath)
 	if err != nil {
 		log.Printf("Error creating file: %v", err)
@@ -33,11 +33,12 @@ func createTemplatedFile(fullFilePath string, template *template.Template, wg sy
 		if err != nil {
 			log.Printf("Error templating: %v", err)
 		}
+		log.Printf("Finished templating : %v", fullFilePath)
 		wg.Done()
 	}()
 }
 
-func TemplateFileAndOverwrite(fileDir string, fileName string, template *template.Template, wg sync.WaitGroup, data interface{}) {
+func TemplateFileAndOverwrite(fileDir string, fileName string, template *template.Template, wg *sync.WaitGroup, data interface{}) {
 	fullFilePath := fmt.Sprintf("%v/%v", fileDir, fileName)
 	err := os.MkdirAll(fileDir, os.ModePerm)
 	if err != nil {
@@ -47,7 +48,7 @@ func TemplateFileAndOverwrite(fileDir string, fileName string, template *templat
 
 }
 
-func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *template.Template, wg sync.WaitGroup, data interface{}) {
+func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *template.Template, wg *sync.WaitGroup, data interface{}) {
 	fullFilePath := path.Join(fileDir, fileName)
 
 	if _, err := os.Stat(fullFilePath); os.IsNotExist(err) {
