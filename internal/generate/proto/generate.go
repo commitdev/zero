@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"os"
 	"os/exec"
 	"sync"
 
@@ -14,76 +13,22 @@ import (
 )
 
 func Generate(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
-	GenerateIDLMakefile(templator, config, wg)
-	GenerateProtoHealth(templator, config, wg)
-	GenerateServiceProtobufFiles(templator, config, wg)
-	GenerateGoModIDL(templator, config, wg)
-	GenerateProtoServiceLibs(config)
-}
-
-func GenerateGoModIDL(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
 	idlPath := fmt.Sprintf("%s-idl", config.Name)
-	idlOutput := fmt.Sprintf("%s/go.mod", idlPath)
-	err := util.CreateDirIfDoesNotExist(idlPath)
-	f, err := os.Create(idlOutput)
+	idlHealthPath := fmt.Sprintf("%s/proto/health", idlPath)
 
-	if err != nil {
-		log.Printf("Error: %v", err)
-	}
+	util.TemplateFileIfDoesNotExist(idlPath, "go.mod", templator.Go.GoModIDL, wg, config)
+	util.TemplateFileIfDoesNotExist(idlPath, "Makefile", templator.MakefileTemplate, wg, config)
+	GenerateServiceProtobufFiles(templator, config, wg)
+	util.TemplateFileIfDoesNotExist(idlHealthPath, "health.proto", templator.ProtoHealthTemplate, wg, config)
 
-	wg.Add(1)
-	go templator.Go.GoModIDL.Execute(f, config)
-}
-
-func GenerateIDLMakefile(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
-	makeFilePath := fmt.Sprintf("%s-idl", config.Name)
-	makeFileOutput := fmt.Sprintf("%s/Makefile", makeFilePath)
-
-	err := util.CreateDirIfDoesNotExist(makeFilePath)
-	if err != nil {
-		log.Printf("Error generating prototool config: %v", err)
-	}
-
-	f, err := os.Create(makeFileOutput)
-	if err != nil {
-		log.Printf("Error: %v", err)
-	}
-
-	wg.Add(1)
-	go templator.MakefileTemplate.Execute(f, config)
-}
-
-func GenerateProtoHealth(templator *templator.Templator, config *config.Commit0Config, wg sync.WaitGroup) {
-	protoHealthPath := fmt.Sprintf("%s-idl/proto/health", config.Name)
-	protoHealthOutput := fmt.Sprintf("%s/health.proto", protoHealthPath)
-
-	err := util.CreateDirIfDoesNotExist(protoHealthPath)
-	if err != nil {
-		log.Printf("Error: %v", err)
-	}
-
-	f, err := os.Create(protoHealthOutput)
-	if err != nil {
-		log.Printf("Error: %v", err)
-	}
-
-	wg.Add(1)
-	go templator.ProtoHealthTemplate.Execute(f, config)
+	GenerateProtoServiceLibs(config)
 }
 
 func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Commit0Config, wg sync.WaitGroup) {
 	protoPath := fmt.Sprintf("%s-idl/proto", cfg.Name)
 	for _, s := range cfg.Services {
 		serviceProtoDir := fmt.Sprintf("%s/%s", protoPath, s.Name)
-		err := os.Mkdir(serviceProtoDir, os.ModePerm)
-		if os.IsExist(err) {
-			log.Printf("%s service proto exists skipping.", s.Name)
-			continue
-		}
-
-		serviceProtoFilePath := fmt.Sprintf("%s/%s.proto", serviceProtoDir, s.Name)
-
-		f, err := os.Create(serviceProtoFilePath)
+		file := fmt.Sprintf("%s.proto", s.Name)
 
 		data := struct {
 			*config.Commit0Config
@@ -93,8 +38,7 @@ func GenerateServiceProtobufFiles(templator *templator.Templator, cfg *config.Co
 			s.Name,
 		}
 
-		wg.Add(1)
-		go templator.ProtoServiceTemplate.Execute(f, data)
+		util.TemplateFileIfDoesNotExist(serviceProtoDir, file, templator.ProtoServiceTemplate, wg, data)
 	}
 }
 

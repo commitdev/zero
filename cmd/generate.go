@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"log"
-	"os"
 	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
@@ -12,6 +11,7 @@ import (
 	"github.com/commitdev/commit0/internal/generate/proto"
 	"github.com/commitdev/commit0/internal/generate/react"
 	"github.com/commitdev/commit0/internal/templator"
+	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/spf13/cobra"
 )
@@ -61,16 +61,7 @@ var generateCmd = &cobra.Command{
 			react.Generate(t, cfg, wg)
 		}
 
-		f, err := os.Create("README.md")
-		if err != nil {
-			log.Printf("Error creating commit0 config: %v", err)
-		}
-
-		wg.Add(1)
-		go func() {
-			t.Readme.Execute(f, cfg)
-			wg.Done()
-		}()
+		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, wg, cfg)
 
 		if cfg.Network.Http.Enabled {
 			http.GenerateHTTPGW(t, cfg, wg)

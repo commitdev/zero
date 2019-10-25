@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/commitdev/commit0/internal/templator"
+	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/spf13/cobra"
 )
@@ -25,33 +26,10 @@ func Create(projectName string, outDir string, t *templator.Templator) string {
 	} else if err != nil {
 		log.Fatalf("Error creating root: %v ", err)
 	}
-
-	commit0ConfigPath := path.Join(rootDir, "commit0.yml")
-	log.Printf("%s", commit0ConfigPath)
-
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		f, err := os.Create(commit0ConfigPath)
-		if err != nil {
-			log.Printf("Error creating commit0 config: %v", err)
-		}
 
-		t.Commit0.Execute(f, projectName)
-		wg.Done()
-	}()
-
-	wg.Add(1)
-	go func() {
-		gitIgnorePath := path.Join(rootDir, ".gitignore")
-		f, err := os.Create(gitIgnorePath)
-		if err != nil {
-			log.Printf("Error creating commit0 config: %v", err)
-		}
-
-		t.GitIgnore.Execute(f, projectName)
-		wg.Done()
-	}()
+	util.TemplateFileIfDoesNotExist(rootDir, "commit0.yml", t.Commit0, wg, projectName)
+	util.TemplateFileIfDoesNotExist(rootDir, ".gitignore", t.GitIgnore, wg, projectName)
 
 	wg.Wait()
 	return rootDir
