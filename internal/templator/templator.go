@@ -41,6 +41,7 @@ type Templator struct {
 	Go                   *GoTemplator
 	Docker               *DockerTemplator
 	React                *DirectoryTemplator
+	Kubernetes           *DirectoryTemplator
 }
 
 func NewTemplator(box *packr.Box) *Templator {
@@ -54,6 +55,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		Readme:               NewSingleFileTemplator(box, "util/README.tmpl"),
 		Docker:               NewDockerFileTemplator(box),
 		React:                NewDirectoryTemplator(box, "react"),
+		Kubernetes:           NewDirectoryTemplator(box, "kubernetes"),
 	}
 }
 

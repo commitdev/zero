@@ -1,20 +1,19 @@
 package cmd
 
 import (
-
-	"log"
-	"sync"
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/generate/docker"
 	"github.com/commitdev/commit0/internal/generate/golang"
 	"github.com/commitdev/commit0/internal/generate/http"
+	"github.com/commitdev/commit0/internal/generate/kubernetes"
 	"github.com/commitdev/commit0/internal/generate/proto"
 	"github.com/commitdev/commit0/internal/generate/react"
-	"github.com/commitdev/commit0/internal/generate/kubernetes"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/spf13/cobra"
+	"log"
+	"sync"
 )
 
 var configPath string
@@ -62,7 +61,7 @@ var generateCmd = &cobra.Command{
 		case React:
 			react.Generate(t, cfg, &wg)
 		case Kubernetes:
-			kubernetes.Generate(Templator, cfg)
+			kubernetes.Generate(t, cfg, &wg)
 		}
 
 		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, &wg, cfg)
