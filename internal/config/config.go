@@ -60,10 +60,10 @@ type Commit0Config struct {
 }
 
 type Kubernetes struct {
-	ClusterName  string
-	Deploy       bool
-	AWSAccountId string
-	AWSRegion    string
+	ClusterName  string `yaml:"clusterName"`
+	Deploy       bool   `yaml:"deploy"`
+	AWSAccountId string `yaml:"awsAccountId"`
+	AWSRegion    string `yaml:"awsRegion"`
 }
 
 func LoadConfig(filePath string) *Commit0Config {

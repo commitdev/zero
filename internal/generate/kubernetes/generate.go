@@ -1,13 +1,11 @@
 package kubernetes
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
@@ -17,65 +15,50 @@ import (
 func Generate(templator *templator.Templator, config *config.Commit0Config, wg *sync.WaitGroup) {
 	templator.Kubernetes.TemplateFiles(config, false, wg)
 
+}
+
+func Execute(config *config.Commit0Config) {
 	if config.Kubernetes.Deploy {
-		_tf_init := tf_init()
-		_tf_plan := tf_plan()
-		execute(_tf_init)
-		execute(_tf_plan)
+		log.Println("Planning infrastructure...")
+		execute(exec.Command("terraform", "init"))
+		execute(exec.Command("terraform", "plan"))
 	}
-
-}
-
-// Terraform init cmd
-func tf_init() *exec.Cmd {
-
-	return exec.Command("terraform", "init")
-}
-
-// Terraform plan cmd
-func tf_plan() *exec.Cmd {
-
-	return exec.Command("terraform", "plan")
 }
 
 func execute(cmd *exec.Cmd) {
-	dir, err1 := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err1 != nil {
-		log.Fatal(err1)
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Getting working directory failed: %v\n", err)
 	}
 
-	cmd.Dir = dir + "/kubernetes/terraform/environments/staging"
+	cmd.Dir = fmt.Sprintf("%s/kubernetes/terraform/environments/staging", dir)
 
-	var stdoutBuf, stderrBuf bytes.Buffer
-	stdoutIn, _ := cmd.StdoutPipe()
-	stderrIn, _ := cmd.StderrPipe()
+	stdoutPipe, _ := cmd.StdoutPipe()
+	stderrPipe, _ := cmd.StderrPipe()
 
 	var errStdout, errStderr error
-	stdout := io.MultiWriter(os.Stdout, &stdoutBuf)
-	stderr := io.MultiWriter(os.Stderr, &stderrBuf)
-	err := cmd.Start()
+	err = cmd.Start()
 	if err != nil {
-		log.Fatalf("cmd.Start() failed with '%s'\n", err)
+		log.Fatalf("Starting terraform command failed: %v\n", err)
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-
 	go func() {
-		_, errStdout = io.Copy(stdout, stdoutIn)
-		wg.Done()
+		_, errStdout = io.Copy(os.Stdout, stdoutPipe)
 	}()
-
-	_, errStderr = io.Copy(stderr, stderrIn)
-	wg.Wait()
+	go func() {
+		_, errStderr = io.Copy(os.Stderr, stderrPipe)
+	}()
 
 	err = cmd.Wait()
 	if err != nil {
-		log.Fatalf("cmd.Run() failed with %s\n", err)
+		log.Fatalf("Executing terraform command failed: %v\n", err)
 	}
-	if errStdout != nil || errStderr != nil {
-		log.Fatal("failed to capture stdout or stderr\n")
+
+	if errStdout != nil {
+		log.Printf("Failed to capture stdout: %v\n", errStdout)
 	}
-	outStr, errStr := string(stdoutBuf.Bytes()), string(stderrBuf.Bytes())
-	fmt.Printf("\nout:\n%s\nerr:\n%s\n", outStr, errStr)
+
+	if errStderr != nil {
+		log.Printf("Failed to capture stderr: %v\n", errStderr)
+	}
 }

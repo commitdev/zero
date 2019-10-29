@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"log"
+	"sync"
+
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/generate/docker"
 	"github.com/commitdev/commit0/internal/generate/golang"
@@ -12,8 +15,6 @@ import (
 	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/spf13/cobra"
-	"log"
-	"sync"
 )
 
 var configPath string
@@ -71,7 +72,14 @@ var generateCmd = &cobra.Command{
 			docker.GenerateGoHTTPGWDockerFile(t, cfg, &wg)
 		}
 
+		// Wait for all the templates to be generated
 		wg.Wait()
+
+		switch language {
+		case Kubernetes:
+			kubernetes.Execute(cfg)
+		}
+
 	},
 }
 
