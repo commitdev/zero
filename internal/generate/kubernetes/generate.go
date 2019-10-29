@@ -2,14 +2,16 @@ package kubernetes
 
 import (
 	"bytes"
-	"github.com/commitdev/commit0/internal/config"
-	"github.com/commitdev/commit0/internal/templator"
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"sync"
+
+	"github.com/commitdev/commit0/internal/config"
+	"github.com/commitdev/commit0/internal/templator"
 )
 
 func Generate(templator *templator.Templator, config *config.Commit0Config, wg *sync.WaitGroup) {
@@ -36,7 +38,6 @@ func tf_plan() *exec.Cmd {
 	return exec.Command("terraform", "plan")
 }
 
-// Executes cmd passed in
 func execute(cmd *exec.Cmd) {
 	dir, err1 := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err1 != nil {
@@ -45,11 +46,13 @@ func execute(cmd *exec.Cmd) {
 
 	cmd.Dir = dir + "/kubernetes/terraform/environments/staging"
 
-	var errStdout, errStderr error
+	var stdoutBuf, stderrBuf bytes.Buffer
 	stdoutIn, _ := cmd.StdoutPipe()
 	stderrIn, _ := cmd.StderrPipe()
-	stdout := NewCapturingPassThroughWriter(os.Stdout)
-	stderr := NewCapturingPassThroughWriter(os.Stderr)
+
+	var errStdout, errStderr error
+	stdout := io.MultiWriter(os.Stdout, &stdoutBuf)
+	stderr := io.MultiWriter(os.Stderr, &stderrBuf)
 	err := cmd.Start()
 	if err != nil {
 		log.Fatalf("cmd.Start() failed with '%s'\n", err)
@@ -73,29 +76,6 @@ func execute(cmd *exec.Cmd) {
 	if errStdout != nil || errStderr != nil {
 		log.Fatal("failed to capture stdout or stderr\n")
 	}
-}
-
-// CapturingPassThroughWriter is a writer that remembers
-// data written to it and passes it to w
-type CapturingPassThroughWriter struct {
-	buf bytes.Buffer
-	w   io.Writer
-}
-
-// NewCapturingPassThroughWriter creates new CapturingPassThroughWriter
-func NewCapturingPassThroughWriter(w io.Writer) *CapturingPassThroughWriter {
-	return &CapturingPassThroughWriter{
-		w: w,
-	}
-}
-
-// Write writes data to the writer, returns number of bytes written and an error
-func (w *CapturingPassThroughWriter) Write(d []byte) (int, error) {
-	w.buf.Write(d)
-	return w.w.Write(d)
-}
-
-// Bytes returns bytes written to the writer
-func (w *CapturingPassThroughWriter) Bytes() []byte {
-	return w.buf.Bytes()
+	outStr, errStr := string(stdoutBuf.Bytes()), string(stderrBuf.Bytes())
+	fmt.Printf("\nout:\n%s\nerr:\n%s\n", outStr, errStr)
 }
