@@ -8,6 +8,7 @@ import (
 	"github.com/commitdev/commit0/internal/generate/docker"
 	"github.com/commitdev/commit0/internal/generate/golang"
 	"github.com/commitdev/commit0/internal/generate/http"
+	"github.com/commitdev/commit0/internal/generate/kubernetes"
 	"github.com/commitdev/commit0/internal/generate/proto"
 	"github.com/commitdev/commit0/internal/generate/react"
 	"github.com/commitdev/commit0/internal/templator"
@@ -20,11 +21,12 @@ var configPath string
 var language string
 
 const (
-	Go    = "go"
-	React = "react"
+	Go         = "go"
+	React      = "react"
+	Kubernetes = "kubernetes"
 )
 
-var supportedLanguages = [...]string{Go, React}
+var supportedLanguages = [...]string{Go, React, Kubernetes}
 
 func init() {
 
@@ -59,6 +61,8 @@ var generateCmd = &cobra.Command{
 			docker.GenerateGoDockerCompose(t, cfg, &wg)
 		case React:
 			react.Generate(t, cfg, &wg)
+		case Kubernetes:
+			kubernetes.Generate(t, cfg, &wg)
 		}
 
 		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, &wg, cfg)
@@ -68,7 +72,14 @@ var generateCmd = &cobra.Command{
 			docker.GenerateGoHTTPGWDockerFile(t, cfg, &wg)
 		}
 
+		// Wait for all the templates to be generated
 		wg.Wait()
+
+		switch language {
+		case Kubernetes:
+			kubernetes.Execute(cfg)
+		}
+
 	},
 }
 
