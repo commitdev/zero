@@ -31,7 +31,7 @@ func TestGenerateJenkins(t *testing.T) {
 	templates := packr.New("templates", "../../../templates")
 	testTemplator := templator.NewTemplator(templates)
 
-	var waitgroup *sync.WaitGroup
+	var waitgroup sync.WaitGroup
 
 	testConf := &config.Commit0Config{
 		Language: "go",
@@ -40,10 +40,11 @@ func TestGenerateJenkins(t *testing.T) {
 		},
 	}
 
-	err := ci.Generate(testTemplator.CI, testConf, testData+"/actual", waitgroup)
+	err := ci.Generate(testTemplator.CI, testConf, testData+"/actual", &waitgroup)
 	if err != nil {
 		t.Errorf("Error when executing test. %s", err)
 	}
+	waitgroup.Wait()
 
 	actual, err := ioutil.ReadFile(testData + "actual/Jenkinsfile")
 	if err != nil {
@@ -66,7 +67,7 @@ func TestGenerateCircleCI(t *testing.T) {
 	templates := packr.New("templates", "../../../templates")
 	testTemplator := templator.NewTemplator(templates)
 
-	var waitgroup *sync.WaitGroup
+	var waitgroup sync.WaitGroup
 
 	testConf := &config.Commit0Config{
 		Language: "go",
@@ -75,10 +76,11 @@ func TestGenerateCircleCI(t *testing.T) {
 		},
 	}
 
-	err := ci.Generate(testTemplator.CI, testConf, testData+"/actual", waitgroup)
+	err := ci.Generate(testTemplator.CI, testConf, testData+"/actual", &waitgroup)
 	if err != nil {
 		t.Errorf("Error when executing test. %s", err)
 	}
+	waitgroup.Wait()
 
 	actual, err := ioutil.ReadFile(testData + "actual/.circleci/config.yml")
 	if err != nil {
@@ -101,7 +103,7 @@ func TestGenerateTravisCI(t *testing.T) {
 	templates := packr.New("templates", "../../../templates")
 	testTemplator := templator.NewTemplator(templates)
 
-	var waitgroup *sync.WaitGroup
+	var waitgroup sync.WaitGroup
 
 	testConf := &config.Commit0Config{
 		Language: "go",
@@ -110,10 +112,11 @@ func TestGenerateTravisCI(t *testing.T) {
 		},
 	}
 
-	err := ci.Generate(testTemplator.CI, testConf, testData+"/actual", waitgroup)
+	err := ci.Generate(testTemplator.CI, testConf, testData+"/actual", &waitgroup)
 	if err != nil {
 		t.Errorf("Error when executing test. %s", err)
 	}
+	waitgroup.Wait()
 
 	actual, err := ioutil.ReadFile(testData + "actual/.travis.yml")
 	if err != nil {
