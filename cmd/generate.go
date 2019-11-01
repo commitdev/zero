@@ -5,10 +5,7 @@ import (
 	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
-	"github.com/commitdev/commit0/internal/generate/ci"
-	"github.com/commitdev/commit0/internal/generate/docker"
 	"github.com/commitdev/commit0/internal/generate/golang"
-	"github.com/commitdev/commit0/internal/generate/http"
 	"github.com/commitdev/commit0/internal/generate/kubernetes"
 	"github.com/commitdev/commit0/internal/generate/proto"
 	"github.com/commitdev/commit0/internal/generate/react"
@@ -19,7 +16,6 @@ import (
 )
 
 var configPath string
-var language string
 
 const (
 	Go         = "go"
@@ -32,7 +28,6 @@ var supportedLanguages = [...]string{Go, React, Kubernetes}
 func init() {
 
 	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "commit0.yml", "config path")
-	generateCmd.PersistentFlags().StringVarP(&language, "language", "l", "", "language to generate project in")
 
 	rootCmd.AddCommand(generateCmd)
 }
@@ -41,54 +36,58 @@ var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate idl & application folders",
 	Run: func(cmd *cobra.Command, args []string) {
-		if !ValidLanguage() {
-			log.Fatalf("'%s' is not a supported language.", language)
-		}
 
 		templates := packr.New("templates", "../templates")
 		t := templator.NewTemplator(templates)
 
 		cfg := config.LoadConfig(configPath)
-		cfg.Language = language
 		cfg.Print()
 
 		var wg sync.WaitGroup
-		switch language {
-		case Go:
-			proto.Generate(t, cfg, &wg)
-			golang.Generate(t, cfg, &wg)
+		if !ValidLanguage(cfg.Frontend.Framework) {
+			log.Fatalf("'%s' is not a supported framework.", cfg.Frontend.Framework)
+		}
 
-			docker.GenerateGoAppDockerFile(t, cfg, &wg)
-			docker.GenerateGoDockerCompose(t, cfg, &wg)
+		for _, s := range cfg.Services {
+			if !ValidLanguage(cfg.Frontend.Framework) {
+				log.Fatalf("'%s' in service '%s' is not a supported language.", s.Name, s.Language)
+			}
+		}
+
+		for _, s := range cfg.Services {
+			switch s.Language {
+			case Go:
+				log.Printf("Creating Go service")
+				proto.Generate(t, cfg, s, &wg)
+				golang.Generate(t, cfg, s, &wg)
+			}
+		}
+
+		if cfg.Infrastructure.AWS.EKS.ClusterName != "" {
+			kubernetes.Generate(t, cfg, &wg)
+		}
+
+		// @TODO : This strucuture probably needs to be adjusted. Probably too generic.
+		switch cfg.Frontend.Framework {
 		case React:
 			react.Generate(t, cfg, &wg)
-		case Kubernetes:
-			kubernetes.Generate(t, cfg, &wg)
 		}
 
 		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, &wg, cfg)
 
-		if cfg.CI.System != "" {
-			ci.Generate(t.CI, cfg, ".", &wg)
-		}
-
-		if cfg.Network.Http.Enabled {
-			http.GenerateHTTPGW(t, cfg, &wg)
-			docker.GenerateGoHTTPGWDockerFile(t, cfg, &wg)
-		}
-
 		// Wait for all the templates to be generated
 		wg.Wait()
 
-		switch language {
-		case Kubernetes:
+		log.Println("Executing commands")
+		// @TODO : Move this stuff to another command? Or genericize it a bit.
+		if cfg.Infrastructure.AWS.EKS.Deploy {
 			kubernetes.Execute(cfg)
 		}
 
 	},
 }
 
-func ValidLanguage() bool {
+func ValidLanguage(language string) bool {
 	for _, l := range supportedLanguages {
 		if l == language {
 			return true

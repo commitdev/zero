@@ -19,19 +19,20 @@ func CreateDirIfDoesNotExist(path string) error {
 }
 
 var FuncMap = template.FuncMap{
-	"Title": strings.Title,
+	"Title":   strings.Title,
+	"ToLower": strings.ToLower,
 }
 
 func createTemplatedFile(fullFilePath string, template *template.Template, wg *sync.WaitGroup, data interface{}) {
 	f, err := os.Create(fullFilePath)
 	if err != nil {
-		log.Printf("Error creating file: %v", err)
+		log.Printf("Error creating file '%s' : %v", fullFilePath, err)
 	}
 	wg.Add(1)
 	go func() {
 		err = template.Execute(f, data)
 		if err != nil {
-			log.Printf("Error templating: %v", err)
+			log.Printf("Error templating '%s': %v", fullFilePath, err)
 		}
 		log.Printf("Finished templating : %v", fullFilePath)
 		wg.Done()

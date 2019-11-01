@@ -33,14 +33,16 @@ func TestGenerateJenkins(t *testing.T) {
 
 	var waitgroup sync.WaitGroup
 
-	testConf := &config.Commit0Config{
-		Language: "go",
-		CI: config.CI{
-			System: "jenkins",
-		},
+	testConf := &config.Commit0Config{}
+	testCI := config.CI{
+		System:       "jenkins",
+		BuildImage:   "golang/golang",
+		BuildTag:     "1.12",
+		BuildCommand: "make build",
+		TestCommand:  "make test",
 	}
 
-	err := ci.Generate(testTemplator.CI, testConf, testData+"/actual", &waitgroup)
+	err := ci.Generate(testTemplator.CI, testConf, testCI, testData+"/actual", &waitgroup)
 	if err != nil {
 		t.Errorf("Error when executing test. %s", err)
 	}
@@ -69,14 +71,16 @@ func TestGenerateCircleCI(t *testing.T) {
 
 	var waitgroup sync.WaitGroup
 
-	testConf := &config.Commit0Config{
-		Language: "go",
-		CI: config.CI{
-			System: "circleci",
-		},
+	testConf := &config.Commit0Config{}
+	testCI := config.CI{
+		System:       "circleci",
+		BuildImage:   "golang/golang",
+		BuildTag:     "1.12",
+		BuildCommand: "make build",
+		TestCommand:  "make test",
 	}
 
-	err := ci.Generate(testTemplator.CI, testConf, testData+"/actual", &waitgroup)
+	err := ci.Generate(testTemplator.CI, testConf, testCI, testData+"/actual", &waitgroup)
 	if err != nil {
 		t.Errorf("Error when executing test. %s", err)
 	}
@@ -105,14 +109,16 @@ func TestGenerateTravisCI(t *testing.T) {
 
 	var waitgroup sync.WaitGroup
 
-	testConf := &config.Commit0Config{
-		Language: "go",
-		CI: config.CI{
-			System: "travisci",
-		},
+	testConf := &config.Commit0Config{}
+	testCI := config.CI{
+		System:       "travisci",
+		Language:     "go",
+		BuildImage:   "golang/golang",
+		BuildTag:     "1.12",
+		BuildCommand: "make build",
+		TestCommand:  "make test",
 	}
-
-	err := ci.Generate(testTemplator.CI, testConf, testData+"/actual", &waitgroup)
+	err := ci.Generate(testTemplator.CI, testConf, testCI, testData+"/actual", &waitgroup)
 	if err != nil {
 		t.Errorf("Error when executing test. %s", err)
 	}

@@ -8,71 +8,80 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type Maintainers struct {
+type maintainers struct {
 	Name  string
 	Email string
 }
 
-type Grpc struct {
+type grpc struct {
 	Host string
 	Port int
 }
 
-type Graphql struct {
+type graphql struct {
 	Enabled bool
 	Port    int
 }
 
-type Http struct {
+type http struct {
 	Enabled bool
 	Port    int
 }
 
-type Web struct {
+type web struct {
 	Enabled bool
 	Port    int
 }
 
-type Network struct {
-	Grpc    Grpc
-	Http    Http
-	Web     Web
-	Graphql Graphql
+type network struct {
+	Grpc    grpc
+	Http    http
+	Web     web
+	Graphql graphql
 }
 
 type Service struct {
 	Name        string
 	Description string
+	Language    string
+	GitRepo     string `yaml:"gitRepo"`
+	DockerRepo  string `yaml:"dockerRepo"`
+	Network     network
+	CI          CI
 }
 
 type CI struct {
-	System          string `yaml:"system"`
-	BuildImage      string `yaml:"build-image"`
-	BuildCommand    string `yaml:"build-command"`
-	TestCommand     string `yaml:"test-command"`
-	LanguageVersion string `yaml:"language-version"`
+	System       string
+	Language     string
+	BuildImage   string `yaml:"buildImage"`
+	BuildTag     string `yaml:"buildTag"`
+	BuildCommand string `yaml:"buildCommand"`
+	TestCommand  string `yaml:"testCommand"`
 }
 
 type Commit0Config struct {
-	Language     string        `yaml:"string"`
-	Organization string        `yaml:"organization"`
-	Name         string        `yaml:"name"`
-	Description  string        `yaml:"description"`
-	GitRepo      string        `yaml:"git-repo"`
-	DockerRepo   string        `yaml:"docker-repo"`
-	Maintainers  []Maintainers `yaml:"maintainers"`
-	Network      Network       `yaml:"network"`
-	Services     []Service     `yaml:"services"`
-	React        React         `yaml:"react"`
-	Kubernetes   Kubernetes    `yaml:"kubernetes"`
-	CI           CI            `yaml:"ci"`
+	Organization   string
+	Name           string
+	Description    string
+	Maintainers    []maintainers
+	Services       []Service
+	Frontend       frontend
+	Infrastructure infrastructure
 }
 
-type Kubernetes struct {
-	ClusterName  string `yaml:"clusterName"`
-	Deploy       bool   `yaml:"deploy"`
-	AWSAccountId string `yaml:"awsAccountId"`
-	AWSRegion    string `yaml:"awsRegion"`
+type infrastructure struct {
+	AWS aws
+}
+
+type aws struct {
+	AccountId string `yaml:"accountId"`
+	Region    string
+	EKS       eks
+}
+
+type eks struct {
+	ClusterName string `yaml:"clusterName"`
+	Deploy      bool
 }
 
 func LoadConfig(filePath string) *Commit0Config {

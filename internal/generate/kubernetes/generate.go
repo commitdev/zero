@@ -18,7 +18,7 @@ func Generate(templator *templator.Templator, config *config.Commit0Config, wg *
 }
 
 func Execute(config *config.Commit0Config) {
-	if config.Kubernetes.Deploy {
+	if config.Infrastructure.AWS.EKS.Deploy {
 		log.Println("Planning infrastructure...")
 		execute(exec.Command("terraform", "init"))
 		execute(exec.Command("terraform", "plan"))
