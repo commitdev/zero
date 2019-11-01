@@ -3,6 +3,7 @@ package ci
 import (
 	"fmt"
 	"sync"
+	"text/template"
 
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
@@ -47,22 +48,25 @@ func Generate(templator *templator.CITemplator, config *config.Commit0Config, ba
 
 	var ciConfigPath string
 	var ciFilename string
+	var ciTemp *template.Template
 
 	switch config.CI.System {
 	case "jenkins":
 		ciConfigPath = basePath
 		ciFilename = "Jenkinsfile"
+		ciTemp = templator.Jenkins
 	case "circleci":
 		ciConfigPath = fmt.Sprintf("%s/%s", basePath, ".circleci/")
 		ciFilename = "config.yml"
+		ciTemp = templator.CircleCI
 	case "travisci":
 		ciConfigPath = basePath
 		ciFilename = ".travis.yml"
+		ciTemp = templator.TravisCI
 	default:
 		return &CIGenerationError{"Unsupported CI System", config}
 	}
-
-	util.TemplateFileIfDoesNotExist(ciConfigPath, ciFilename, templator.TravisCI, wg, config)
+	util.TemplateFileIfDoesNotExist(ciConfigPath, ciFilename, ciTemp, wg, config)
 
 	return nil
 }

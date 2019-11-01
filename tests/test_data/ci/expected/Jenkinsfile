@@ -1,0 +1,29 @@
+pipeline {
+    agent none
+    stages {
+        stage('Build and Test') {
+            parallel {
+                stage('Build') {
+                    agent {
+                        docker {
+                            image 'golang/golang:1.12'
+                        }
+                    }
+                    steps {
+                        sh 'make build'
+                    }
+                }
+                stage('Test') {
+                    agent {
+                        docker {
+                            image 'golang/golang:1.12'
+                        }
+                    }
+                    steps {
+                        sh 'make test'
+                    }
+                }
+            }
+        }
+    }
+}
