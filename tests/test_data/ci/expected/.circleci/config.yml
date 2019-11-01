@@ -2,23 +2,23 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: {{ .CI.BuildImage }}
+      - image: golang/golang:1.12
     steps:
       - checkout
       - run: 
         name: Build
         command: |
-          {{ .CI.BuildCommand }}
+          make build
 
   test:
     docker:
-      - image: {{ .CI.BuildImage }}
+      - image: golang/golang:1.12
     steps:
       - checkout
       - run: 
         name: Test
         command: |
-          {{ .CI.TestCommand }}
+          make test
 
 
 workflow:
