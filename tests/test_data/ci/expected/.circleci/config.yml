@@ -5,7 +5,7 @@ jobs:
       - image: golang/golang:1.12
     steps:
       - checkout
-      - run: 
+      - run:
         name: Build
         command: |
           make build
@@ -15,7 +15,7 @@ jobs:
       - image: golang/golang:1.12
     steps:
       - checkout
-      - run: 
+      - run:
         name: Test
         command: |
           make test

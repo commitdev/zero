@@ -9,6 +9,8 @@ import (
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
+	"github.com/kyokomi/emoji"
+	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
 
@@ -18,13 +20,13 @@ func init() {
 
 func Create(projectName string, outDir string, t *templator.Templator) string {
 	rootDir := path.Join(outDir, projectName)
-	log.Printf("Creating project %s.", projectName)
+	log.Println(aurora.Cyan(emoji.Sprintf(":tada: Creating project %s.", projectName)))
 	err := os.MkdirAll(rootDir, os.ModePerm)
 
 	if os.IsExist(err) {
-		log.Fatalf("Directory %v already exists! Error: %v", projectName, err)
+		log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: Directory %v already exists! Error: %v", projectName, err)))
 	} else if err != nil {
-		log.Fatalf("Error creating root: %v ", err)
+		log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: Error creating root: %v ", err)))
 	}
 	var wg sync.WaitGroup
 
@@ -40,7 +42,7 @@ var createCmd = &cobra.Command{
 	Short: "Create new project with provided name.",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
-			log.Fatalf("Project name cannot be empty!")
+			log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: Project name cannot be empty!")))
 		}
 
 		templates := packr.New("templates", "../templates")

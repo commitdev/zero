@@ -1,21 +1,23 @@
 package docker
 
 import (
+	"path/filepath"
 	"sync"
 
-	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
 )
 
-func GenerateGoAppDockerFile(templator *templator.Templator, config *config.Commit0Config, wg *sync.WaitGroup) {
-	util.TemplateFileIfDoesNotExist("docker/app", "Dockerfile", templator.Docker.ApplicationDocker, wg, config)
+func GenerateGoAppDockerFile(templator *templator.Templator, data templator.GolangTemplateData, basePath string, wg *sync.WaitGroup) {
+	path := filepath.Join(basePath, "docker/app")
+	util.TemplateFileIfDoesNotExist(path, "Dockerfile", templator.Docker.ApplicationDocker, wg, data)
 }
 
-func GenerateGoHTTPGWDockerFile(templator *templator.Templator, config *config.Commit0Config, wg *sync.WaitGroup) {
-	util.TemplateFileIfDoesNotExist("docker/http", "Dockerfile", templator.Docker.HttpGatewayDocker, wg, config)
+func GenerateGoHTTPGWDockerFile(templator *templator.Templator, data templator.GolangTemplateData, basePath string, wg *sync.WaitGroup) {
+	path := filepath.Join(basePath, "docker/http")
+	util.TemplateFileIfDoesNotExist(path, "Dockerfile", templator.Docker.HttpGatewayDocker, wg, data)
 }
 
-func GenerateGoDockerCompose(templator *templator.Templator, config *config.Commit0Config, wg *sync.WaitGroup) {
-	util.TemplateFileIfDoesNotExist("", "docker-compose.yml", templator.Docker.DockerCompose, wg, config)
+func GenerateGoDockerCompose(templator *templator.Templator, data templator.GolangTemplateData, basePath string, wg *sync.WaitGroup) {
+	util.TemplateFileIfDoesNotExist(basePath, "docker-compose.yml", templator.Docker.DockerCompose, wg, data)
 }

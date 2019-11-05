@@ -4,12 +4,12 @@ module "staging" {
   environment = "staging"
 
   # Project configuration
-  project             = "{{ .Kubernetes.ClusterName }}"
-  region              = "{{ .Kubernetes.AWSRegion }}"
-  allowed_account_ids = ["{{ .Kubernetes.AWSAccountId }}"]
+  project             = "{{ .Infrastructure.AWS.EKS.ClusterName }}"
+  region              = "{{ .Infrastructure.AWS.Region }}"
+  allowed_account_ids = ["{{ .Infrastructure.AWS.AccountId }}"]
 
   # ECR configuration
-  ecr_repositories = ["{{ .Kubernetes.ClusterName }}"]
+  ecr_repositories = ["{{ .Infrastructure.AWS.EKS.ClusterName }}"]
 
   # EKS configuration
   eks_worker_instance_type = "t2.small"

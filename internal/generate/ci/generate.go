@@ -19,7 +19,7 @@ const (
 
 type CIGenerationError struct {
 	err    string
-	config *config.Commit0Config
+	config config.CI
 }
 
 func (e *CIGenerationError) Error() string {
@@ -27,46 +27,34 @@ func (e *CIGenerationError) Error() string {
 }
 
 // Generate a CI configuration file based on your language and CI system
-func Generate(templator *templator.CITemplator, config *config.Commit0Config, basePath string, wg *sync.WaitGroup) error {
-	switch config.Language {
-	case "go":
-		if config.CI.LanguageVersion == "" {
-			config.CI.LanguageVersion = defaultGoVersion
-		}
-		if config.CI.BuildImage == "" {
-			config.CI.BuildImage = fmt.Sprintf("%s:%s", defaultGoDockerImage, config.CI.LanguageVersion)
-		}
-		if config.CI.BuildCommand == "" {
-			config.CI.BuildCommand = defaultBuildCommand
-		}
-		if config.CI.TestCommand == "" {
-			config.CI.TestCommand = defaultTestCommand
-		}
-	default:
-		return &CIGenerationError{"Unsupported Language", config}
-	}
+func Generate(t *templator.CITemplator, cfg *config.Commit0Config, ciConfig config.CI, basePath string, wg *sync.WaitGroup) error {
 
 	var ciConfigPath string
 	var ciFilename string
 	var ciTemp *template.Template
 
-	switch config.CI.System {
+	switch ciConfig.System {
 	case "jenkins":
 		ciConfigPath = basePath
 		ciFilename = "Jenkinsfile"
-		ciTemp = templator.Jenkins
+		ciTemp = t.Jenkins
 	case "circleci":
 		ciConfigPath = fmt.Sprintf("%s/%s", basePath, ".circleci/")
 		ciFilename = "config.yml"
-		ciTemp = templator.CircleCI
+		ciTemp = t.CircleCI
 	case "travisci":
 		ciConfigPath = basePath
 		ciFilename = ".travis.yml"
-		ciTemp = templator.TravisCI
+		ciTemp = t.TravisCI
 	default:
-		return &CIGenerationError{"Unsupported CI System", config}
+		return &CIGenerationError{"Unsupported CI System", ciConfig}
 	}
-	util.TemplateFileIfDoesNotExist(ciConfigPath, ciFilename, ciTemp, wg, config)
+
+	data := templator.CITemplateData{
+		*cfg,
+		ciConfig,
+	}
+	util.TemplateFileIfDoesNotExist(ciConfigPath, ciFilename, ciTemp, wg, data)
 
 	return nil
 }

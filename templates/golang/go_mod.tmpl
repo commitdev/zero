@@ -1,9 +1,9 @@
-module {{ .GitRepo }}/{{ .Name }}
+module {{ .Service.GitRepo }}/{{ .Config.Name }}
 
 go 1.12
 
-replace {{ .GitRepo }}/{{ .Name }}-idl => ./{{ .Name }}-idl
+replace {{ .Service.GitRepo }}/{{ .Config.Name }}-idl => ./{{ .Config.Name }}-idl
 
 require (
-  {{ .GitRepo }}/{{ .Name }}-idl v0.0.0
+  {{ .Service.GitRepo }}/{{ .Config.Name }}-idl v0.0.0
 )

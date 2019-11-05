@@ -1,28 +1,28 @@
 syntax = "proto3";
 
-option go_package = "{{ .GitRepo }}/{{ .Name }}-idl/gen/go/{{ .ServiceName }}";
+option go_package = "{{ .Service.GitRepo }}/{{ .Config.Name }}-idl/gen/go/{{ .Service.Name }}";
 
-package {{ .ServiceName }};
+package {{ .Service.Name }};
 
 import "proto/health/health.proto";
 
-{{- if .Network.Http.Enabled}}
+{{- if .Service.Network.Http.Enabled}}
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 	info: {
-		title: "{{ .ServiceName | Title }}";
+		title: "{{ .Service.Name | Title }}";
 		version: "1.0";
 	}
 };
 {{- end}}
 
-service {{ .ServiceName | Title }} {
+service {{ .Service.Name | Title }} {
   rpc Check(health.HealthCheckRequest) returns (health.HealthCheckResponse){
-  {{- if .Network.Http.Enabled }}
+  {{- if .Service.Network.Http.Enabled }}
     option (google.api.http) = {
-			get: "/v1/{{ .ServiceName }}/health"
+			get: "/v1/{{ .Service.Name }}/health"
 		};
   {{- end}}
   }
