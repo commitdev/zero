@@ -11,10 +11,13 @@ import (
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
+
+	"github.com/kyokomi/emoji"
+	"github.com/logrusorgru/aurora"
 )
 
 func Generate(t *templator.Templator, cfg *config.Commit0Config, service config.Service, wg *sync.WaitGroup) {
-	idlPath := fmt.Sprintf("%s-idl", service.Name)
+	idlPath := fmt.Sprintf("%s-idl", cfg.Name)
 	idlHealthPath := filepath.Join(idlPath, "proto", "health")
 
 	data := templator.GolangTemplateData{
@@ -30,11 +33,11 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, service config.
 	file := fmt.Sprintf("%s.proto", service.Name)
 	util.TemplateFileIfDoesNotExist(serviceProtoDir, file, t.ProtoServiceTemplate, wg, data)
 
-	GenerateProtoServiceLibs(service)
+	GenerateProtoServiceLibs(cfg)
 }
 
-func GenerateProtoServiceLibs(service config.Service) {
-	idlRoot := fmt.Sprintf("%s-idl", service.Name)
+func GenerateProtoServiceLibs(cfg *config.Commit0Config) {
+	idlRoot := fmt.Sprintf("%s-idl", cfg.Name)
 	cmd := exec.Command("make", "generate")
 	cmd.Dir = idlRoot
 	var out bytes.Buffer
@@ -46,7 +49,7 @@ func GenerateProtoServiceLibs(service config.Service) {
 
 	log.Print("Generating proto service libs...")
 	if err != nil {
-		log.Printf("Failed running command in: %v", cmd.Dir)
-		log.Printf("Error executing protoc generation: %v %v", err, stderr.String())
+		log.Println(aurora.Red(emoji.Sprintf(":exclamation: Failed running command in: %v", cmd.Dir)))
+		log.Println(aurora.Red(emoji.Sprintf(":exclamation: Error executing protoc generation: %v %v", err, stderr.String())))
 	}
 }

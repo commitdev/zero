@@ -8,6 +8,9 @@ import (
 	"strings"
 	"sync"
 	"text/template"
+
+	"github.com/kyokomi/emoji"
+	"github.com/logrusorgru/aurora"
 )
 
 func CreateDirIfDoesNotExist(path string) error {
@@ -26,15 +29,15 @@ var FuncMap = template.FuncMap{
 func createTemplatedFile(fullFilePath string, template *template.Template, wg *sync.WaitGroup, data interface{}) {
 	f, err := os.Create(fullFilePath)
 	if err != nil {
-		log.Printf("Error creating file '%s' : %v", fullFilePath, err)
+		log.Println(aurora.Red(emoji.Sprintf(":exclamation: Error creating file '%s' : %v", fullFilePath, err)))
 	}
 	wg.Add(1)
 	go func() {
 		err = template.Execute(f, data)
 		if err != nil {
-			log.Printf("Error templating '%s': %v", fullFilePath, err)
+			log.Println(aurora.Red(emoji.Sprintf(":exclamation: Error templating '%s': %v", fullFilePath, err)))
 		}
-		log.Printf("Finished templating : %v", fullFilePath)
+		log.Println(aurora.Green(emoji.Sprintf(":white_check_mark: Finished templating : %v", fullFilePath)))
 		wg.Done()
 	}()
 }
@@ -43,7 +46,7 @@ func TemplateFileAndOverwrite(fileDir string, fileName string, template *templat
 	fullFilePath := fmt.Sprintf("%v/%v", fileDir, fileName)
 	err := os.MkdirAll(fileDir, os.ModePerm)
 	if err != nil {
-		log.Printf("Error creating directory %v: %v", fullFilePath, err)
+		log.Println(aurora.Red(emoji.Sprintf(":exclamation: Error creating directory %v: %v", fullFilePath, err)))
 	}
 	createTemplatedFile(fullFilePath, template, wg, data)
 
@@ -56,11 +59,11 @@ func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *templ
 		if fileDir != "" {
 			err := CreateDirIfDoesNotExist(fileDir)
 			if err != nil {
-				log.Printf("Error creating directory %v: %v", fullFilePath, err)
+				log.Println(aurora.Red(emoji.Sprintf(":exclamation: Error creating directory %v: %v", fullFilePath, err)))
 			}
 		}
 		createTemplatedFile(fullFilePath, template, wg, data)
 	} else {
-		log.Printf("%v already exists. skipping.", fullFilePath)
+		log.Println(aurora.Yellow(emoji.Sprintf("%v already exists. skipping.", fullFilePath)))
 	}
 }

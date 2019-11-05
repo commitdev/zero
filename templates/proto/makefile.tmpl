@@ -36,6 +36,9 @@ generate: generate-grpc {{ if .Service.Network.Web.Enabled }}generate-web{{- end
 generate-grpc:
 	mkdir -p gen/{{ $language }}
 	protoc ${PROTO_SOURCES} --{{ $language }}_out=plugins=grpc,paths=source_relative:proto ./proto/health/*.proto
+	{{- range .Config.Services}}
+	protoc ${PROTO_SOURCES} --{{ $language }}_out=plugins=grpc,paths=source_relative:proto ./proto/{{ .Name }}/*.proto
+	{{- end }}
 	cp -f -rv proto/proto/* gen/go
 	rm -rf proto/proto
 
@@ -43,6 +46,9 @@ generate-grpc:
 generate-web:
 	mkdir -p gen/web
 	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:proto ./proto/health/*.proto
+	{{- range .Config.Services}}
+	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:proto ./proto/{{ .Name }}/*.proto
+	{{- end }}
 	cp -f -rv proto/proto/* gen/web
 	cp -f -rv proto/Proto/* gen/web
 	rm -rf proto/proto proto/Proto
@@ -52,6 +58,9 @@ generate-web:
 generate-http:
 	mkdir -p gen/go
 	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/health/*.proto
+	{{- range .Config.Services}}
+	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/{{ .Name }}/*.proto
+	{{- end }}
 	cp -f -rv proto/proto/* gen/go
 	rm -rf proto/proto
 {{- end}}
