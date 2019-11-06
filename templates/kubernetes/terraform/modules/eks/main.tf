@@ -1,6 +1,6 @@
 # Create KubernetesAdmin role for aws-iam-authenticator
 resource "aws_iam_role" "kubernetes_admin_role" {
-  name               = "kubernetes-admin"
+  name               = "{{ .Config.Name }}-kubernetes-admin"
   assume_role_policy = var.assume_role_policy
   description        = "Kubernetes administrator role (for AWS IAM Authenticator)"
 }
