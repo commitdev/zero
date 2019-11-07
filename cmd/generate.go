@@ -19,14 +19,6 @@ import (
 
 var configPath string
 
-const (
-	Go         = "go"
-	React      = "react"
-	Kubernetes = "kubernetes"
-)
-
-var supportedLanguages = [...]string{Go, React, Kubernetes}
-
 func init() {
 
 	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "commit0.yml", "config path")
@@ -46,19 +38,19 @@ var generateCmd = &cobra.Command{
 		cfg.Print()
 
 		var wg sync.WaitGroup
-		if !ValidLanguage(cfg.Frontend.Framework) {
+		if !util.ValidateLanguage(cfg.Frontend.Framework) {
 			log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: '%s' is not a supported framework.", cfg.Frontend.Framework)))
 		}
 
 		for _, s := range cfg.Services {
-			if !ValidLanguage(cfg.Frontend.Framework) {
+			if !util.ValidateLanguage(cfg.Frontend.Framework) {
 				log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: '%s' in service '%s' is not a supported language.", s.Name, s.Language)))
 			}
 		}
 
 		for _, s := range cfg.Services {
 			switch s.Language {
-			case Go:
+			case util.Go:
 				log.Println(aurora.Cyan(emoji.Sprintf("Creating Go service")))
 				proto.Generate(t, cfg, s, &wg)
 				golang.Generate(t, cfg, s, &wg)
@@ -72,7 +64,7 @@ var generateCmd = &cobra.Command{
 
 		// @TODO : This strucuture probably needs to be adjusted. Probably too generic.
 		switch cfg.Frontend.Framework {
-		case React:
+		case util.React:
 			log.Println(aurora.Cyan(emoji.Sprintf("Creating React frontend")))
 			react.Generate(t, cfg, &wg)
 		}
@@ -89,14 +81,4 @@ var generateCmd = &cobra.Command{
 		}
 
 	},
-}
-
-func ValidLanguage(language string) bool {
-	for _, l := range supportedLanguages {
-		if l == language {
-			return true
-		}
-	}
-
-	return false
 }

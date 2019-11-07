@@ -1,0 +1,55 @@
+organization: {{.Organization}}
+name: {{.ProjectName}}
+description: {{.Description}}
+git-repo: github.com/{{.GitRepoName}}
+docker-repo:
+maintainers:
+{{range .Maintainers}}
+# - name: {{.Name}}
+#   email: {{.Email}}
+{{end}}
+
+kubernetes:
+  clusterName: staging
+  deploy: true
+  awsAccountId: 1234
+  awsRegion: us-east-1
+
+network:
+  grpc:
+    host: 0.0.0.0
+    port: 3000
+  http:
+    enabled: true
+    port: 8080
+  web:
+    enabled: true
+    port: 8090
+
+react:
+  app:
+    name: {{.ProjectName}}
+  header:
+    enabled: true
+  account:
+    enabled: true
+    required: false
+  sidenav:
+    enabled: true
+    items:
+      - path: /
+        label: Home
+        icon: home
+      - path: /account
+        label: Account
+        icon: account_circle
+  views:
+    - path: /account
+      component: account
+    - path: /
+      component: home
+
+ci:
+  system: circleci
+
+services:
