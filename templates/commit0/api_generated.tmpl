@@ -1,32 +1,28 @@
 organization: {{.Organization}}
 name: {{.ProjectName}}
 description: {{.Description}}
-git-repo: github.com/{{.GitRepoName}}
-docker-repo:
 maintainers:
 {{range .Maintainers}}
 # - name: {{.Name}}
 #   email: {{.Email}}
 {{end}}
 
-kubernetes:
-  clusterName: staging
-  deploy: true
-  awsAccountId: 1234
-  awsRegion: us-east-1
+infrastructure:
+  aws:
+    accountId: 1234
+    region: us-east-1
+    eks:
+      clusterName: staging
+      deploy: true
 
-network:
-  grpc:
-    host: 0.0.0.0
-    port: 3000
-  http:
-    enabled: true
-    port: 8080
-  web:
-    enabled: true
-    port: 8090
-
-react:
+frontend:
+  framework: {{.FrontendLanguage}}
+  ci:
+    system: circleci
+    buildImage: react/react
+    buildTag: 1234
+    buildCommand: make build
+    testCommand: make test
   app:
     name: {{.ProjectName}}
   header:
@@ -49,7 +45,28 @@ react:
     - path: /
       component: home
 
-ci:
-  system: circleci
 
 services:
+  {{range .Services}}
+  - name: {{.Name}}
+    description: {{.Description}}
+    language: {{.Language}}
+    gitRepo: {{.GitRepo}}
+    dockerRepo:
+    ci:
+      system: circleci
+      buildImage: golang/golang
+      buildTag: 1.12
+      buildCommand: make build
+      testCommand: make test
+    network:
+      grpc:
+        host: 0.0.0.0
+        port: 3000
+      http:
+        enabled: true
+        port: 8080
+      web:
+        enabled: true
+        port: 8090
+  {{end}}

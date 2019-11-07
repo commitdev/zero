@@ -8,10 +8,9 @@
  - Post request body json example:
  ``` {
       "projectName":"funApp",
-      "language":"go",
+      "frontendLanguage":"react",
       "organization":"commit org",
       "description":"this app will do amazing things",
-      "gitRepoName":"fun-repo",
       "maintainers":[
          {
             "name":"Lill",
@@ -20,6 +19,20 @@
          {
             "name":"Pi",
             "email":"pi@live.ca"
+         }
+      ],
+      "services":[
+         {
+            "name":"user",
+            "description":"user service",
+            "language":"go",
+            "gitRepo":"github.com/user"
+         },
+         {
+            "name":"account",
+            "description":"bank account service",
+            "language":"go",
+            "gitRepo":"github.com/account"
          }
       ]
    }

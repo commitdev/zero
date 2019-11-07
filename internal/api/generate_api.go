@@ -14,16 +14,23 @@ type Maintainer struct {
 	Email string `json:"email"`
 }
 
-type ProjectConfiguration struct {
-	ProjectName   string       `json:"projectName"`
-	Language      string       `json:"language"`
-	Organization  string       `json:"organization"`
-	Description   string       `json:"description"`
-	GitRepoName   string       `json:"gitRepoName"`
-	Maintainers   []Maintainer `json:"maintainers"`
+type Service struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Language    string `json:"language"`
+	GitRepo     string `json:"gitRepo"`
 }
 
-func generate(w http.ResponseWriter, req *http.Request) {
+type ProjectConfiguration struct {
+	ProjectName       string       `json:"projectName"`
+	FrontendLanguage  string       `json:"frontendLanguage"`
+	Organization      string       `json:"organization"`
+	Description       string       `json:"description"`
+	Maintainers       []Maintainer `json:"maintainers"`
+	Services          []Service    `json:"services"`
+}
+
+func generateProject(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch req.Method {
 	case "POST":
@@ -48,7 +55,7 @@ func generate(w http.ResponseWriter, req *http.Request) {
 func main() {
 	var router = mux.NewRouter()
 	var api = router.PathPrefix("/v1/generate").Subrouter()
-	api.NotFoundHandler = http.HandlerFunc(generate)
+	api.NotFoundHandler = http.HandlerFunc(generateProject)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
