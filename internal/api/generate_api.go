@@ -7,35 +7,15 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/commitdev/commit0/internal/util"
 )
-
-type Maintainer struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
-type Service struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Language    string `json:"language"`
-	GitRepo     string `json:"gitRepo"`
-}
-
-type ProjectConfiguration struct {
-	ProjectName       string       `json:"projectName"`
-	FrontendLanguage  string       `json:"frontendLanguage"`
-	Organization      string       `json:"organization"`
-	Description       string       `json:"description"`
-	Maintainers       []Maintainer `json:"maintainers"`
-	Services          []Service    `json:"services"`
-}
 
 func generateProject(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch req.Method {
 	case "POST":
 		decoder := json.NewDecoder(req.Body)
-		var projectConfig ProjectConfiguration
+		var projectConfig util.ProjectConfiguration
 		err := decoder.Decode(&projectConfig)
 		if err != nil {
 			panic(err)

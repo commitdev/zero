@@ -13,7 +13,7 @@ import (
 	"github.com/gobuffalo/packr/v2"
 )
 
-func CreateProject(projectConfig ProjectConfiguration) string {
+func CreateProject(projectConfig util.ProjectConfiguration) string {
 	templates := packr.New("templates", "../../templates")
 	t := templator.NewTemplator(templates)
 	outDir := "./"
@@ -28,7 +28,7 @@ func CreateProject(projectConfig ProjectConfiguration) string {
 	}
 	var wg sync.WaitGroup
 
-	util.TemplateFileIfDoesNotExist(rootDir, util.ApiGeneratedYamlName, t.ApiCommit0, &wg, projectConfig)
+	util.TemplateFileIfDoesNotExist(rootDir, util.CommitYml, t.Commit0, &wg, projectConfig)
 
 	util.TemplateFileIfDoesNotExist(rootDir, ".gitignore", t.GitIgnore, &wg, projectConfig.ProjectName)
 
@@ -39,7 +39,7 @@ func CreateProject(projectConfig ProjectConfiguration) string {
 	return rootDir
 }
 
-func GenerateArtifacts(projectConfig ProjectConfiguration) {
+func GenerateArtifacts(projectConfig util.ProjectConfiguration) {
 
 	templates := packr.New("templates", "../templates")
 	t := templator.NewTemplator(templates)
@@ -48,7 +48,7 @@ func GenerateArtifacts(projectConfig ProjectConfiguration) {
 	if (err != nil) {
 		panic(err)
 	}
-	cfg := config.LoadConfig(util.ApiGeneratedYamlName)
+	cfg := config.LoadConfig(util.CommitYml)
 	cfg.Print()
 
 	generate.GenerateArtifactsHelper(t, cfg)

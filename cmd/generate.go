@@ -4,6 +4,7 @@ import (
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/generate"
 	"github.com/commitdev/commit0/internal/templator"
+	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +13,7 @@ var configPath string
 
 func init() {
 
-	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "commit0.yml", "config path")
+	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", util.CommitYml, "config path")
 
 	rootCmd.AddCommand(generateCmd)
 }

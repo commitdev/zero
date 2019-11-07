@@ -37,7 +37,6 @@ type GoTemplator struct {
 
 // Templator contains all the templates
 type Templator struct {
-	ApiCommit0           *template.Template
 	Commit0              *template.Template
 	GitIgnore            *template.Template
 	Readme               *template.Template
@@ -57,7 +56,6 @@ func NewTemplator(box *packr.Box) *Templator {
 		ProtoHealthTemplate:  NewSingleFileTemplator(box, "proto/health_proto.tmpl"),
 		ProtoServiceTemplate: NewSingleFileTemplator(box, "proto/service_proto.tmpl"),
 		Go:                   NewGoTemplator(box),
-		ApiCommit0:           NewSingleFileTemplator(box, "commit0/api_generated.tmpl"),
 		Commit0:              NewSingleFileTemplator(box, "commit0/commit0.tmpl"),
 		GitIgnore:            NewSingleFileTemplator(box, "util/gitignore.tmpl"),
 		Readme:               NewSingleFileTemplator(box, "util/README.tmpl"),

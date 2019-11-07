@@ -4,11 +4,11 @@
  - To run:
  `go run internal/api/generate_api.go internal/api/create_project.go`
  - Endpoint:
- `localhost:8080/{version}/generate`
+    - POST `localhost:8080/{version}/generate`
  - Post request body json example:
  ``` {
       "projectName":"funApp",
-      "frontendLanguage":"react",
+      "frontendFramework":"react",
       "organization":"commit org",
       "description":"this app will do amazing things",
       "maintainers":[

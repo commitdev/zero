@@ -1,9 +1,11 @@
-organization: mycompany
-name: {{.}}
-description:
+organization: {{.Organization}}
+name: {{.ProjectName}}
+description: {{.Description}}
 maintainers:
-# - name: bob
-#   email: bob@test.com
+  {{range .Maintainers}}
+  # - name: {{.Name}}
+  #   email: {{.Email}}
+  {{end}}
 
 infrastructure:
   aws:
@@ -14,7 +16,7 @@ infrastructure:
       deploy: true
 
 frontend:
-  framework: react
+  framework: {{.FrontendFramework}}
   ci:
     system: circleci
     buildImage: react/react
@@ -22,7 +24,7 @@ frontend:
     buildCommand: make build
     testCommand: make test
   app:
-    name: {{.}}
+    name: {{.ProjectName}}
   header:
     enabled: true
   account:
@@ -45,10 +47,11 @@ frontend:
 
 
 services:
-  - name: User
-    description: User service
-    language: go
-    gitRepo: github.com/test/repo
+  {{range .Services}}
+  - name: {{.Name}}
+    description: {{.Description}}
+    language: {{.Language}}
+    gitRepo: {{.GitRepo}}
     dockerRepo:
     ci:
       system: circleci
@@ -66,3 +69,4 @@ services:
       web:
         enabled: true
         port: 8090
+  {{end}}
