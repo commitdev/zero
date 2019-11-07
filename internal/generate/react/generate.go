@@ -8,9 +8,11 @@ import (
 	"github.com/commitdev/commit0/internal/templator"
 )
 
-func Generate(templator *templator.Templator, config *config.Commit0Config, wg *sync.WaitGroup) {
-	templator.React.TemplateFiles(config, false, wg)
-	if config.Frontend.CI.System != "" {
-		ci.Generate(templator.CI, config, config.Frontend.CI, "react/", wg)
+func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup) {
+	data := templator.GenericTemplateData{*cfg}
+
+	t.React.TemplateFiles(data, false, wg)
+	if cfg.Frontend.CI.System != "" {
+		ci.Generate(t.CI, cfg, cfg.Frontend.CI, "react/", wg)
 	}
 }

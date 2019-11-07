@@ -77,7 +77,7 @@ var generateCmd = &cobra.Command{
 			react.Generate(t, cfg, &wg)
 		}
 
-		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, &wg, cfg)
+		util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, &wg, templator.GenericTemplateData{*cfg})
 
 		// Wait for all the templates to be generated
 		wg.Wait()

@@ -1,5 +1,5 @@
 resource "aws_iam_role" "k8s_monitoring" {
-  name                  = "k8s-${var.environment}-monitoring"
+  name                  = "{{ .Config.Name }}-k8s-${var.environment}-monitoring"
   assume_role_policy    = var.assume_role_policy
   force_detach_policies = true
 }

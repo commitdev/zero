@@ -1,18 +1,18 @@
 export default {
   app: {
-    name: '{{ .Frontend.App.Name }}',
+    name: '{{ .Config.Frontend.App.Name }}',
   },
   account: {
-    enabled: {{ .Frontend.Account.Enabled }},
-    required: {{ .Frontend.Account.Required }},
+    enabled: {{ .Config.Frontend.Account.Enabled }},
+    required: {{ .Config.Frontend.Account.Required }},
   },
   header: {
-    enabled: {{ .Frontend.Header.Enabled }},
+    enabled: {{ .Config.Frontend.Header.Enabled }},
   },
   sidenav: {
-    enabled: {{ .Frontend.Sidenav.Enabled }},
+    enabled: {{ .Config.Frontend.Sidenav.Enabled }},
     items: [
-      {{ range .Frontend.Sidenav.Items }}
+      {{ range .Config.Frontend.Sidenav.Items }}
       {
         path: '{{ .Path }}',
         label: '{{ .Label }}',
@@ -22,7 +22,7 @@ export default {
     ]
   },
   views: [
-    {{ range .Frontend.Views }}
+    {{ range .Config.Frontend.Views }}
     {
       path: '{{ .Path }}',
       component: '{{ .Component }}',

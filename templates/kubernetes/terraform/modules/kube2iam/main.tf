@@ -42,7 +42,7 @@ resource "aws_iam_role_policy" "node_kube2iam_policy" {
 ## ALB Ingress Controller
 # Create a role and establish a trust relationship with the worker nodes
 resource "aws_iam_role" "k8s_worker_alb_ingress_controller_role" {
-  name                  = "k8s-alb-ingress-controller"
+  name                  = "{{ .Config.Name }}-k8s-alb-ingress-controller"
   assume_role_policy    = data.aws_iam_policy_document.k8s_worker_assumerole_policy.json
   force_detach_policies = true
 }
