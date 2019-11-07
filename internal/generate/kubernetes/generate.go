@@ -18,8 +18,11 @@ import (
 )
 
 type Secrets struct {
-	AwsAccessKeyID     string
-	AwsSecretAccessKey string
+	Aws struct {
+		AwsAccessKeyID     string
+		AwsSecretAccessKey string
+		Region             string
+	}
 }
 
 func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup, pathPrefix string) {
@@ -46,6 +49,45 @@ func Execute(config *config.Commit0Config, pathPrefix string) {
 		log.Println("Planning infrastructure...")
 		execute(exec.Command("terraform", "init"), pathPrefix)
 		execute(exec.Command("terraform", "plan"), pathPrefix)
+	}
+}
+
+func execute(cmd *exec.Cmd, pathPrefix string) {
+	dir, err := os.Getwd()
+
+	if err != nil {
+		log.Fatalf("Getting working directory failed: %v\n", err)
+	}
+	kubDir := path.Join(pathPrefix, "kubernetes/terraform/environments/staging")
+	cmd.Dir = path.Join(dir, kubDir)
+
+	stdoutPipe, _ := cmd.StdoutPipe()
+	stderrPipe, _ := cmd.StderrPipe()
+
+	var errStdout, errStderr error
+	err = cmd.Start()
+	if err != nil {
+		log.Fatalf("Starting terraform command failed: %v\n", err)
+	}
+
+	go func() {
+		_, errStdout = io.Copy(os.Stdout, stdoutPipe)
+	}()
+	go func() {
+		_, errStderr = io.Copy(os.Stderr, stderrPipe)
+	}()
+
+	err = cmd.Wait()
+	if err != nil {
+		log.Fatalf("Executing terraform command failed: %v\n", err)
+	}
+
+	if errStdout != nil {
+		log.Printf("Failed to capture stdout: %v\n", errStdout)
+	}
+
+	if errStderr != nil {
+		log.Printf("Failed to capture stderr: %v\n", errStderr)
 	}
 }
 
@@ -127,10 +169,23 @@ func promptCredentials() Secrets {
 		panic(err2)
 	}
 
-	awsSecrets := Secrets{
-		accessKeyIDResult,
-		secretAccessKeyResult,
+	regionPrompt := promptui.Select{
+		Label: "Select Region",
+		Items: []string{"us-west-1", "us-west-2", "us-east-1", "us-east-2", "ca-central-1",
+			"eu-central-1", "eu-west-1", "ap-east-1", "ap-south-1"},
 	}
+
+	_, regionResult, err3 := regionPrompt.Run()
+
+	if err3 != nil {
+		log.Fatalf("Prompt failed %v\n", err3)
+		panic(err3)
+	}
+
+	awsSecrets := Secrets{}
+	awsSecrets.Aws.AwsAccessKeyID = accessKeyIDResult
+	awsSecrets.Aws.AwsSecretAccessKey = secretAccessKeyResult
+	awsSecrets.Aws.Region = regionResult
 
 	return awsSecrets
 
@@ -142,43 +197,4 @@ func fileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
-}
-
-func execute(cmd *exec.Cmd, pathPrefix string) {
-	dir, err := os.Getwd()
-
-	if err != nil {
-		log.Fatalf("Getting working directory failed: %v\n", err)
-	}
-	kubDir := path.Join(pathPrefix, "kubernetes/terraform/environments/staging")
-	cmd.Dir = path.Join(dir, kubDir)
-
-	stdoutPipe, _ := cmd.StdoutPipe()
-	stderrPipe, _ := cmd.StderrPipe()
-
-	var errStdout, errStderr error
-	err = cmd.Start()
-	if err != nil {
-		log.Fatalf("Starting terraform command failed: %v\n", err)
-	}
-
-	go func() {
-		_, errStdout = io.Copy(os.Stdout, stdoutPipe)
-	}()
-	go func() {
-		_, errStderr = io.Copy(os.Stderr, stderrPipe)
-	}()
-
-	err = cmd.Wait()
-	if err != nil {
-		log.Fatalf("Executing terraform command failed: %v\n", err)
-	}
-
-	if errStdout != nil {
-		log.Printf("Failed to capture stdout: %v\n", errStdout)
-	}
-
-	if errStderr != nil {
-		log.Printf("Failed to capture stderr: %v\n", errStderr)
-	}
 }
