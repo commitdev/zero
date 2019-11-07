@@ -4,8 +4,6 @@ description:
 git-repo: github.com/yourrepo
 docker-repo: 
 maintainers: 
-# - name: bob 
-#   email: bob@test.com
 
 network:
   grpc:
@@ -17,6 +15,5 @@ network:
   web:
     enabled: true
     port: 8090
-
 
 services:

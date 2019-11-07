@@ -36,29 +36,28 @@ check:
 fmt:
 	go fmt ./...
 
-run:
-	go run main.go
-
-build:
-	CGO_ENABLED=0 packr2 build -o commit0
-	packr2 clean
-
 build-example: build clean-example
 	mkdir -p example
 	cd example && ../commit0 create "hello-world"
 	cd example/hello-world && ../../commit0 generate -l go
+
+build-docker-local:
+	docker build . -t commit0:v0
 
 build-example-docker: clean-example
 	mkdir -p example
 	docker run -v "$(shell pwd)/example:/project" --user $(shell id -u):$(shell id -g) commit0:v0 create "hello-world"
 	docker run -v "$(shell pwd)/example/hello-world:/project" --user $(shell id -u):$(shell id -g) commit0:v0 generate -l go
 
-build-docker-local:
-	docker build . -t commit0:v0
-
 clean-example:
 	rm -rf example
 
+# builds 
+build:
+	CGO_ENABLED=0 packr2 build -o commit0
+	packr2 clean
+
+# Installs the CLI int your GOPATH
 install-go:
 	CGO_ENABLED=0 packr2 build -o ${GOPATH}/bin/commit0
 	packr2 clean
