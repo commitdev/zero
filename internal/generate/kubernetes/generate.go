@@ -1,12 +1,14 @@
 package kubernetes
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
@@ -82,16 +84,27 @@ func writeSecrets(s Secrets) {
 
 func promptCredentials() Secrets {
 
-	// validate := func(input string) error {
-	// 	var awsAccessKeyIDPat = regexp.MustCompile(`[A-Z0-9]{20}(?![A-Z0-9])`)
-	// 	if !awsAccessKeyIDPat.MatchString(input) {
-	// 		return errors.New("Invalid number")
-	// 	}
-	// 	return nil
-	// }
+	validateAKID := func(input string) error {
+		// 20 uppercase alphanumeric characters
+		var awsAccessKeyIDPat = regexp.MustCompile(`^[A-Z0-9]{20}$`)
+		if !awsAccessKeyIDPat.MatchString(input) {
+			return errors.New("Invalid aws_access_key_id")
+		}
+		return nil
+	}
+
+	validateSAK := func(input string) error {
+		// 40 base64 characters
+		var awsAccessKeyIDPat = regexp.MustCompile(`^[A-Za-z0-9/+=]{40}$`)
+		if !awsAccessKeyIDPat.MatchString(input) {
+			return errors.New("Invalid aws_secret_access_key")
+		}
+		return nil
+	}
 
 	accessKeyIDPrompt := promptui.Prompt{
-		Label: "Aws Access Key ID",
+		Label:    "Aws Access Key ID",
+		Validate: validateAKID,
 	}
 
 	accessKeyIDResult, err1 := accessKeyIDPrompt.Run()
@@ -101,10 +114,10 @@ func promptCredentials() Secrets {
 		panic(err1)
 	}
 
-	// awsSecrets.aws.awsAccessKeyID = accessKeyIDResult
-
 	secretAccessKeyPrompt := promptui.Prompt{
-		Label: "Aws Access Key ID",
+		Label:    "Aws Access Key ID",
+		Validate: validateSAK,
+		Mask:     '*',
 	}
 
 	secretAccessKeyResult, err2 := secretAccessKeyPrompt.Run()
@@ -114,7 +127,6 @@ func promptCredentials() Secrets {
 		panic(err2)
 	}
 
-	// awsSecrets.aws.awsSecretAccessKey = secretAccessKeyResult
 	awsSecrets := Secrets{
 		accessKeyIDResult,
 		secretAccessKeyResult,
@@ -132,7 +144,7 @@ func fileExists(filename string) bool {
 	return !info.IsDir()
 }
 
-func execute(cmd *exec.Cmd) {
+func execute(cmd *exec.Cmd, pathPrefix string) {
 	dir, err := os.Getwd()
 
 	if err != nil {
