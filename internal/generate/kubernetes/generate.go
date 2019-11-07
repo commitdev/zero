@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -46,13 +47,14 @@ func Execute(config *config.Commit0Config, pathPrefix string) {
 			writeSecrets(awsSecrets)
 		}
 
+		envars := getAwsEnvars(readSecrets())
 		log.Println("Planning infrastructure...")
-		execute(exec.Command("terraform", "init"), pathPrefix)
-		execute(exec.Command("terraform", "plan"), pathPrefix)
+		execute(exec.Command("terraform", "init"), pathPrefix, envars)
+		execute(exec.Command("terraform", "plan"), pathPrefix, envars)
 	}
 }
 
-func execute(cmd *exec.Cmd, pathPrefix string) {
+func execute(cmd *exec.Cmd, pathPrefix string, envars []string) {
 	dir, err := os.Getwd()
 
 	if err != nil {
@@ -65,6 +67,12 @@ func execute(cmd *exec.Cmd, pathPrefix string) {
 	stderrPipe, _ := cmd.StderrPipe()
 
 	var errStdout, errStderr error
+
+	if envars != nil {
+		log.Println("Setting envars to cmd ...")
+		cmd.Env = envars
+	}
+
 	err = cmd.Start()
 	if err != nil {
 		log.Fatalf("Starting terraform command failed: %v\n", err)
@@ -89,6 +97,41 @@ func execute(cmd *exec.Cmd, pathPrefix string) {
 	if errStderr != nil {
 		log.Printf("Failed to capture stderr: %v\n", errStderr)
 	}
+}
+
+func getAwsEnvars(awsSecrets Secrets) []string {
+	env := os.Environ()
+	env = append(env, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", awsSecrets.Aws.AwsAccessKeyID))
+	env = append(env, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", awsSecrets.Aws.AwsSecretAccessKey))
+	env = append(env, fmt.Sprintf("AWS_DEFAULT_REGION=%s", awsSecrets.Aws.Region))
+
+	return env
+}
+
+func readSecrets() Secrets {
+
+	dir, err := os.Getwd()
+
+	if err != nil {
+		log.Fatalf("Getting working directory failed: %v\n", err)
+		panic(err)
+	}
+
+	secretsFile := fmt.Sprintf("%s/secrets.yaml", dir)
+
+	data, err := ioutil.ReadFile(secretsFile)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	awsSecrets := Secrets{}
+
+	err = yaml.Unmarshal(data, &awsSecrets)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return awsSecrets
 }
 
 func writeSecrets(s Secrets) {
@@ -120,7 +163,7 @@ func writeSecrets(s Secrets) {
 
 	n3, err := f.WriteString(string(secretsYaml))
 	f.Sync()
-	log.Printf("wrote %d bytes to %v", n3, secretsFile)
+	log.Printf("Wrote %d bytes to %v", n3, secretsFile)
 
 }
 
