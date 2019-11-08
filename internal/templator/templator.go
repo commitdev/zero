@@ -1,6 +1,7 @@
 package templator
 
 import (
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -125,9 +126,10 @@ type DirectoryTemplator struct {
 	Templates []*template.Template
 }
 
-func (d *DirectoryTemplator) TemplateFiles(data interface{}, overwrite bool, wg *sync.WaitGroup) {
+func (d *DirectoryTemplator) TemplateFiles(data interface{}, overwrite bool, wg *sync.WaitGroup, pathPrefix string) {
 	for _, template := range d.Templates {
-		d, f := filepath.Split(template.Name())
+		templatePath := path.Join(pathPrefix, template.Name())
+		d, f := filepath.Split(templatePath)
 		if strings.HasSuffix(f, ".tmpl") {
 			f = strings.Replace(f, ".tmpl", "", -1)
 		}

@@ -14,7 +14,7 @@ import (
 	"sync"
 )
 
-func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config) {
+func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, pathPrefix string) {
 	var wg sync.WaitGroup
 	if !util.ValidateLanguage(cfg.Frontend.Framework) {
 		log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: '%s' is not a supported framework.", cfg.Frontend.Framework)))
@@ -30,24 +30,24 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config) 
 		switch s.Language {
 		case util.Go:
 			log.Println(aurora.Cyan(emoji.Sprintf("Creating Go service")))
-			proto.Generate(t, cfg, s, &wg)
-			golang.Generate(t, cfg, s, &wg)
+			proto.Generate(t, cfg, s, &wg, pathPrefix)
+			golang.Generate(t, cfg, s, &wg, pathPrefix)
 		}
 	}
 
 	if cfg.Infrastructure.AWS.EKS.ClusterName != "" {
 		log.Println(aurora.Cyan(emoji.Sprintf("Generating Terraform")))
-		kubernetes.Generate(t, cfg, &wg)
+		kubernetes.Generate(t, cfg, &wg, pathPrefix)
 	}
 
 	// @TODO : This strucuture probably needs to be adjusted. Probably too generic.
 	switch cfg.Frontend.Framework {
 	case util.React:
 		log.Println(aurora.Cyan(emoji.Sprintf("Creating React frontend")))
-		react.Generate(t, cfg, &wg)
+		react.Generate(t, cfg, &wg, pathPrefix)
 	}
 
-	util.TemplateFileIfDoesNotExist("", "README.md", t.Readme, &wg, templator.GenericTemplateData{*cfg})
+	util.TemplateFileIfDoesNotExist(pathPrefix, "README.md", t.Readme, &wg, templator.GenericTemplateData{*cfg})
 
 	// Wait for all the templates to be generated
 	wg.Wait()

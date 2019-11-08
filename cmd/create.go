@@ -30,7 +30,7 @@ func Create(projectName string, outDir string, t *templator.Templator) string {
 	}
 	var wg sync.WaitGroup
 
-	var defaultProjConfig = defaultProjConfig(projectName)
+	defaultProjConfig := defaultProjConfig(projectName)
 
 	util.TemplateFileIfDoesNotExist(rootDir, util.CommitYml, t.Commit0, &wg, defaultProjConfig)
 	util.TemplateFileIfDoesNotExist(rootDir, ".gitignore", t.GitIgnore, &wg, projectName)

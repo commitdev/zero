@@ -44,12 +44,10 @@ func GenerateArtifacts(projectConfig util.ProjectConfiguration) {
 	templates := packr.New("templates", "../templates")
 	t := templator.NewTemplator(templates)
 
-	err := os.Chdir(projectConfig.ProjectName) //cd into project
-	if (err != nil) {
-		panic(err)
-	}
-	cfg := config.LoadConfig(util.CommitYml)
+	generatedYml := path.Join(projectConfig.ProjectName, util.CommitYml)
+
+	cfg := config.LoadConfig(generatedYml)
 	cfg.Print()
 
-	generate.GenerateArtifactsHelper(t, cfg)
+	generate.GenerateArtifactsHelper(t, cfg, projectConfig.ProjectName)
 }

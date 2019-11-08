@@ -12,9 +12,9 @@ import (
 	"github.com/commitdev/commit0/internal/templator"
 )
 
-func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup) {
+func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup, pathPrefix string) {
 	data := templator.GenericTemplateData{*cfg}
-	t.Kubernetes.TemplateFiles(data, false, wg)
+	t.Kubernetes.TemplateFiles(data, false, wg, pathPrefix)
 }
 
 func Execute(config *config.Commit0Config) {

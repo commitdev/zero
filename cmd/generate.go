@@ -29,7 +29,7 @@ var generateCmd = &cobra.Command{
 		cfg := config.LoadConfig(configPath)
 		cfg.Print()
 
-		generate.GenerateArtifactsHelper(t, cfg)
+		generate.GenerateArtifactsHelper(t, cfg, "")
 
 	},
 }

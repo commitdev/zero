@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"sync"
 
@@ -16,8 +17,9 @@ import (
 	"github.com/logrusorgru/aurora"
 )
 
-func Generate(t *templator.Templator, cfg *config.Commit0Config, service config.Service, wg *sync.WaitGroup) {
-	idlPath := fmt.Sprintf("%s-idl", cfg.Name)
+func Generate(t *templator.Templator, cfg *config.Commit0Config, service config.Service, wg *sync.WaitGroup, pathPrefix string) {
+	idlName := fmt.Sprintf("%s-idl", cfg.Name)
+	idlPath := path.Join(pathPrefix, idlName)
 	idlHealthPath := filepath.Join(idlPath, "proto", "health")
 
 	data := templator.GolangTemplateData{
@@ -33,13 +35,12 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, service config.
 	file := fmt.Sprintf("%s.proto", service.Name)
 	util.TemplateFileIfDoesNotExist(serviceProtoDir, file, t.ProtoServiceTemplate, wg, data)
 
-	GenerateProtoServiceLibs(cfg)
+	GenerateProtoServiceLibs(idlPath)
 }
 
-func GenerateProtoServiceLibs(cfg *config.Commit0Config) {
-	idlRoot := fmt.Sprintf("%s-idl", cfg.Name)
+func GenerateProtoServiceLibs(idlPath string) {
 	cmd := exec.Command("make", "generate")
-	cmd.Dir = idlRoot
+	cmd.Dir = idlPath
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
