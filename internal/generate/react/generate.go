@@ -12,7 +12,7 @@ import (
 func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup, pathPrefix string) {
 	data := templator.GenericTemplateData{*cfg}
 
-	t.React.TemplateFiles(data, false, wg)
+	t.React.TemplateFiles(data, false, wg, pathPrefix)
 	basePath := path.Join(pathPrefix, "react/")
 	if cfg.Frontend.CI.System != "" {
 		ci.Generate(t.CI, cfg, cfg.Frontend.CI, basePath, wg)
