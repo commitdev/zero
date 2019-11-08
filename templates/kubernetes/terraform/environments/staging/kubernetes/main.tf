@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket         = "project-{{ .Config.Name }}-terraform-state"
-    key            = "infrastructure/terraform/environments/development/main"
+    key            = "infrastructure/terraform/environments/staging/kubernetes"
     encrypt        = true
     region         = "{{ .Config.Infrastructure.AWS.Region }}"
     dynamodb_table = "{{ .Config.Name }}-terraform-state-locks"
@@ -10,9 +10,9 @@ terraform {
 
 # Provision kubernetes resources required to run services/applications
 module "kubernetes" {
-  source = "../../modules/kubernetes"
+  source = "../../../modules/kubernetes"
 
-  environment = "development"
+  environment = "staging"
   region      = "{{ .Config.Infrastructure.AWS.Region }}"
 
   # Authenticate with the EKS cluster via the cluster id

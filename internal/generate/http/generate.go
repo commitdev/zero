@@ -10,5 +10,5 @@ import (
 
 func GenerateGoHTTPGW(templator *templator.Templator, data templator.GolangTemplateData, basePath string, wg *sync.WaitGroup) {
 	path := filepath.Join(basePath, "http")
-	util.TemplateFileAndOverwrite(path, "main.go", templator.Go.GoHTTPGW, wg, data)
+	util.TemplateFileIfDoesNotExist(path, "main.go", templator.Go.GoHTTPGW, wg, data)
 }

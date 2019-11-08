@@ -87,6 +87,7 @@ type terraform struct {
 
 type eks struct {
 	ClusterName string `yaml:"clusterName"`
+	WorkerAMI   string `yaml:"workerAMI"`
 	Deploy      bool
 }
 
