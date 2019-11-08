@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-option go_package = "{{ .GitRepo }}/{{ .Name }}-idl/gen/go/health";
+option go_package = "{{ .Service.GitRepo }}/{{ .Config.Name }}-idl/gen/go/health";
 
 package health;
 
-{{- if .Network.Http.Enabled }}
+{{- if .Service.Network.Http.Enabled }}
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
@@ -32,7 +32,7 @@ message HealthCheckResponse {
 
 service Health {
   rpc Check(HealthCheckRequest) returns (HealthCheckResponse){
-  {{- if .Network.Http.Enabled }}
+  {{- if .Service.Network.Http.Enabled }}
     option (google.api.http) = {
 			get: "/v1/health"
 		};

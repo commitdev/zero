@@ -10,10 +10,7 @@ import (
   "github.com/grpc-ecosystem/grpc-gateway/runtime"
   "google.golang.org/grpc"
 
-	health "{{ $.GitRepo }}/{{ $.Name }}-idl/gen/go/health"
-  {{- range .Services}}
-	{{ .Name }} "{{ $.GitRepo }}/{{ $.Name }}-idl/gen/go/{{ .Name }}"
-	{{- end}}
+	health "{{ $.Service.GitRepo }}/{{ $.Config.Name }}-idl/gen/go/health"
 )
 
 func run(endpoint string, listening string) error {
@@ -25,9 +22,6 @@ func run(endpoint string, listening string) error {
   mux := runtime.NewServeMux()
   opts := []grpc.DialOption{grpc.WithInsecure()}
   err := health.RegisterHealthHandlerFromEndpoint(ctx, mux,  endpoint, opts)
-  {{- range .Services}}
-	err = {{ .Name }}.Register{{ .Name | Title }}HandlerFromEndpoint(ctx, mux,  endpoint, opts)
-	{{- end}}
 
   if err != nil {
     return err
@@ -38,8 +32,8 @@ func run(endpoint string, listening string) error {
 
 func main() {
 
-  endpoint := fmt.Sprintf("%s:%s", getEnv("APP_HOST", "0.0.0.0"), getEnv("APP_PORT", "{{ .Network.Grpc.Port }}"))
-  listening := fmt.Sprintf("%s:%s", getEnv("HTTP_HOST", "0.0.0.0"), getEnv("HTTP_PORT", "{{ .Network.Http.Port }}"))
+  endpoint := fmt.Sprintf("%s:%s", getEnv("APP_HOST", "0.0.0.0"), getEnv("APP_PORT", "{{ .Service.Network.Grpc.Port }}"))
+  listening := fmt.Sprintf("%s:%s", getEnv("HTTP_HOST", "0.0.0.0"), getEnv("HTTP_PORT", "{{ .Service.Network.Http.Port }}"))
 
   log.Printf("Starting http grpc gateway server on %v...", listening)
 

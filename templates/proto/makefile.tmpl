@@ -3,14 +3,14 @@ PROTOC_WEB_VERSION := 1.0.6
 
 PROTO_SOURCES := -I /usr/local/include
 PROTO_SOURCES += -I .
-{{- if .Network.Http.Enabled }}
+{{- if .Service.Network.Http.Enabled }}
 PROTO_SOURCES += -I ${GOPATH}/src
 PROTO_SOURCES += -I ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
 PROTO_SOURCES += -I ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
 {{- end}}
 
-{{- $language := .Language }}
-{{- $http := .Network.Http.Enabled }}
+{{- $language := .Service.Language }}
+{{- $http := .Service.Network.Http.Enabled }}
 
 deps-linux: deps-protoc-linux deps-grpc-web-linux deps-go
 
@@ -31,36 +31,36 @@ deps-go:
 	go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 	go get -u github.com/golang/protobuf/protoc-gen-go
 
-generate: generate-grpc {{ if .Network.Web.Enabled }}generate-web{{- end}} {{ if .Network.Http.Enabled }}generate-http{{- end}}
+generate: generate-grpc {{ if .Service.Network.Web.Enabled }}generate-web{{- end}} {{ if .Service.Network.Http.Enabled }}generate-http{{- end}}
 
-generate-grpc:	
+generate-grpc:
 	mkdir -p gen/{{ $language }}
 	protoc ${PROTO_SOURCES} --{{ $language }}_out=plugins=grpc,paths=source_relative:proto ./proto/health/*.proto
-{{- range .Services}}
+	{{- range .Config.Services}}
 	protoc ${PROTO_SOURCES} --{{ $language }}_out=plugins=grpc,paths=source_relative:proto ./proto/{{ .Name }}/*.proto
-{{- end }}
+	{{- end }}
 	cp -f -rv proto/proto/* gen/go
 	rm -rf proto/proto
 
-{{- if .Network.Web.Enabled }}
+{{- if .Service.Network.Web.Enabled }}
 generate-web:
 	mkdir -p gen/web
 	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:proto ./proto/health/*.proto
-{{- range .Services}}
+	{{- range .Config.Services}}
 	protoc ${PROTO_SOURCES} --grpc-web_out=import_style=typescript,mode=grpcwebtext:proto ./proto/{{ .Name }}/*.proto
-{{- end }}
+	{{- end }}
 	cp -f -rv proto/proto/* gen/web
 	cp -f -rv proto/Proto/* gen/web
 	rm -rf proto/proto proto/Proto
 {{- end}}
 
-{{- if .Network.Http.Enabled }}
+{{- if .Service.Network.Http.Enabled }}
 generate-http:
 	mkdir -p gen/go
 	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/health/*.proto
-{{- range .Services}}
+	{{- range .Config.Services}}
 	protoc ${PROTO_SOURCES} --grpc-gateway_out=logtostderr=true,paths=source_relative:proto --swagger_out=logtostderr=true:proto ./proto/{{ .Name }}/*.proto
-{{- end }}
+	{{- end }}
 	cp -f -rv proto/proto/* gen/go
 	rm -rf proto/proto
 {{- end}}

@@ -2,20 +2,20 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: {{ .CI.BuildImage }}
+      - image: {{ .CI.BuildImage }}:{{ .CI.BuildTag }}
     steps:
       - checkout
-      - run: 
+      - run:
         name: Build
         command: |
           {{ .CI.BuildCommand }}
 
   test:
     docker:
-      - image: {{ .CI.BuildImage }}
+      - image: {{ .CI.BuildImage }}:{{ .CI.BuildTag }}
     steps:
       - checkout
-      - run: 
+      - run:
         name: Test
         command: |
           {{ .CI.TestCommand }}

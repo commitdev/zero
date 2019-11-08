@@ -2,40 +2,44 @@ package golang
 
 import (
 	"fmt"
-	"log"
 	"path/filepath"
 	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
+	"github.com/commitdev/commit0/internal/generate/ci"
+	"github.com/commitdev/commit0/internal/generate/docker"
+	"github.com/commitdev/commit0/internal/generate/http"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
 )
 
-func Generate(templator *templator.Templator, config *config.Commit0Config, wg *sync.WaitGroup) {
-	util.TemplateFileIfDoesNotExist("", "main.go", templator.Go.GoMain, wg, config)
-	util.TemplateFileIfDoesNotExist("", "go.mod", templator.Go.GoMod, wg, config)
-	util.TemplateFileIfDoesNotExist("server/health", "health.go", templator.Go.GoHealthServer, wg, config)
-	GenerateServers(templator, config, wg)
-}
+func Generate(t *templator.Templator, cfg *config.Commit0Config, service config.Service, wg *sync.WaitGroup) {
+	basePath := filepath.Join("service", service.Name)
+	healthPath := filepath.Join(basePath, "health")
 
-func GenerateServers(templator *templator.Templator, config *config.Commit0Config, wg *sync.WaitGroup) {
-	serverDirPath := "server"
-	err := util.CreateDirIfDoesNotExist(serverDirPath)
-	if err != nil {
-		log.Printf("Error creating server path: %v", err)
+	data := templator.GolangTemplateData{
+		*cfg,
+		service,
 	}
 
-	for _, s := range config.Services {
-		path := filepath.Join("server", s.Name)
-		file := fmt.Sprintf("%s.go", s.Name)
+	util.TemplateFileIfDoesNotExist(basePath, "main.go", t.Go.GoMain, wg, data)
+	util.TemplateFileIfDoesNotExist(basePath, "go.mod", t.Go.GoMod, wg, data)
+	util.TemplateFileIfDoesNotExist(healthPath, "health.go", t.Go.GoHealthServer, wg, data)
 
-		data := map[string]string{
-			"ProjectName": config.Name,
-			"ServiceName": s.Name,
-			"GitRepo":     config.GitRepo,
-		}
+	file := fmt.Sprintf("%s.go", service.Name)
 
-		util.TemplateFileIfDoesNotExist(path, file, templator.Go.GoServer, wg, data)
+	util.TemplateFileIfDoesNotExist(basePath, file, t.Go.GoServer, wg, data)
+
+	if service.CI.System != "" {
+		ci.Generate(t.CI, cfg, service.CI, basePath, wg)
+	}
+
+	docker.GenerateGoAppDockerFile(t, data, basePath, wg)
+	docker.GenerateGoDockerCompose(t, data, basePath, wg)
+
+	if service.Network.Http.Enabled {
+		http.GenerateGoHTTPGW(t, data, basePath, wg)
+		docker.GenerateGoHTTPGWDockerFile(t, data, basePath, wg)
 	}
 
 }

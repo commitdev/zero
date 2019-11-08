@@ -1,6 +1,6 @@
-language: {{ .Language }}
-{{ .Language }}:
-- {{ .CI.LanguageVersion}}
+language: {{ .CI.Language }}
+{{ .CI.Language }}:
+- {{ .CI.BuildTag}}
 
 scripts:
 - {{ .CI.BuildCommand }}

@@ -1,20 +1,20 @@
-package {{ .ServiceName }}
+package {{ .Service.Name }}
 
 import (
 	"context"
-	health_api "{{.GitRepo}}/{{ .ProjectName }}-idl/gen/go/health"
-	//api "{{.GitRepo}}/{{ .ProjectName }}-idl/gen/go/{{ .ServiceName }}"
+	health_api "{{.Service.GitRepo}}/{{ .Config.Name }}-idl/gen/go/health"
+	//api "{{.Service.GitRepo}}/{{ .Config.Name }}-idl/gen/go/{{ .Service.Name }}"
 )
 
-type {{ .ServiceName | Title }}Server struct {
+type {{ .Service.Name | Title }}Server struct {
 
 }
 
-func New{{ .ServiceName | Title }}Server() *{{ .ServiceName | Title }}Server {
-	return &{{ .ServiceName | Title }}Server{}
+func New{{ .Service.Name | Title }}Server() *{{ .Service.Name | Title }}Server {
+	return &{{ .Service.Name | Title }}Server{}
 }
 
-func (s *{{ .ServiceName | Title }}Server) Check(ctx context.Context, req *health_api.HealthCheckRequest) (*health_api.HealthCheckResponse, error) {
+func (s *{{ .Service.Name | Title }}Server) Check(ctx context.Context, req *health_api.HealthCheckRequest) (*health_api.HealthCheckResponse, error) {
 	resp := &health_api.HealthCheckResponse{
 		Status: health_api.HealthCheckResponse_SERVING,
 	}

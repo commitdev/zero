@@ -12,13 +12,13 @@ import (
 	"github.com/commitdev/commit0/internal/templator"
 )
 
-func Generate(templator *templator.Templator, config *config.Commit0Config, wg *sync.WaitGroup) {
-	templator.Kubernetes.TemplateFiles(config, false, wg)
-
+func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup) {
+	data := templator.GenericTemplateData{*cfg}
+	t.Kubernetes.TemplateFiles(data, false, wg)
 }
 
 func Execute(config *config.Commit0Config) {
-	if config.Kubernetes.Deploy {
+	if config.Infrastructure.AWS.EKS.Deploy {
 		log.Println("Planning infrastructure...")
 		execute(exec.Command("terraform", "init"))
 		execute(exec.Command("terraform", "plan"))

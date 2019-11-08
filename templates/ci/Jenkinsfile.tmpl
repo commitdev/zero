@@ -6,7 +6,7 @@ pipeline {
                 stage('Build') {
                     agent {
                         docker {
-                            image '{{ .CI.BuildImage }}'
+                            image '{{ .CI.BuildImage }}:{{ .CI.BuildTag }}'
                         }
                     }
                     steps {
@@ -16,7 +16,7 @@ pipeline {
                 stage('Test') {
                     agent {
                         docker {
-                            image '{{ .CI.BuildImage }}'
+                            image '{{ .CI.BuildImage }}:{{ .CI.BuildTag }}'
                         }
                     }
                     steps {

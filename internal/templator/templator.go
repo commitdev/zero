@@ -6,7 +6,6 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/packr/v2/file"
@@ -126,16 +125,16 @@ type DirectoryTemplator struct {
 	Templates []*template.Template
 }
 
-func (d *DirectoryTemplator) TemplateFiles(config *config.Commit0Config, overwrite bool, wg *sync.WaitGroup) {
+func (d *DirectoryTemplator) TemplateFiles(data interface{}, overwrite bool, wg *sync.WaitGroup) {
 	for _, template := range d.Templates {
 		d, f := filepath.Split(template.Name())
 		if strings.HasSuffix(f, ".tmpl") {
 			f = strings.Replace(f, ".tmpl", "", -1)
 		}
 		if overwrite {
-			util.TemplateFileAndOverwrite(d, f, template, wg, config)
+			util.TemplateFileAndOverwrite(d, f, template, wg, data)
 		} else {
-			util.TemplateFileIfDoesNotExist(d, f, template, wg, config)
+			util.TemplateFileIfDoesNotExist(d, f, template, wg, data)
 		}
 	}
 }

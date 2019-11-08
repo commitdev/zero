@@ -28,10 +28,12 @@ type reactView struct {
 	Component string
 }
 
-type React struct {
-	App     reactApp
-	Account reactAccount
-	Header  reactHeader
-	Sidenav reactSidenav
-	Views   []reactView
+type frontend struct {
+	Framework string
+	App       reactApp
+	Account   reactAccount
+	Header    reactHeader
+	Sidenav   reactSidenav
+	Views     []reactView
+	CI        CI
 }

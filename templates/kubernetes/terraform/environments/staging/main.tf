@@ -1,15 +1,25 @@
+terraform {
+  backend "s3" {
+    bucket         = "project-{{ .Config.Name }}-terraform-state"
+    key            = "infrastructure/terraform/environments/staging/main"
+    encrypt        = true
+    region         = "{{ .Config.Infrastructure.AWS.Region }}"
+    dynamodb_table = "terraform-state-locks"
+  }
+}
+
 # Instantiate the staging environment
 module "staging" {
   source      = "../../modules/environment"
   environment = "staging"
 
   # Project configuration
-  project             = "{{ .Kubernetes.ClusterName }}"
-  region              = "{{ .Kubernetes.AWSRegion }}"
-  allowed_account_ids = ["{{ .Kubernetes.AWSAccountId }}"]
+  project             = "{{ .Config.Infrastructure.AWS.EKS.ClusterName }}"
+  region              = "{{ .Config.Infrastructure.AWS.Region }}"
+  allowed_account_ids = ["{{ .Config.Infrastructure.AWS.AccountId }}"]
 
   # ECR configuration
-  ecr_repositories = ["{{ .Kubernetes.ClusterName }}"]
+  ecr_repositories = ["{{ .Config.Infrastructure.AWS.EKS.ClusterName }}"]
 
   # EKS configuration
   eks_worker_instance_type = "t2.small"

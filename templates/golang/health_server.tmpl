@@ -2,7 +2,7 @@ package health
 
 import (
 	"context"
-	api "{{ .GitRepo }}/{{ .Name }}-idl/gen/go/health"
+	api "{{ .Service.GitRepo }}/{{ .Service.Name }}-idl/gen/go/health"
 )
 
 type HealthServer struct {

@@ -1,15 +1,25 @@
+terraform {
+  backend "s3" {
+    bucket         = "project-{{ .Config.Name }}-terraform-state"
+    key            = "infrastructure/terraform/environments/production/main"
+    encrypt        = true
+    region         = "{{ .Config.Infrastructure.AWS.Region }}"
+    dynamodb_table = "terraform-state-locks"
+  }
+}
+
 # Instantiate the production environment
 module "production" {
   source      = "../../modules/environment"
   environment = "production"
 
   # Project configuration
-  project             = "{{ .Kubernetes.ClusterName }}"
-  region              = "{{ .Kubernetes.AWSRegion }}"
-  allowed_account_ids = ["{{ .Kubernetes.AWSAccountId }}"]
+  project             = "{{ .Config.Infrastructure.AWS.EKS.ClusterName }}"
+  region              = "{{ .Config.Infrastructure.AWS.Region }}"
+  allowed_account_ids = ["{{ .Config.Infrastructure.AWS.AccountId }}"]
 
   # ECR configuration
-  ecr_repositories = ["{{ .Kubernetes.ClusterName }}"]
+  ecr_repositories = ["{{ .Config.Infrastructure.AWS.EKS.ClusterName }}"]
 
   # EKS configuration
   eks_worker_instance_type = "m4.large"
