@@ -77,11 +77,16 @@ type aws struct {
 	AccountId string `yaml:"accountId"`
 	Region    string
 	EKS       eks
+	Cognito   cognito
 }
 
 type eks struct {
 	ClusterName string `yaml:"clusterName"`
 	Deploy      bool
+}
+
+type cognito struct {
+	Deploy bool
 }
 
 func LoadConfig(filePath string) *Commit0Config {

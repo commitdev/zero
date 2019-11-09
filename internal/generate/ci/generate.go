@@ -46,6 +46,10 @@ func Generate(t *templator.CITemplator, cfg *config.Commit0Config, ciConfig conf
 		ciConfigPath = basePath
 		ciFilename = ".travis.yml"
 		ciTemp = t.TravisCI
+	case "github":
+		ciConfigPath = fmt.Sprintf("%s/%s", basePath, ".github/")
+		ciFilename = "config.yml"
+		ciTemp = t.CircleCI
 	default:
 		return &CIGenerationError{"Unsupported CI System", ciConfig}
 	}

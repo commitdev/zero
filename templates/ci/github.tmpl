@@ -1,0 +1,29 @@
+name: Build and Deploy
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+   
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    # https://github.com/marketplace/actions/setup-node-js-for-use-with-actions
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    
+    - run: npm install
+
+    - run: npm test
+    
+    - run: npm run build
+
+    - name: upload build artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: build
+        path: build

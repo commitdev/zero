@@ -15,6 +15,7 @@ type CITemplator struct {
 	CircleCI *template.Template
 	TravisCI *template.Template
 	Jenkins  *template.Template
+	Github   *template.Template
 }
 
 // DockerTemplator contains the templates relevent to docker
@@ -48,6 +49,7 @@ type Templator struct {
 	React                *DirectoryTemplator
 	Kubernetes           *DirectoryTemplator
 	CI                   *CITemplator
+	Terraform            *DirectoryTemplator
 }
 
 func NewTemplator(box *packr.Box) *Templator {
@@ -61,6 +63,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		Readme:               NewSingleFileTemplator(box, "util/README.tmpl"),
 		Docker:               NewDockerFileTemplator(box),
 		React:                NewEJSDirectoryTemplator(box, "react"),
+		Terraform:            NewEJSDirectoryTemplator(box, "terraform"),
 		Kubernetes:           NewDirectoryTemplator(box, "kubernetes"),
 		CI:                   NewCITemplator(box),
 	}
@@ -114,10 +117,15 @@ func NewCITemplator(box *packr.Box) *CITemplator {
 	jenkinsTemplateSource, _ := box.FindString("ci/Jenkinsfile.tmpl")
 	jenkinsTemplate, _ := template.New("CIConfig").Parse(jenkinsTemplateSource)
 
+	githubTemplateSource, _ := box.FindString("ci/github.tmpl")
+	// Github also uses double curly braces for their templates
+	githubTemplate, _ := template.New("CIConfig").Delims("<%=", "%>").Parse(githubTemplateSource)
+
 	return &CITemplator{
 		CircleCI: circleciTemplate,
 		TravisCI: travisciTemplate,
 		Jenkins:  jenkinsTemplate,
+		Github:   githubTemplate,
 	}
 }
 

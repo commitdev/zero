@@ -9,6 +9,7 @@ import (
 	"github.com/commitdev/commit0/internal/generate/kubernetes"
 	"github.com/commitdev/commit0/internal/generate/proto"
 	"github.com/commitdev/commit0/internal/generate/react"
+	"github.com/commitdev/commit0/internal/generate/terraform"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
@@ -68,6 +69,12 @@ var generateCmd = &cobra.Command{
 		if cfg.Infrastructure.AWS.EKS.ClusterName != "" {
 			log.Println(aurora.Cyan(emoji.Sprintf("Generating Terraform")))
 			kubernetes.Generate(t, cfg, &wg)
+		}
+
+		// TODO we'll need to completely revamp the templating system eventually
+		if cfg.Infrastructure.AWS.Cognito.Deploy == true {
+			log.Println(aurora.Cyan(emoji.Sprintf("Generating Terraform")))
+			terraform.Generate(t, cfg, &wg)
 		}
 
 		// @TODO : This strucuture probably needs to be adjusted. Probably too generic.
