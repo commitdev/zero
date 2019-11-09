@@ -39,11 +39,6 @@ RUN GO111MODULE=off go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-
 RUN curl -kLo /tmp/terraform.zip "https://releases.hashicorp.com/terraform/0.12.12/terraform_0.12.12_linux_amd64.zip" && \
 unzip -d /usr/local/bin/ /tmp/terraform.zip
 
-RUN apk add --update bash ca-certificates git python && \
-apk add --update -t deps make py-pip
-
-RUN pip install awscli
-
 RUN chmod +x /usr/local/bin/* && \
   upx --lzma /usr/local/bin/*
 
