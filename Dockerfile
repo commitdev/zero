@@ -47,10 +47,6 @@ RUN pip install awscli
 RUN chmod +x /usr/local/bin/* && \
   upx --lzma /usr/local/bin/*
 
-
-RUN mkdir -p /home/certs/curl
-COPY /certs/curl/cacert.pem /home/certs/curl/
-
 WORKDIR tmp/commit0
 COPY . .
 
@@ -61,16 +57,15 @@ RUN make build-deps && make build && \
 FROM alpine:3.10
 ENV \
   PROTOBUF_VERSION=3.6.1-r1 \
-  GOPATH=/proto-libs \
-  CURL_CA_BUNDLE=/home/certs/curl/cacert.pem \
-  SSL_CERT_DIR=/home/certs/curl \
-  SSL_CERT_FILE=cacert.pem
+  GOPATH=/proto-libs 
+
+RUN apk add --update bash ca-certificates git python && \
+apk add --update -t deps make py-pip
 
 RUN mkdir ${GOPATH}
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/include /usr/local/include
 COPY --from=builder /go/src/github.com/grpc-ecosystem/grpc-gateway ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
-COPY --from=builder /home/certs/curl /home/certs/curl
 WORKDIR /project
 RUN apk add --update --no-cache make protobuf=${PROTOBUF_VERSION} && \
   rm -rf /var/cache/apk/*

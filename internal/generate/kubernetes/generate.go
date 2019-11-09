@@ -27,11 +27,13 @@ type Secrets struct {
 	}
 }
 
+// Generate templates
 func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup, pathPrefix string) {
 	data := templator.GenericTemplateData{*cfg}
 	t.Kubernetes.TemplateFiles(data, false, wg, pathPrefix)
 }
 
+// Execute terraform
 func Execute(config *config.Commit0Config, pathPrefix string) {
 	if config.Infrastructure.AWS.EKS.Deploy {
 		log.Println("Preparing aws environment...")
