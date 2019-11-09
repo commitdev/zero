@@ -10,7 +10,7 @@ func init() {
 }
 
 var commit0api = &cobra.Command{
-	Use:   "api",
+	Use:   "ui",
 	Short: "Run Commit0 Api",
 	Run: func(cmd *cobra.Command, args []string) {
 		api.Commit0Api()
