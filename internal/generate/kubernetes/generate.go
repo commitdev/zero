@@ -193,7 +193,7 @@ func promptCredentials() Secrets {
 	}
 
 	accessKeyIDPrompt := promptui.Prompt{
-		Label:    "Aws Access Key ID: ",
+		Label:    "Aws Access Key ID ",
 		Validate: validateAKID,
 	}
 
@@ -205,7 +205,7 @@ func promptCredentials() Secrets {
 	}
 
 	secretAccessKeyPrompt := promptui.Prompt{
-		Label:    "Aws Secret Access Key: ",
+		Label:    "Aws Secret Access Key ",
 		Validate: validateSAK,
 		Mask:     '*',
 	}
@@ -218,7 +218,7 @@ func promptCredentials() Secrets {
 	}
 
 	regionPrompt := promptui.Select{
-		Label: "Select AWS Region: ",
+		Label: "Select AWS Region ",
 		Items: []string{"us-west-1", "us-west-2", "us-east-1", "us-east-2", "ca-central-1",
 			"eu-central-1", "eu-west-1", "ap-east-1", "ap-south-1"},
 	}
