@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"log"
@@ -13,7 +13,7 @@ import (
 	"github.com/gobuffalo/packr/v2"
 )
 
-func CreateProject(projectConfig util.ProjectConfiguration) string {
+func createProject(projectConfig util.ProjectConfiguration) string {
 	templates := packr.New("templates", "../../templates")
 	t := templator.NewTemplator(templates)
 	outDir := "./"

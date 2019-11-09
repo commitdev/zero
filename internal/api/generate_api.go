@@ -1,12 +1,11 @@
-package main
-
+package api
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/commitdev/commit0/internal/util"
 )
 
@@ -21,7 +20,7 @@ func generateProject(w http.ResponseWriter, req *http.Request) {
 			panic(err)
 		}
 		log.Println(projectConfig.ProjectName)
-		CreateProject(projectConfig)
+		createProject(projectConfig)
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte(`{"message": "Post successful"}`))
 
@@ -32,7 +31,7 @@ func generateProject(w http.ResponseWriter, req *http.Request) {
 
 }
 
-func main() {
+func Commit0Api() {
 	var router = mux.NewRouter()
 	var api = router.PathPrefix("/v1/generate").Subrouter()
 	api.NotFoundHandler = http.HandlerFunc(generateProject)

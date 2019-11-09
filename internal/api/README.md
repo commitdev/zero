@@ -2,7 +2,7 @@
 
 ## Usage
  - To run:
- `go run internal/api/generate_api.go internal/api/create_project.go`
+ `commit0 api`
  - Endpoint:
     - POST `localhost:8080/{version}/generate`
  - Post request body json example:
