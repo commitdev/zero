@@ -47,7 +47,7 @@ RUN pip install awscli
 RUN chmod +x /usr/local/bin/* && \
   upx --lzma /usr/local/bin/*
 
-WORKDIR tmp/commit0
+WORKDIR /tmp/commit0
 COPY . .
 
 RUN make build-deps && make build && \

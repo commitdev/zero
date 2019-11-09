@@ -33,15 +33,22 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGr
 	t.Kubernetes.TemplateFiles(data, false, wg, pathPrefix)
 }
 
-// Execute terraform
+func getCwd() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Getting working directory failed: %v\n", err)
+		panic(err)
+	}
+
+	return dir
+}
+
+// Execute terrafrom init & plan
 func Execute(config *config.Commit0Config, pathPrefix string) {
 	if config.Infrastructure.AWS.EKS.Deploy {
 		log.Println("Preparing aws environment...")
 
-		dir, err := os.Getwd()
-		if err != nil {
-			log.Fatalf("Getting working directory failed: %v\n", err)
-		}
+		dir := getCwd()
 
 		if fileExists(fmt.Sprintf("%s/secrets.yaml", dir)) {
 			log.Println("secrets.yaml exists ...")
@@ -113,12 +120,7 @@ func getAwsEnvars(awsSecrets Secrets) []string {
 
 func readSecrets() Secrets {
 
-	dir, err := os.Getwd()
-
-	if err != nil {
-		log.Fatalf("Getting working directory failed: %v\n", err)
-		panic(err)
-	}
+	dir := getCwd()
 
 	secretsFile := fmt.Sprintf("%s/secrets.yaml", dir)
 
@@ -195,11 +197,11 @@ func promptCredentials() Secrets {
 		Validate: validateAKID,
 	}
 
-	accessKeyIDResult, err1 := accessKeyIDPrompt.Run()
+	accessKeyIDResult, err := accessKeyIDPrompt.Run()
 
-	if err1 != nil {
-		log.Fatalf("Prompt failed %v\n", err1)
-		panic(err1)
+	if err != nil {
+		log.Fatalf("Prompt failed %v\n", err)
+		panic(err)
 	}
 
 	secretAccessKeyPrompt := promptui.Prompt{
@@ -208,11 +210,11 @@ func promptCredentials() Secrets {
 		Mask:     '*',
 	}
 
-	secretAccessKeyResult, err2 := secretAccessKeyPrompt.Run()
+	secretAccessKeyResult, err := secretAccessKeyPrompt.Run()
 
-	if err2 != nil {
-		log.Fatalf("Prompt failed %v\n", err2)
-		panic(err2)
+	if err != nil {
+		log.Fatalf("Prompt failed %v\n", err)
+		panic(err)
 	}
 
 	regionPrompt := promptui.Select{
@@ -221,11 +223,11 @@ func promptCredentials() Secrets {
 			"eu-central-1", "eu-west-1", "ap-east-1", "ap-south-1"},
 	}
 
-	_, regionResult, err3 := regionPrompt.Run()
+	_, regionResult, err := regionPrompt.Run()
 
-	if err3 != nil {
-		log.Fatalf("Prompt failed %v\n", err3)
-		panic(err3)
+	if err != nil {
+		log.Fatalf("Prompt failed %v\n", err)
+		panic(err)
 	}
 
 	awsSecrets := Secrets{}
