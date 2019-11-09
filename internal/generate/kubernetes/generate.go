@@ -18,6 +18,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Secrets - AWS prompted credentials
 type Secrets struct {
 	Aws struct {
 		AwsAccessKeyID     string
