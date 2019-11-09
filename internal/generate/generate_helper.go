@@ -55,6 +55,6 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 	log.Println("Executing commands")
 	// @TODO : Move this stuff to another command? Or genericize it a bit.
 	if cfg.Infrastructure.AWS.EKS.Deploy {
-		kubernetes.Execute(cfg)
+		kubernetes.Execute(cfg, pathPrefix)
 	}
 }
