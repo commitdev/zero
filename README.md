@@ -22,7 +22,7 @@ The best way then to use this is to add an alias, then you can use the CLI as if
 ## Usage
 
 1) To create a project run `commit0 create [PROJECT_NAME]`
-2) A folder will be created and within that update the `commit0.yml` and then run `commit0 generate -l=[LANGUAGE OF CHOICE] eg. go`
+2) A folder will be created and within that update the `commit0.yml` and then run `commit0 generate`
 3) You will see that there is now an idl folder created.
 4) Within the idl folder modify the the protobuf services generated with your desired methods
 5) Go up to the parent directory and re run `commit0 generate -l=[LANGUAGE OF CHOICE]`

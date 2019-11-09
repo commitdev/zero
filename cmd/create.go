@@ -30,11 +30,32 @@ func Create(projectName string, outDir string, t *templator.Templator) string {
 	}
 	var wg sync.WaitGroup
 
-	util.TemplateFileIfDoesNotExist(rootDir, "commit0.yml", t.Commit0, &wg, projectName)
+	defaultProjConfig := defaultProjConfig(projectName)
+
+	util.TemplateFileIfDoesNotExist(rootDir, util.CommitYml, t.Commit0, &wg, defaultProjConfig)
 	util.TemplateFileIfDoesNotExist(rootDir, ".gitignore", t.GitIgnore, &wg, projectName)
 
 	wg.Wait()
 	return rootDir
+}
+
+func defaultProjConfig(projectName string) util.ProjectConfiguration {
+	return util.ProjectConfiguration{
+		ProjectName:       projectName,
+		FrontendFramework: "react",
+		Organization:      "mycompany",
+		Description:       "",
+		Maintainers: []util.Maintainer{{
+			Name:  "bob",
+			Email: "bob@test.com",
+		}},
+		Services: []util.Service{{
+			Name:  "User",
+			Description: "User Service",
+			Language: "go",
+			GitRepo: "github.com/test/repo",
+		}},
+	}
 }
 
 var createCmd = &cobra.Command{

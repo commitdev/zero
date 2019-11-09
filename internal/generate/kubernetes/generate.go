@@ -1,37 +1,37 @@
 package kubernetes
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 )
 
-func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup) {
+func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup, pathPrefix string) {
 	data := templator.GenericTemplateData{*cfg}
-	t.Kubernetes.TemplateFiles(data, false, wg)
+	t.Kubernetes.TemplateFiles(data, false, wg, pathPrefix)
 }
 
-func Execute(config *config.Commit0Config) {
+func Execute(config *config.Commit0Config, pathPrefix string) {
 	if config.Infrastructure.AWS.EKS.Deploy {
 		log.Println("Planning infrastructure...")
-		execute(exec.Command("terraform", "init"))
-		execute(exec.Command("terraform", "plan"))
+		execute(exec.Command("terraform", "init"), pathPrefix)
+		execute(exec.Command("terraform", "plan"), pathPrefix)
 	}
 }
 
-func execute(cmd *exec.Cmd) {
+func execute(cmd *exec.Cmd, pathPrefix string) {
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatalf("Getting working directory failed: %v\n", err)
 	}
-
-	cmd.Dir = fmt.Sprintf("%s/kubernetes/terraform/environments/staging", dir)
+	kubDir := path.Join(pathPrefix, "kubernetes/terraform/environments/staging")
+	cmd.Dir = path.Join(dir, kubDir)
 
 	stdoutPipe, _ := cmd.StdoutPipe()
 	stderrPipe, _ := cmd.StderrPipe()

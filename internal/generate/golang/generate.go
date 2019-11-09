@@ -13,8 +13,8 @@ import (
 	"github.com/commitdev/commit0/internal/util"
 )
 
-func Generate(t *templator.Templator, cfg *config.Commit0Config, service config.Service, wg *sync.WaitGroup) {
-	basePath := filepath.Join("service", service.Name)
+func Generate(t *templator.Templator, cfg *config.Commit0Config, service config.Service, wg *sync.WaitGroup, pathPrefix string) {
+	basePath := filepath.Join(pathPrefix, "service", service.Name)
 	healthPath := filepath.Join(basePath, "health")
 
 	data := templator.GolangTemplateData{
