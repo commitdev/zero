@@ -9,11 +9,13 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"regexp"
 	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
+	"github.com/commitdev/commit0/internal/util"
 	"github.com/manifoldco/promptui"
 	"gopkg.in/yaml.v2"
 )
@@ -33,22 +35,12 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGr
 	t.Kubernetes.TemplateFiles(data, false, wg, pathPrefix)
 }
 
-func getCwd() string {
-	dir, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("Getting working directory failed: %v\n", err)
-		panic(err)
-	}
-
-	return dir
-}
-
 // Execute terrafrom init & plan
 func Execute(config *config.Commit0Config, pathPrefix string) {
 	if config.Infrastructure.AWS.EKS.Deploy {
 		log.Println("Preparing aws environment...")
 
-		dir := getCwd()
+		dir := util.GetCwd()
 
 		if fileExists(fmt.Sprintf("%s/secrets.yaml", dir)) {
 			log.Println("secrets.yaml exists ...")
@@ -65,11 +57,8 @@ func Execute(config *config.Commit0Config, pathPrefix string) {
 }
 
 func execute(cmd *exec.Cmd, pathPrefix string, envars []string) {
-	dir, err := os.Getwd()
+	dir := util.GetCwd()
 
-	if err != nil {
-		log.Fatalf("Getting working directory failed: %v\n", err)
-	}
 	kubDir := path.Join(pathPrefix, "kubernetes/terraform/environments/staging")
 	cmd.Dir = path.Join(dir, kubDir)
 
@@ -79,11 +68,10 @@ func execute(cmd *exec.Cmd, pathPrefix string, envars []string) {
 	var errStdout, errStderr error
 
 	if envars != nil {
-		log.Println("Setting envars to cmd ...")
 		cmd.Env = envars
 	}
 
-	err = cmd.Start()
+	err := cmd.Start()
 	if err != nil {
 		log.Fatalf("Starting terraform command failed: %v\n", err)
 	}
@@ -120,7 +108,7 @@ func getAwsEnvars(awsSecrets Secrets) []string {
 
 func readSecrets() Secrets {
 
-	dir := getCwd()
+	dir := util.GetCwd()
 
 	secretsFile := fmt.Sprintf("%s/secrets.yaml", dir)
 
@@ -142,34 +130,25 @@ func readSecrets() Secrets {
 func writeSecrets(s Secrets) {
 	secretsYaml, err := yaml.Marshal(&s)
 
-	fmt.Printf("SECRETS: %v", string(secretsYaml))
-
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		panic(err)
 	}
 
-	dir, err := os.Getwd()
+	dir := util.GetCwd()
 
 	if err != nil {
 		log.Fatalf("Getting working directory failed: %v\n", err)
 		panic(err)
 	}
 
-	secretsFile := fmt.Sprintf("%s/secrets.yaml", dir)
-	// err = ioutil.WriteFile(secretsFile, []byte(secretsYaml), 0644)
-	f, err := os.Create(secretsFile)
+	secretsFile := filepath.Join(dir, "secrets.yaml")
+	err = ioutil.WriteFile(secretsFile, []byte(secretsYaml), 0644)
+
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		panic(err)
 	}
-
-	defer f.Close()
-
-	n3, err := f.WriteString(string(secretsYaml))
-	f.Sync()
-	log.Printf("Wrote %d bytes to %v", n3, secretsFile)
-
 }
 
 func promptCredentials() Secrets {
@@ -185,8 +164,8 @@ func promptCredentials() Secrets {
 
 	validateSAK := func(input string) error {
 		// 40 base64 characters
-		var awsAccessKeyIDPat = regexp.MustCompile(`^[A-Za-z0-9/+=]{40}$`)
-		if !awsAccessKeyIDPat.MatchString(input) {
+		var awsSecretAccessKeyPat = regexp.MustCompile(`^[A-Za-z0-9/+=]{40}$`)
+		if !awsSecretAccessKeyPat.MatchString(input) {
 			return errors.New("Invalid aws_secret_access_key")
 		}
 		return nil
