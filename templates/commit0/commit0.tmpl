@@ -17,32 +17,9 @@ frontend:
   framework: react
   ci:
     system: circleci
-    buildImage: react/react
     buildTag: 1234
-    buildCommand: make build
-    testCommand: make test
   app:
     name: {{.}}
-  header:
-    enabled: true
-  account:
-    enabled: true
-    required: false
-  sidenav:
-    enabled: true
-    items:
-      - path: /
-        label: Home
-        icon: home
-      - path: /account
-        label: Account
-        icon: account_circle
-  views:
-    - path: /account
-      component: account
-    - path: /
-      component: home
-
 
 services:
   - name: User

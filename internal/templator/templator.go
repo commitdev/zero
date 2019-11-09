@@ -60,7 +60,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		GitIgnore:            NewSingleFileTemplator(box, "util/gitignore.tmpl"),
 		Readme:               NewSingleFileTemplator(box, "util/README.tmpl"),
 		Docker:               NewDockerFileTemplator(box),
-		React:                NewDirectoryTemplator(box, "react"),
+		React:                NewEJSDirectoryTemplator(box, "react"),
 		Kubernetes:           NewDirectoryTemplator(box, "kubernetes"),
 		CI:                   NewCITemplator(box),
 	}
@@ -144,6 +144,23 @@ func NewDirectoryTemplator(box *packr.Box, dir string) *DirectoryTemplator {
 	for _, file := range getFileNames(box, dir) {
 		templateSource, _ := box.FindString(file)
 		template, err := template.New(file).Funcs(util.FuncMap).Parse(templateSource)
+		if err != nil {
+			panic(err)
+		}
+		templates = append(templates, template)
+	}
+	return &DirectoryTemplator{
+		Templates: templates,
+	}
+}
+
+// TODO standardize and consolidate the templating syntax, also allow for a config struct to change delimiters
+// NewEJSDirectoryTemplator
+func NewEJSDirectoryTemplator(box *packr.Box, dir string) *DirectoryTemplator {
+	templates := []*template.Template{}
+	for _, file := range getFileNames(box, dir) {
+		templateSource, _ := box.FindString(file)
+		template, err := template.New(file).Delims("<%=", "%>").Funcs(util.FuncMap).Parse(templateSource)
 		if err != nil {
 			panic(err)
 		}
