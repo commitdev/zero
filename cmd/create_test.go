@@ -8,6 +8,7 @@ import (
 
 	"github.com/commitdev/commit0/cmd"
 	"github.com/commitdev/commit0/internal/templator"
+	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
 )
 
@@ -25,7 +26,7 @@ func TestCreateWorks(t *testing.T) {
 	root := cmd.Create(projectName, tmpdir, templator)
 	defer os.RemoveAll(tmpdir)
 
-	st, err := os.Stat(path.Join(root, "commit0.yml"))
+	st, err := os.Stat(path.Join(root, util.CommitYml))
 	if err != nil {
 		t.Fatal(err)
 	}

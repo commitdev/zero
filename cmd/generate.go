@@ -1,36 +1,24 @@
 package cmd
 
 import (
-	"log"
-	"sync"
-
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/generate/golang"
 	"github.com/commitdev/commit0/internal/generate/kubernetes"
 	"github.com/commitdev/commit0/internal/generate/proto"
 	"github.com/commitdev/commit0/internal/generate/react"
 	"github.com/commitdev/commit0/internal/generate/terraform"
+	"github.com/commitdev/commit0/internal/generate"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
 	"github.com/gobuffalo/packr/v2"
-	"github.com/kyokomi/emoji"
-	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
 
 var configPath string
 
-const (
-	Go         = "go"
-	React      = "react"
-	Kubernetes = "kubernetes"
-)
-
-var supportedLanguages = [...]string{Go, React, Kubernetes}
-
 func init() {
 
-	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "commit0.yml", "config path")
+	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", util.CommitYml, "config path")
 
 	rootCmd.AddCommand(generateCmd)
 }
@@ -46,6 +34,7 @@ var generateCmd = &cobra.Command{
 		cfg := config.LoadConfig(configPath)
 		cfg.Print()
 
+<<<<<<< HEAD
 		var wg sync.WaitGroup
 		if !ValidLanguage(cfg.Frontend.Framework) {
 			log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: '%s' is not a supported framework.", cfg.Frontend.Framework)))
@@ -91,16 +80,9 @@ var generateCmd = &cobra.Command{
 		if cfg.Infrastructure.AWS.EKS.Deploy {
 			kubernetes.Execute(cfg)
 		}
+=======
+		generate.GenerateArtifactsHelper(t, cfg, "")
+>>>>>>> master
 
 	},
-}
-
-func ValidLanguage(language string) bool {
-	for _, l := range supportedLanguages {
-		if l == language {
-			return true
-		}
-	}
-
-	return false
 }

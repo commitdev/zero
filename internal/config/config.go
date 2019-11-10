@@ -8,7 +8,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type maintainers struct {
+type maintainer struct {
 	Name  string
 	Email string
 }
@@ -63,7 +63,7 @@ type Commit0Config struct {
 	Organization   string
 	Name           string
 	Description    string
-	Maintainers    []maintainers
+	Maintainers    []maintainer
 	Services       []Service
 	Frontend       frontend
 	Infrastructure infrastructure

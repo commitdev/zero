@@ -36,11 +36,15 @@ RUN mkdir -p /tmp/protoc && \
 
 RUN GO111MODULE=off go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 
+RUN curl -sSLo /tmp/terraform.zip "https://releases.hashicorp.com/terraform/0.12.12/terraform_0.12.12_linux_amd64.zip" && \
+unzip -d /usr/local/bin/ /tmp/terraform.zip
+
 RUN chmod +x /usr/local/bin/* && \
   upx --lzma /usr/local/bin/*
 
-WORKDIR tmp/commit0
+WORKDIR /tmp/commit0
 COPY . .
+
 RUN make build-deps && make build && \
   mv commit0 /usr/local/bin && \
   upx --lzma /usr/local/bin/commit0
@@ -48,7 +52,11 @@ RUN make build-deps && make build && \
 FROM alpine:3.10
 ENV \
   PROTOBUF_VERSION=3.6.1-r1 \
-  GOPATH=/proto-libs
+  GOPATH=/proto-libs 
+
+RUN apk add --update bash ca-certificates git python && \
+apk add --update -t deps make py-pip
+
 RUN mkdir ${GOPATH}
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/include /usr/local/include
