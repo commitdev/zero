@@ -97,6 +97,7 @@ The application starts at `cmd/generate.go`
 4. each generator (`react/generate.go`, `ci/generate.go` etc) further delegates and actually executes the templating based on the configs passed in.
   - `internal/templator/templator.go` is the base class and includes generic templating handling logic 
   - it CI is required, it'll also call a CI generator and pass in the service specific CI configs
+  - TOOD: CI templates have to call separate templates based on the context
   - TODO: templator should be generic and not have any knowledge of the specific templating implementation (go, ci etc), move that logic upstream
 5. Depending on the config (`deploy == true` for certain) it'll also run the `Execute` function and actually deploy the infrastructure
 

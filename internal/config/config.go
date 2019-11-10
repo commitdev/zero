@@ -77,16 +77,17 @@ type aws struct {
 	AccountId string `yaml:"accountId"`
 	Region    string
 	EKS       eks
-	Cognito   cognito
+	Cognito   bool
+	Terraform terraform
+}
+
+type terraform struct {
+	RemoteState bool
 }
 
 type eks struct {
 	ClusterName string `yaml:"clusterName"`
 	Deploy      bool
-}
-
-type cognito struct {
-	Deploy bool
 }
 
 func LoadConfig(filePath string) *Commit0Config {

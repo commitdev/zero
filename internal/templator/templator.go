@@ -63,7 +63,7 @@ func NewTemplator(box *packr.Box) *Templator {
 		Readme:               NewSingleFileTemplator(box, "util/README.tmpl"),
 		Docker:               NewDockerFileTemplator(box),
 		React:                NewEJSDirectoryTemplator(box, "react"),
-		Terraform:            NewEJSDirectoryTemplator(box, "terraform"),
+		Terraform:            NewDirectoryTemplator(box, "terraform"),
 		Kubernetes:           NewDirectoryTemplator(box, "kubernetes"),
 		CI:                   NewCITemplator(box),
 	}

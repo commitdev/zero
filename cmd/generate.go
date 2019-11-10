@@ -71,11 +71,8 @@ var generateCmd = &cobra.Command{
 			kubernetes.Generate(t, cfg, &wg)
 		}
 
-		// TODO we'll need to completely revamp the templating system eventually
-		if cfg.Infrastructure.AWS.Cognito.Deploy == true {
-			log.Println(aurora.Cyan(emoji.Sprintf("Generating Terraform")))
-			terraform.Generate(t, cfg, &wg)
-		}
+		log.Println(aurora.Cyan(emoji.Sprintf("Generating Terraform")))
+		terraform.Generate(t, cfg, &wg)
 
 		// @TODO : This strucuture probably needs to be adjusted. Probably too generic.
 		switch cfg.Frontend.Framework {
