@@ -22,10 +22,10 @@ The best way then to use this is to add an alias, then you can use the CLI as if
 ## Usage
 
 1) To create a project run `commit0 create [PROJECT_NAME]`
-2) A folder will be created and within that update the `commit0.yml` and then run `commit0 generate`
+2) A folder will be created and within that update the `commit0.yml` and then run `commit0 generate -c <commit0.yml>`
 3) You will see that there is now an idl folder created.
 4) Within the idl folder modify the the protobuf services generated with your desired methods
-5) Go up to the parent directory and re run `commit0 generate -l=[LANGUAGE OF CHOICE]`
+5) Go up to the parent directory and re run `commit0 generate -c <commit0.yml>`
 6) You will now see a `server` folder navigate to your service folder within that directory and implement the methods generated for it
 7) Once you have tested your implementation and are happy with it return to the idl repo push that directory up to git
 8) Return to the parent directory and check the depency file, for go it will be the go.mod file remove the lines that point it to your local directory, this will now point it to the version on git that was pushed up previously
@@ -66,12 +66,40 @@ this will create a commit0 executable in your working direcory. To install insta
 make install-go
 ```
 
+Compile a new `commit0` binary in the working directory
+```
+make build 
+```
+
+Now you can either add your project directory to your path or just execute it directly
+```
+mkdir tmp
+cd tmp
+../commit0 create test-app
+cd test-app
+../../commit0 generate -c commit0.yml
+```
+
 ### Architecture
 The project is built with GoLang and requires Docker 
 - /cmd - the CLI command entry points
 - /internal/generate
 - /internal/config
 - /internal/templator - the templating service
+
+Example Flow:
+The application starts at `cmd/generate.go`
+1. loads all the templates from packr 
+  - TODO: eventually this should be loaded remotely throug a dependency management system
+2. loads the config from the commit0.yml config file
+3. based on the configs, run the appropriate generators
+  - templator is passed in to the Generate function for dependency injection
+4. each generator (`react/generate.go`, `ci/generate.go` etc) further delegates and actually executes the templating based on the configs passed in.
+  - `internal/templator/templator.go` is the base class and includes generic templating handling logic 
+  - it CI is required, it'll also call a CI generator and pass in the service specific CI configs
+  - TOOD: CI templates have to call separate templates based on the context
+  - TODO: templator should be generic and not have any knowledge of the specific templating implementation (go, ci etc), move that logic upstream
+5. Depending on the config (`deploy == true` for certain) it'll also run the `Execute` function and actually deploy the infrastructure
 
 ### Building locally
 

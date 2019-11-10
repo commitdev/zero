@@ -16,6 +16,7 @@ type CITemplator struct {
 	CircleCI *template.Template
 	TravisCI *template.Template
 	Jenkins  *template.Template
+	Github   *template.Template
 }
 
 // DockerTemplator contains the templates relevent to docker
@@ -49,6 +50,7 @@ type Templator struct {
 	React                *DirectoryTemplator
 	Kubernetes           *DirectoryTemplator
 	CI                   *CITemplator
+	Terraform            *DirectoryTemplator
 }
 
 func NewTemplator(box *packr.Box) *Templator {
@@ -61,7 +63,8 @@ func NewTemplator(box *packr.Box) *Templator {
 		GitIgnore:            NewSingleFileTemplator(box, "util/gitignore.tmpl"),
 		Readme:               NewSingleFileTemplator(box, "util/README.tmpl"),
 		Docker:               NewDockerFileTemplator(box),
-		React:                NewDirectoryTemplator(box, "react"),
+		React:                NewEJSDirectoryTemplator(box, "react"),
+		Terraform:            NewDirectoryTemplator(box, "terraform"),
 		Kubernetes:           NewDirectoryTemplator(box, "kubernetes"),
 		CI:                   NewCITemplator(box),
 	}
@@ -115,10 +118,15 @@ func NewCITemplator(box *packr.Box) *CITemplator {
 	jenkinsTemplateSource, _ := box.FindString("ci/Jenkinsfile.tmpl")
 	jenkinsTemplate, _ := template.New("CIConfig").Parse(jenkinsTemplateSource)
 
+	githubTemplateSource, _ := box.FindString("ci/github.tmpl")
+	// Github also uses double curly braces for their templates
+	githubTemplate, _ := template.New("CIConfig").Delims("<%=", "%>").Parse(githubTemplateSource)
+
 	return &CITemplator{
 		CircleCI: circleciTemplate,
 		TravisCI: travisciTemplate,
 		Jenkins:  jenkinsTemplate,
+		Github:   githubTemplate,
 	}
 }
 
@@ -146,6 +154,23 @@ func NewDirectoryTemplator(box *packr.Box, dir string) *DirectoryTemplator {
 	for _, file := range getFileNames(box, dir) {
 		templateSource, _ := box.FindString(file)
 		template, err := template.New(file).Funcs(util.FuncMap).Parse(templateSource)
+		if err != nil {
+			panic(err)
+		}
+		templates = append(templates, template)
+	}
+	return &DirectoryTemplator{
+		Templates: templates,
+	}
+}
+
+// TODO standardize and consolidate the templating syntax, also allow for a config struct to change delimiters
+// NewEJSDirectoryTemplator
+func NewEJSDirectoryTemplator(box *packr.Box, dir string) *DirectoryTemplator {
+	templates := []*template.Template{}
+	for _, file := range getFileNames(box, dir) {
+		templateSource, _ := box.FindString(file)
+		template, err := template.New(file).Delims("<%=", "%>").Funcs(util.FuncMap).Parse(templateSource)
 		if err != nil {
 			panic(err)
 		}

@@ -26,6 +26,7 @@ func (e *CIGenerationError) Error() string {
 	return fmt.Sprintf("Error: %s. Unable to Generate CI/CD Pipeline with config:\n%v\n", e.err, e.config)
 }
 
+// TODO shouldn't have to pass in both ciConfig, and cfg, it's redundant.
 // Generate a CI configuration file based on your language and CI system
 func Generate(t *templator.CITemplator, cfg *config.Commit0Config, ciConfig config.CI, basePath string, wg *sync.WaitGroup) error {
 
@@ -46,6 +47,10 @@ func Generate(t *templator.CITemplator, cfg *config.Commit0Config, ciConfig conf
 		ciConfigPath = basePath
 		ciFilename = ".travis.yml"
 		ciTemp = t.TravisCI
+	case "github":
+		ciConfigPath = fmt.Sprintf("%s/%s", basePath, ".github/workflow/")
+		ciFilename = "config.yml"
+		ciTemp = t.Github
 	default:
 		return &CIGenerationError{"Unsupported CI System", ciConfig}
 	}

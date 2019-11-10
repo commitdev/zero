@@ -1,0 +1,33 @@
+{
+  "home": "home",
+  "dashboard": "dashboard",
+  "about": "about",
+  "next": "next",
+  "forms": "forms",
+  "inbox": "inbox",
+  "menu": "menu",
+  "item": "item",
+  "start": "start",
+  "login": "login",
+  "signup": "Sign up",
+  "submit": "submit",
+  "exit": "exit",
+  "logout": "logout",
+  "tos": "Terms of Service",
+  "not_found": "Not Found",
+  "back": "back",
+  "continue": "continue",
+  "reset_password": "reset password",
+  "see_all": "See all",
+  "download": "Download",
+  "phrase": {
+    "forgot_password": "Forgot your password?",
+    "login_invalid": "Credentials Invalid",
+    "unexpected_error": "Unexpected Error",
+    "home_title": "App Title",
+    "home_welcome": "Welcome",
+    "copyright": "Copyright © 2018 All rights reserved",
+    "tos_read": "Please read and agree to the terms of service",
+    "tos_agree": "I agree to the Terms of Service"
+  }
+}
