@@ -79,6 +79,10 @@ As the templates are embeded into the binary you will need to ensure packr2 is i
 
 You can run `make deps-go` to install this.
 
+As there alot of dependencies it will be easier to use this tool within the provided image, clone the repo and then run `make build-docker-local`.
+
+The best way then to use this is to add an alias, then you can use the CLI as if it was installed as usual on your machine:
+`alias commit0='docker run -it -v "$(pwd):/project" commit0:v0'`
 
 ### Dependencies
 

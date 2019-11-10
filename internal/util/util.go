@@ -26,6 +26,16 @@ var FuncMap = template.FuncMap{
 	"ToLower": strings.ToLower,
 }
 
+func GetCwd() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Getting working directory failed: %v\n", err)
+		panic(err)
+	}
+
+	return dir
+}
+
 func createTemplatedFile(fullFilePath string, template *template.Template, wg *sync.WaitGroup, data interface{}) {
 	f, err := os.Create(fullFilePath)
 	if err != nil {
