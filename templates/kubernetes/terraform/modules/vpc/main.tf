@@ -11,13 +11,13 @@ module "vpc" {
 
   # Allow kubernetes ALB ingress controller to auto-detect
   private_subnet_tags = {
-    "kubernetes.io/cluster/${var.project}-${var.environment}" = "owned"
-    "kubernetes.io/role/internal-elb"                         = "1"
+    "kubernetes.io/cluster/${var.project}" = "owned"
+    "kubernetes.io/role/internal-elb"      = "1"
   }
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${var.project}-${var.environment}" = "owned"
-    "kubernetes.io/role/elb"                                  = "1"
+    "kubernetes.io/cluster/${var.project}" = "owned"
+    "kubernetes.io/role/elb"               = "1"
   }
 
   enable_nat_gateway   = true
