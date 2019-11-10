@@ -31,3 +31,15 @@ variable "eks_worker_asg_max_size" {
 variable "eks_worker_ami" {
   description = "The (EKS-optimized) AMI for EKS worker instances"
 }
+
+# {{ if .Config.Infrastructure.AWS.Cognito }}
+variable "auth_namespace" {
+  default = "cognito_auth"
+}
+variable "auth_pool_name" {
+  description = "AWS Cognito pool name"
+}
+variable "auth_pool_provider" {
+  description = "AWS Cognito pool provider"
+}
+# {{- end}}
