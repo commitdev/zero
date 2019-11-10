@@ -22,8 +22,8 @@ func main() {
 	//Server initialization & registration
 	healthServer := health.NewHealthServer()
 	healthpb.RegisterHealthServer(s, healthServer)
-	{{ .Config.Name }}Server := {{ .Config.Name }}.New{{ .Config.Name | Title}}Server()
-	{{ .Config.Name }}pb.Register{{ .Config.Name | Title}}Server(s, {{ .Config.Name }}Server)
+	{{ .Config.Name | CleanGoIdentifier }}Server := {{ .Config.Name | CleanGoIdentifier }}.New{{ .Config.Name | Title | CleanGoIdentifier}}Server()
+	{{ .Config.Name | CleanGoIdentifier }}pb.Register{{ .Config.Name | Title | CleanGoIdentifier}}Server(s, {{ .Config.Name | CleanGoIdentifier }}Server)
 
 
 	log.Printf("Starting grpc server on %v...", grpcAddr)

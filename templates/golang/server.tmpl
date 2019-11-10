@@ -10,11 +10,11 @@ type {{ .Service.Name | Title }}Server struct {
 
 }
 
-func New{{ .Service.Name | Title }}Server() *{{ .Service.Name | Title }}Server {
-	return &{{ .Service.Name | Title }}Server{}
+func New{{ .Service.Name | Title | CleanGoIdentifier }}Server() *{{ .Service.Name | Title }}Server {
+	return &{{ .Service.Name | Title | CleanGoIdentifier }}Server{}
 }
 
-func (s *{{ .Service.Name | Title }}Server) Check(ctx context.Context, req *health_api.HealthCheckRequest) (*health_api.HealthCheckResponse, error) {
+func (s *{{ .Service.Name | Title | CleanGoIdentifier }}Server) Check(ctx context.Context, req *health_api.HealthCheckRequest) (*health_api.HealthCheckResponse, error) {
 	resp := &health_api.HealthCheckResponse{
 		Status: health_api.HealthCheckResponse_SERVING,
 	}

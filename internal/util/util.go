@@ -21,9 +21,14 @@ func CreateDirIfDoesNotExist(path string) error {
 	return nil
 }
 
+func CleanGoIdentifier(identifier string) string {
+	return strings.ReplaceAll(identifier, "-", "")
+}
+
 var FuncMap = template.FuncMap{
-	"Title":   strings.Title,
-	"ToLower": strings.ToLower,
+	"Title":             strings.Title,
+	"ToLower":           strings.ToLower,
+	"CleanGoIdentifier": CleanGoIdentifier,
 }
 
 func GetCwd() string {

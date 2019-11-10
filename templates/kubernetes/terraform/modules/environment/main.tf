@@ -42,17 +42,3 @@ module "kube2iam" {
   eks_worker_iam_role_name = module.eks.worker_iam_role_name
   iam_account_id           = data.aws_caller_identity.current.account_id
 }
-
-# Provision kubernetes resources required to run services/applications
-module "kubernetes" {
-  source = "../../modules/kubernetes"
-
-  environment = var.environment
-  region      = var.region
-
-  # Authenticate with the EKS cluster via the cluster id
-  cluster_name = module.eks.cluster_id
-
-  # Assume-role policy used by monitoring fluentd daemonset
-  assume_role_policy = data.aws_iam_policy_document.assumerole_root_policy.json
-}

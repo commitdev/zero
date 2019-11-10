@@ -24,6 +24,7 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, service config.
 
 	util.TemplateFileIfDoesNotExist(basePath, "main.go", t.Go.GoMain, wg, data)
 	util.TemplateFileIfDoesNotExist(basePath, "go.mod", t.Go.GoMod, wg, data)
+	util.TemplateFileIfDoesNotExist(basePath, "server.go", t.Go.GoServer, wg, data)
 	util.TemplateFileIfDoesNotExist(healthPath, "health.go", t.Go.GoHealthServer, wg, data)
 
 	file := fmt.Sprintf("%s.go", service.Name)
