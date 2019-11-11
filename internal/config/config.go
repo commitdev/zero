@@ -86,8 +86,6 @@ type terraform struct {
 }
 
 type cognito struct {
-	PoolID   string
-	ClientID string
 	Deploy   bool
 }
 

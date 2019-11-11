@@ -46,13 +46,13 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 	terraform.Generate(t, cfg, &wg, pathPrefix)
 	if cfg.Infrastructure.AWS.Cognito.Deploy {
 
-		outputs := map[string]string{
-			"cognito_pool_id":   "",
-			"cognito_client_id": "",
+		outputs := []string{
+			"cognito_pool_id",
+			"cognito_client_id",
 		}
-		kubernetes.ApplyTerraform(cfg, pathPrefix, outputs)
-		cfg.Infrastructure.AWS.Cognito.PoolID = outputs["cognito_pool_id"]
-		cfg.Infrastructure.AWS.Cognito.ClientID = outputs["cognito_pool_id"]
+		outputValues := terraform.Execute(cfg, pathPrefix, outputs)
+		cfg.Frontend.Env.CognitoPoolID = outputValues["cognito_pool_id"]
+		cfg.Frontend.Env.CognitoClientID = outputValues["cognito_pool_id"]
 	}
 
 	// @TODO : This strucuture probably needs to be adjusted. Probably too generic.

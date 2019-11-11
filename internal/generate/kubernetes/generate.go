@@ -64,33 +64,33 @@ func Execute(config *config.Commit0Config, pathPrefix string) {
 		if fileExists(fmt.Sprintf("%s/secrets.yaml", dir)) {
 			log.Println("secrets.yaml exists ...")
 		} else {
-			awsSecrets := promptCredentials()
+			awsSecrets := PromptCredentials()
 			writeSecrets(awsSecrets)
 		}
 
-		envars := getAwsEnvars(readSecrets())
+		envars := GetAwsEnvars(readSecrets())
 
 		pathPrefix = filepath.Join(pathPrefix, "kubernetes/terraform")
 
 		// @TODO : A check here would be nice to see if this stuff exists first, mostly for testing
 		log.Println(aurora.Cyan(emoji.Sprintf(":alarm_clock: Initializing remote backend...")))
-		execute(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
-		execute(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
+		ExecuteCmd(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
+		ExecuteCmd(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
 
 		log.Println(aurora.Cyan(":alarm_clock: Planning infrastructure..."))
-		execute(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging"), envars)
-		execute(exec.Command("terraform", "plan"), filepath.Join(pathPrefix, "environments/staging"), envars)
+		ExecuteCmd(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging"), envars)
+		ExecuteCmd(exec.Command("terraform", "plan"), filepath.Join(pathPrefix, "environments/staging"), envars)
 
 		log.Println(aurora.Cyan(":alarm_clock: Applying infrastructure configuration..."))
-		execute(exec.Command("terraform", "apply"), filepath.Join(pathPrefix, "environments/staging"), envars)
+		ExecuteCmd(exec.Command("terraform", "apply"), filepath.Join(pathPrefix, "environments/staging"), envars)
 
 		log.Println(aurora.Cyan(":alarm_clock: Applying kubernetes configuration..."))
-		execute(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging/kubernetes"), envars)
-		execute(exec.Command("terraform", "plan"), filepath.Join(pathPrefix, "environments/staging/kubernetes"), envars)
+		ExecuteCmd(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging/kubernetes"), envars)
+		ExecuteCmd(exec.Command("terraform", "plan"), filepath.Join(pathPrefix, "environments/staging/kubernetes"), envars)
 	}
 }
 
-func execute(cmd *exec.Cmd, pathPrefix string, envars []string) {
+func ExecuteCmd(cmd *exec.Cmd, pathPrefix string, envars []string) {
 	dir := util.GetCwd()
 
 	cmd.Dir = path.Join(dir, pathPrefix)
@@ -130,7 +130,7 @@ func execute(cmd *exec.Cmd, pathPrefix string, envars []string) {
 	}
 }
 
-func getAwsEnvars(awsSecrets Secrets) []string {
+func GetAwsEnvars(awsSecrets Secrets) []string {
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", awsSecrets.Aws.AwsAccessKeyID))
 	env = append(env, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", awsSecrets.Aws.AwsSecretAccessKey))
@@ -184,7 +184,7 @@ func writeSecrets(s Secrets) {
 	}
 }
 
-func promptCredentials() Secrets {
+func PromptCredentials() Secrets {
 
 	validateAKID := func(input string) error {
 		// 20 uppercase alphanumeric characters

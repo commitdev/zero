@@ -1,5 +1,5 @@
 {
-  "name": "react-app",
+  "name": "<% .Config.Name %>",
   "version": "0.1.0",
   "private": true,
   "author": "",

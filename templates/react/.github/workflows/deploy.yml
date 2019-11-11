@@ -48,5 +48,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: "us-west-2"
           FROM_PATH: "./build"
-          DEST_PATH: "s3://<%= .Config.Frontend.App.Name %>"
+          DEST_PATH: "s3://<% .Config.Frontend.App.Name %>"
           OPTIONS: "--acl public-read"

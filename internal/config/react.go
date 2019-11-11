@@ -4,14 +4,9 @@ type reactApp struct {
 	Name string
 }
 
-type reactAccount struct {
-	Enabled  bool
-	Required bool
-}
-
-type reactView struct {
-	Path      string
-	Component string
+type environment struct {
+	CognitoPoolID   string
+	CognitoClientID string
 }
 
 type frontend struct {
@@ -19,4 +14,5 @@ type frontend struct {
 	Hostname  string
 	App       reactApp
 	CI        CI
+	Env       environment
 }
