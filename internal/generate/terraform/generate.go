@@ -44,7 +44,7 @@ func Execute(config *config.Commit0Config, pathPrefix string) {
 
 		envars := util.MakeAwsEnvars(util.GetSecrets())
 
-		pathPrefix = filepath.Join(pathPrefix, "kubernetes/terraform")
+		pathPrefix = filepath.Join(pathPrefix, "terraform")
 
 		// @TODO : A check here would be nice to see if this stuff exists first, mostly for testing
 		log.Println(aurora.Cyan(emoji.Sprintf(":alarm_clock: Initializing remote backend...")))
