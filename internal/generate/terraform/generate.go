@@ -53,7 +53,7 @@ func ExecuteWithOuput(config *config.Commit0Config, pathPrefix string, outputs [
 		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), path, envars)
 
 		for _, output := range outputs {
-			outputValue := getOutput(exec.Command("terraform", "output", output), pathPrefix, envars)
+			outputValue := getOutput(exec.Command("terraform", "output", output), path, envars)
 			outputsMap[output] = outputValue
 		}
 
@@ -73,7 +73,7 @@ func getOutput(cmd *exec.Cmd, pathPrefix string, envars []string) string {
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("Executing terraform command failed: %v\n", err)
+		log.Fatalf("Executing terraform output failed: %v\n", err)
 	}
 	return string(out)
 }

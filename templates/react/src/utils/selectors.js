@@ -32,17 +32,6 @@ function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component'
 }
 
-function createProgressSelector(forms, formTabs) {
-  return function getFormProgress({ data }) {
-    const formResponses = getProp(data, ['myProfile', 'formResponses']) || []
-
-    return {
-      orgId: getProp(data, ['myProfile', 'profile', 'orgId']),
-      formProgress: new FormProgress({ forms, formResponses, formTabs }),
-    }
-  }
-}
-
 const FormProgressPropDefs = {
   forms: PropTypes.arrayOf(
     PropTypes.shape({

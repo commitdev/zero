@@ -35,7 +35,7 @@ class SessionLoader extends React.PureComponent {
     try {
       this.setState({ loading: true })
 
-      const { jwt, payload } = await auth.getToken()
+      const { jwt } = await auth.getToken()
 
       if (!jwt) {
         // NOTE: if we don't logout, it'll cause a redirect loop

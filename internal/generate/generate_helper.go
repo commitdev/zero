@@ -55,7 +55,7 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 		}
 		outputValues := terraform.ExecuteWithOuput(cfg, pathPrefix, outputs)
 		cfg.Frontend.Env.CognitoPoolID = outputValues["cognito_pool_id"]
-		cfg.Frontend.Env.CognitoClientID = outputValues["cognito_pool_id"]
+		cfg.Frontend.Env.CognitoClientID = outputValues["cognito_client_id"]
 	}
 
 	// @TODO : This strucuture probably needs to be adjusted. Probably too generic.
