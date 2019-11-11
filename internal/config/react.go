@@ -16,6 +16,7 @@ type reactView struct {
 
 type frontend struct {
 	Framework string
+	Hostname  string
 	App       reactApp
 	CI        CI
 }
