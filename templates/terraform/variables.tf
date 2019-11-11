@@ -14,14 +14,13 @@ variable "remote_state_dynamo_table" {
   description = "Dynamo DB Table to store the remote state locks"
 }
 # {{- end}}
-# {{ if .Config.Infrastructure.AWS.Cognito }}
-variable "auth_namespace" {
-  default = "cognito_auth"
-} 
-variable "auth_pool_name" {
+# {{ if .Config.Infrastructure.AWS.Cognito.Deploy }}
+variable "user_pool" {
+  default = "{{ .Config.Name }}"
   description = "AWS Cognito pool name"
 } 
-variable "auth_pool_provider" {
-  description = "AWS Cognito pool provider"
-}
+variable "hostname" {
+  default = "{{ .Config.Frontend.Hostname }}"
+  description = "AWS Cognito pool name"
+} 
 # {{- end}}

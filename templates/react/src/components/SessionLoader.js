@@ -4,6 +4,7 @@ import { withApollo } from 'react-apollo'
 
 import LoadingIndicator from './LoadingIndicator'
 import auth from '../services/auth'
+import { router } from '../utils'
 import { queries } from '../constants'
 
 class SessionLoader extends React.PureComponent {
@@ -22,8 +23,8 @@ class SessionLoader extends React.PureComponent {
     if (loading !== false) {
       return <LoadingIndicator />
     } else if (errorMsg) {
-      auth.login()
-      return this.props.children || null
+      const Redirect = router.createRedirect('/login')
+      return <Redirect />
     } else {
       return this.props.children || null
     }
@@ -34,7 +35,7 @@ class SessionLoader extends React.PureComponent {
     try {
       this.setState({ loading: true })
 
-      const jwt = await auth.getToken()
+      const { jwt, payload } = await auth.getToken()
 
       if (!jwt) {
         // NOTE: if we don't logout, it'll cause a redirect loop
@@ -53,7 +54,7 @@ class SessionLoader extends React.PureComponent {
       console.error(err)
       // TODO error handling separate exceptions from session expiry
       this.setState({ errorMsg: err.message })
-      auth.login()
+      router.push('/login')
     }
   }
 }

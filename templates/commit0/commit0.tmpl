@@ -14,6 +14,8 @@ infrastructure:
     eks:
       clusterName: staging
       deploy: true
+    cognito:
+      deploy: true
 
 frontend:
   framework: {{.FrontendFramework}}

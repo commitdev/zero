@@ -1,5 +1,5 @@
 {
-  "name": "<%= .Config.Frontend.App.Name %>",
+  "name": "react-app",
   "version": "0.1.0",
   "private": true,
   "author": "",
@@ -13,6 +13,7 @@
     "@types/qs": "^6.5.3",
     "@types/react": "^16.9.1",
     "@types/react-dom": "^16.8.5",
+    "amazon-cognito-identity-js": "^3.2.0",
     "apollo-cache-inmemory": "^1.6.2",
     "apollo-client": "^2.6.3",
     "apollo-link": "^1.2.12",

@@ -90,7 +90,8 @@ class Login extends React.PureComponent {
   _submit = async ({ email, password }) => {
     try {
       this._isLoading()
-      await auth.login()
+      await auth.login({email, password})
+      window.location.assign('/app/')
     } catch (err) {
       const errorMsg = err.message
       this.props.enqueueSnackbar(errorMsg, { variant: 'error' })
