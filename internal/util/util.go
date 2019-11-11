@@ -2,8 +2,10 @@ package util
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 	"sync"
@@ -80,5 +82,45 @@ func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *templ
 		createTemplatedFile(fullFilePath, template, wg, data)
 	} else {
 		log.Println(aurora.Yellow(emoji.Sprintf("%v already exists. skipping.", fullFilePath)))
+	}
+}
+
+func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
+	dir := GetCwd()
+
+	cmd.Dir = path.Join(dir, pathPrefix)
+
+	stdoutPipe, _ := cmd.StdoutPipe()
+	stderrPipe, _ := cmd.StderrPipe()
+
+	var errStdout, errStderr error
+
+	if envars != nil {
+		cmd.Env = envars
+	}
+
+	err := cmd.Start()
+	if err != nil {
+		log.Fatalf("Starting command failed: %v\n", err)
+	}
+
+	go func() {
+		_, errStdout = io.Copy(os.Stdout, stdoutPipe)
+	}()
+	go func() {
+		_, errStderr = io.Copy(os.Stderr, stderrPipe)
+	}()
+
+	err = cmd.Wait()
+	if err != nil {
+		log.Fatalf("Executing command failed: %v\n", err)
+	}
+
+	if errStdout != nil {
+		log.Printf("Failed to capture stdout: %v\n", errStdout)
+	}
+
+	if errStderr != nil {
+		log.Printf("Failed to capture stderr: %v\n", errStderr)
 	}
 }

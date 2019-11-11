@@ -37,8 +37,11 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 		}
 	}
 
+	log.Println(aurora.Cyan(emoji.Sprintf("Generating Terraform")))
+	terraform.Generate(t, cfg, &wg, pathPrefix)
+
 	if cfg.Infrastructure.AWS.EKS.ClusterName != "" {
-		log.Println(aurora.Cyan(emoji.Sprintf("Generating Terraform")))
+		log.Println(aurora.Cyan(emoji.Sprintf("Generating Kubernetes Configuration")))
 		kubernetes.Generate(t, cfg, &wg, pathPrefix)
 	}
 
@@ -49,9 +52,6 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 		react.Generate(t, cfg, &wg, pathPrefix)
 	}
 
-	log.Println(aurora.Cyan(emoji.Sprintf("Generating Terraform")))
-	terraform.Generate(t, cfg, &wg, pathPrefix)
-
 	util.TemplateFileIfDoesNotExist(pathPrefix, "README.md", t.Readme, &wg, templator.GenericTemplateData{*cfg})
 
 	// Wait for all the templates to be generated
@@ -60,6 +60,7 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 	log.Println("Executing commands")
 	// @TODO : Move this stuff to another command? Or genericize it a bit.
 	if cfg.Infrastructure.AWS.EKS.Deploy {
+		terraform.Execute(cfg, pathPrefix)
 		kubernetes.Execute(cfg, pathPrefix)
 	}
 }

@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket         = "project-{{ .Config.Name }}-terraform-state"
-    key            = "infrastructure/terraform/environments/development/main"
+    key            = "infrastructure/terraform/environments/development/kubernetes"
     encrypt        = true
     region         = "{{ .Config.Infrastructure.AWS.Region }}"
     dynamodb_table = "{{ .Config.Name }}-terraform-state-locks"
