@@ -1,3 +1,8 @@
+variable "project" {
+  default = "{{ .Config.Name }}"
+  description = "The name of the project, mostly for tagging"
+}
+
 variable "region" {
   default = "{{ .Config.Infrastructure.AWS.Region }}"
   description = "The AWS region"

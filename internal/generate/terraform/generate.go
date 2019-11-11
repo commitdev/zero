@@ -7,10 +7,6 @@ import (
 	"path/filepath"
 	"sync"
 
-	"log"
-	"os/exec"
-	"path/filepath"
-
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
@@ -50,14 +46,14 @@ func ExecuteWithOuput(config *config.Commit0Config, pathPrefix string, outputs [
 
 		envars := util.MakeAwsEnvars(util.GetSecrets())
 
-		pathPrefix = filepath.Join(pathPrefix, "terraform")
+		path := filepath.Join(pathPrefix, "terraform")
 
-		log.Println(aurora.Cyan(":alarm_clock: Applying infrastructure configuration..."))
-		util.ExecuteCommand(exec.Command("terraform", "init"), pathPrefix, envars)
-		util.ExecuteCommand(exec.Command("terraform", "apply"), pathPrefix, envars)
+		log.Println(aurora.Cyan(":alarm_clock: Applying infrastructure configuration..."), path)
+		util.ExecuteCommand(exec.Command("terraform", "init"), path, envars)
+		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), path, envars)
 
 		for _, output := range outputs {
-			outputValue := ExecuteOutput(exec.Command("terraform", "output", output), pathPrefix, envars)
+			outputValue := getOutput(exec.Command("terraform", "output", output), pathPrefix, envars)
 			outputsMap[output] = outputValue
 		}
 
@@ -66,7 +62,7 @@ func ExecuteWithOuput(config *config.Commit0Config, pathPrefix string, outputs [
 	return outputsMap
 }
 
-func ExecuteOutput(cmd *exec.Cmd, pathPrefix string, envars []string) string {
+func getOutput(cmd *exec.Cmd, pathPrefix string, envars []string) string {
 	dir := util.GetCwd()
 
 	cmd.Dir = path.Join(dir, pathPrefix)
