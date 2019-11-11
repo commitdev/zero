@@ -16,7 +16,7 @@ import (
 	"github.com/logrusorgru/aurora"
 )
 
-func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, pathPrefix string) {
+func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, pathPrefix string, runInit bool, runApply bool) {
 	var wg sync.WaitGroup
 	if !util.ValidateLanguage(cfg.Frontend.Framework) {
 		log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: '%s' is not a supported framework.", cfg.Frontend.Framework)))
@@ -50,21 +50,15 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 	// Wait for all the templates to be generated
 	wg.Wait()
 
-	log.Println("Executing commands")
-	// @TODO : Move this stuff to another command? Or genericize it a bit.
-	if cfg.Infrastructure.AWS.EKS.Deploy {
-		terraform.Execute(cfg, pathPrefix)
-		kubernetes.Execute(cfg, pathPrefix)
+	log.Println(aurora.Cyan(emoji.Sprintf("Initializing Infrastructure")))
+	if cfg.Infrastructure.AWS.EKS.ClusterName != "" && runInit {
+		terraform.Init(cfg, pathPrefix)
 	}
 
-	if cfg.Infrastructure.AWS.Cognito.Deploy {
-		outputs := []string{
-			"cognito_pool_id",
-			"cognito_client_id",
-		}
-		outputValues := terraform.GetOutputs(cfg, pathPrefix, outputs)
-		cfg.Frontend.Env.CognitoPoolID = outputValues["cognito_pool_id"]
-		cfg.Frontend.Env.CognitoClientID = outputValues["cognito_client_id"]
+	log.Println(aurora.Cyan(emoji.Sprintf("Creating Infrastructure")))
+	if cfg.Infrastructure.AWS.EKS.ClusterName != "" && runApply {
+		terraform.Execute(cfg, pathPrefix)
+		kubernetes.Execute(cfg, pathPrefix)
 	}
 
 	// @TODO : This strucuture probably needs to be adjusted. Probably too generic.

@@ -19,14 +19,12 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGr
 }
 
 // Execute terrafrom init & plan
-func Execute(config *config.Commit0Config, pathPrefix string) {
-	if config.Infrastructure.AWS.EKS.Deploy {
-		envars := util.MakeAwsEnvars(util.GetSecrets())
+func Execute(cfg *config.Commit0Config, pathPrefix string) {
+	envars := util.MakeAwsEnvars(util.GetSecrets())
 
-		pathPrefix = filepath.Join(pathPrefix, "kubernetes/terraform")
+	pathPrefix = filepath.Join(pathPrefix, "kubernetes/terraform")
 
-		log.Println(aurora.Cyan(":alarm_clock: Applying kubernetes configuration..."))
-		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging/kubernetes"), envars)
-		util.ExecuteCommand(exec.Command("terraform", "plan"), filepath.Join(pathPrefix, "environments/staging/kubernetes"), envars)
-	}
+	log.Println(aurora.Cyan(":alarm_clock: Applying kubernetes configuration..."))
+	util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging"), envars)
+	util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "environments/staging"), envars)
 }

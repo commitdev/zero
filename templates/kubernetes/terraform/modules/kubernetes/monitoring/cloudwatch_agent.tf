@@ -1,12 +1,9 @@
-data "aws_iam_policy" "CloudWatchAgentServerPolicy" {
-  arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-}
-
 resource "kubernetes_service_account" "cloudwatch_agent" {
   metadata {
     name      = "cloudwatch-agent"
     namespace = "amazon-cloudwatch"
   }
+  depends_on = [kubernetes_namespace.amazon_cloudwatch]
 }
 
 resource "kubernetes_cluster_role" "cloudwatch_agent_role" {
@@ -76,6 +73,7 @@ resource "kubernetes_config_map" "cwagentconfig" {
       }
     )
   }
+  depends_on = [kubernetes_namespace.amazon_cloudwatch]
 }
 
 resource "kubernetes_daemonset" "cloudwatch_agent" {

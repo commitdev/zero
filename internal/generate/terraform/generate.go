@@ -37,6 +37,7 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGr
 	t.Terraform.TemplateFiles(data, false, wg, pathPrefix)
 }
 
+// GetOutputs captures the terraform output for the specific variables
 func GetOutputs(config *config.Commit0Config, pathPrefix string, outputs []string) map[string]string {
 	outputsMap := make(map[string]string)
 
@@ -54,8 +55,8 @@ func GetOutputs(config *config.Commit0Config, pathPrefix string, outputs []strin
 	return outputsMap
 }
 
-// Execute terrafrom init & plan
-func Execute(config *config.Commit0Config, pathPrefix string) {
+// Init sets up anything required by Execute
+func Init(config *config.Commit0Config, pathPrefix string) {
 	// @TODO : Change this check. Most likely we should discover the accountid
 	if config.Infrastructure.AWS.AccountId != "" {
 		log.Println("Preparing aws environment...")
@@ -68,16 +69,31 @@ func Execute(config *config.Commit0Config, pathPrefix string) {
 		log.Println(aurora.Cyan(emoji.Sprintf(":alarm_clock: Initializing remote backend...")))
 		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
 		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
+	}
+}
 
-		log.Println(aurora.Cyan(":alarm_clock: Planning infrastructure..."))
-		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging"), envars)
-		util.ExecuteCommand(exec.Command("terraform", "plan"), filepath.Join(pathPrefix, "environments/staging"), envars)
+// Execute terrafrom init & plan. May modify the config passed in
+func Execute(cfg *config.Commit0Config, pathPrefix string) {
+	// @TODO : Change this check. Most likely we should discover the accountid
+	if cfg.Infrastructure.AWS.AccountId != "" {
+		log.Println("Preparing aws environment...")
+
+		envars := util.MakeAwsEnvars(util.GetSecrets())
+
+		pathPrefix = filepath.Join(pathPrefix, "terraform")
 
 		log.Println(aurora.Cyan(":alarm_clock: Applying infrastructure configuration..."))
-		util.ExecuteCommand(exec.Command("terraform", "apply"), filepath.Join(pathPrefix, "environments/staging"), envars)
+		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging"), envars)
+		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "environments/staging"), envars)
 
-		log.Println(aurora.Cyan(":alarm_clock: Applying kubernetes configuration..."))
-		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging/kubernetes"), envars)
-		util.ExecuteCommand(exec.Command("terraform", "plan"), filepath.Join(pathPrefix, "environments/staging/kubernetes"), envars)
+		if cfg.Infrastructure.AWS.Cognito.Enabled {
+			outputs := []string{
+				"cognito_pool_id",
+				"cognito_client_id",
+			}
+			outputValues := GetOutputs(cfg, pathPrefix, outputs)
+			cfg.Frontend.Env.CognitoPoolID = outputValues["cognito_pool_id"]
+			cfg.Frontend.Env.CognitoClientID = outputValues["cognito_client_id"]
+		}
 	}
 }
