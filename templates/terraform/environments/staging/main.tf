@@ -32,4 +32,6 @@ module "staging" {
   eks_worker_ami = "{{ .Config.Infrastructure.AWS.EKS.WorkerAMI }}"
   {{- end }}
 
+  # Client configuration
+  user_pool = "{{ .Config.Name }}-staging"
 }

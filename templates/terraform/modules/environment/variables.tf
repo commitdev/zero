@@ -34,7 +34,6 @@ variable "eks_worker_ami" {
 
 # {{ if .Config.Infrastructure.AWS.Cognito.Deploy }}
 variable "user_pool" {
-  default = "{{ .Config.Name }}"
   description = "AWS Cognito pool name"
 } 
 variable "hostname" {

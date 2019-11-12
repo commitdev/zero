@@ -47,7 +47,7 @@ module "kube2iam" {
 
 # {{ if .Config.Infrastructure.AWS.Cognito.Deploy }}
 resource "aws_cognito_user_pool" "users" {
-  name = "${var.project}-user-pool"
+  name = "${var.user_pool}-user-pool"
 
   username_attributes = [
     "email",
@@ -57,7 +57,7 @@ resource "aws_cognito_user_pool" "users" {
 }
 
 resource "aws_cognito_user_pool_client" "client" {
-  name = "${var.user_pool}-user-pool-client"
+  name = "${var.user_pool}-cognito-client"
 
   user_pool_id    = "${aws_cognito_user_pool.users.id}"
   generate_secret = false
