@@ -34,6 +34,7 @@ module "development" {
 
   # Client configuration
   user_pool = "{{ .Config.Name }}-development"
+  hostname = "{{ .Config.Frontend.Hostname }}"
   s3_hosting_bucket_name = "{{ .Config.Name }}-development"
 
 }
