@@ -49,6 +49,10 @@ module "cognito" {
   user_pool   = var.user_pool
   hostname    = var.hostname
 }
+
+output "cognito" {
+  value       = module.cognito
+}
 # {{- end}}
 
 # {{ if .Config.Infrastructure.AWS.S3Hosting.Enabled }}

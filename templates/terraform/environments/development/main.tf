@@ -38,3 +38,11 @@ module "development" {
   s3_hosting_bucket_name = "{{ .Config.Name }}-development"
 
 }
+
+output "cognito_client_id" {
+  value = module.staging.cognito.cognito_client_id
+}
+
+output "cognito_pool_id" {
+  value = module.staging.cognito.cognito_pool_id
+}

@@ -45,10 +45,10 @@ func GetOutputs(config *config.Commit0Config, pathPrefix string, outputs []strin
 
 	envars := util.MakeAwsEnvars(util.GetSecrets())
 
-	path := filepath.Join(pathPrefix, "terraform")
+	pathPrefix = filepath.Join(pathPrefix, "environments/staging")
 
 	for _, output := range outputs {
-		outputValue := util.ExecuteCommandOutput(exec.Command("terraform", "output", output), path, envars)
+		outputValue := util.ExecuteCommandOutput(exec.Command("terraform", "output", output), pathPrefix, envars)
 		outputsMap[output] = outputValue
 	}
 

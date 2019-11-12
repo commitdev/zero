@@ -136,7 +136,7 @@ func ExecuteCommandOutput(cmd *exec.Cmd, pathPrefix string, envars []string) str
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("Executing terraform output failed: %v\n", err)
+		log.Fatalf("Executing command failed: (%v) %s\n", err, out)
 	}
 	return string(out)
 }
