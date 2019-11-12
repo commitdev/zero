@@ -1,6 +1,5 @@
 import { typeDefs } from '../models/typeDefs'
 import resolvers from '../controllers/resolvers'
-import { config } from '../constants'
 import auth from '../services/auth'
 
 import { ApolloClient } from 'apollo-client'

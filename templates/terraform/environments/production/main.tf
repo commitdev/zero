@@ -31,4 +31,10 @@ module "production" {
   # https://us-east-1.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.14%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=us-east-1
   eks_worker_ami = "{{ .Config.Infrastructure.AWS.EKS.WorkerAMI }}"
   {{- end }}
+
+  # Client configuration
+  user_pool = "{{ .Config.Name }}-production"
+  hostname = "{{ .Config.Frontend.Hostname }}"
+  s3_hosting_bucket_name = "{{ .Config.Name }}-production"
+
 }

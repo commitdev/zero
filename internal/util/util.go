@@ -124,3 +124,19 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 		log.Printf("Failed to capture stderr: %v\n", errStderr)
 	}
 }
+
+func ExecuteCommandOutput(cmd *exec.Cmd, pathPrefix string, envars []string) string {
+	dir := GetCwd()
+
+	cmd.Dir = path.Join(dir, pathPrefix)
+
+	if envars != nil {
+		cmd.Env = envars
+	}
+
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Fatalf("Executing terraform output failed: %v\n", err)
+	}
+	return string(out)
+}

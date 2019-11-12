@@ -94,6 +94,7 @@ The application starts at `cmd/generate.go`
 2. loads the config from the commit0.yml config file
 3. based on the configs, run the appropriate generators
   - templator is passed in to the Generate function for dependency injection
+  - `internal/generate/generate_helper.go` iterates through all the configs and runs each generator
 4. each generator (`react/generate.go`, `ci/generate.go` etc) further delegates and actually executes the templating based on the configs passed in.
   - `internal/templator/templator.go` is the base class and includes generic templating handling logic 
   - it CI is required, it'll also call a CI generator and pass in the service specific CI configs

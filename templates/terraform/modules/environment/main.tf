@@ -43,31 +43,15 @@ module "kube2iam" {
   iam_account_id           = data.aws_caller_identity.current.account_id
 }
 
-# @TODO - Move this to a different file
+# {{ if .Config.Infrastructure.AWS.Cognito.Deploy }}
+resource "cognito" "auth" {
+  user_pool   = var.user_pool
+  hostname    = var.hostname
+}
+# {{- end}}
 
-# {{ if .Config.Infrastructure.AWS.Cognito }}
-# ref: https://github.com/squidfunk/terraform-aws-cognito-auth#usage
-
-# data "aws_acm_certificate" "wildcard_cert" {
-#   domain   = "*.${var.public_dns_zone}"
-# }
-
-module "cognito-auth" {
-  source  = "squidfunk/cognito-auth/aws"
-  version = "0.4.2"
-
-  namespace                      = "${var.auth_namespace}"
-  region                         = "${var.region}"
-  cognito_identity_pool_name     = "${var.auth_pool_name}"
-  cognito_identity_pool_provider = "${var.auth_pool_provider}"
-
-  # Optional: Default UI
-  # app_hosted_zone_id             = "<hosted-zone-id>"
-  # app_certificate_arn            = "${data.aws_acm_certificate.wildcard_cert.arn}"
-  # app_domain                     = "<domain>"
-  # app_origin                     = "<origin-domain>"
-
-  # Optional: Email delivery
-  # ses_sender_address             = "<email>"
+# {{ if .Config.Infrastructure.AWS.S3Hosting.Deploy }}
+resource "s3_hosting" "assets" {
+  bucket_name   = var.s3_hosting_bucket_name
 }
 # {{- end}}

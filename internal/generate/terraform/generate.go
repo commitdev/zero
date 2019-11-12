@@ -9,6 +9,7 @@ import (
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
+
 	"github.com/kyokomi/emoji"
 	"github.com/logrusorgru/aurora"
 )
@@ -34,6 +35,23 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGr
 	data := templator.GenericTemplateData{Config: *cfg}
 
 	t.Terraform.TemplateFiles(data, false, wg, pathPrefix)
+}
+
+func GetOutputs(config *config.Commit0Config, pathPrefix string, outputs []string) map[string]string {
+	outputsMap := make(map[string]string)
+
+	log.Println("Preparing aws environment...")
+
+	envars := util.MakeAwsEnvars(util.GetSecrets())
+
+	path := filepath.Join(pathPrefix, "terraform")
+
+	for _, output := range outputs {
+		outputValue := util.ExecuteCommandOutput(exec.Command("terraform", "output", output), path, envars)
+		outputsMap[output] = outputValue
+	}
+
+	return outputsMap
 }
 
 // Execute terrafrom init & plan

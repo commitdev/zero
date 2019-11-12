@@ -77,12 +77,21 @@ type aws struct {
 	AccountId string `yaml:"accountId"`
 	Region    string
 	EKS       eks
-	Cognito   bool
+	Cognito   cognito
+	S3Hosting s3Hosting `yaml:"s3_hosting"`
 	Terraform terraform
 }
 
 type terraform struct {
 	RemoteState bool
+}
+
+type cognito struct {
+	Deploy bool
+}
+
+type s3Hosting struct {
+	Deploy bool
 }
 
 type eks struct {

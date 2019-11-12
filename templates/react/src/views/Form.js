@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { compose, withApollo } from 'react-apollo'
 import { makeStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
@@ -14,7 +14,7 @@ import formFields from '../components/forms'
 import SurveyNavBar from '../components/survey/NavBar'
 import SurveyCompleted from '../components/survey/Completed'
 import { trackException } from '../utils/error'
-import { router, helpers } from '../utils'
+import { router } from '../utils'
 
 // TODO get userId from session JWT paylod
 const userId = 123
@@ -80,10 +80,8 @@ function Form({ params, client, children }) {
       fieldSetsMap.set(fieldSetName, [...fields, fieldTypes[i]])
     }
     const fieldSets = Array.from(fieldSetsMap)
-    // if (!fieldSets[params.step]) {
-    // return params.step >= fieldSets.length ? <FormCompleted/> : null
-    // }
-    const [fieldName, fields] = fieldSets[params.step] || []
+
+    const [fieldName, fields] = fieldSets[params.step] || [] // eslint-disable-line no-unused-vars
 
     const progress =
       parseInt(params.step) / fieldSets.length || MINIMUM_PROGRESS

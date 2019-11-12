@@ -5,7 +5,7 @@ import Card from '@material-ui/core/Card'
 import CardActions from '@material-ui/core/CardActions'
 
 import Centered from '../components/Centered'
-import { P, Text } from '../components/Text'
+import { Text } from '../components/Text'
 import SampleRestQuery from '../components/graphql/SampleRestQuery'
 import AppNavbar from '../components/AppNavbar'
 import { to } from '../utils/router'
@@ -22,7 +22,6 @@ function Dashboard({ location }) {
             <Text>phrase.home_welcome</Text>:
             <SampleRestQuery />
           </Grid>
-          <Query query={Queries.GET_ALL_FORM_TEMPLATES}>{Forms}</Query>
         </Grid>
       </Centered>
     </React.Fragment>

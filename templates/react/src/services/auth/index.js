@@ -1,3 +1,3 @@
-import auth from './auth0.js'
+import auth from './cognito.js'
 
 export default auth

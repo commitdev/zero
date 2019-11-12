@@ -120,7 +120,7 @@ func NewCITemplator(box *packr.Box) *CITemplator {
 
 	githubTemplateSource, _ := box.FindString("ci/github.tmpl")
 	// Github also uses double curly braces for their templates
-	githubTemplate, _ := template.New("CIConfig").Delims("<%=", "%>").Parse(githubTemplateSource)
+	githubTemplate, _ := template.New("CIConfig").Delims("<%", "%>").Parse(githubTemplateSource)
 
 	return &CITemplator{
 		CircleCI: circleciTemplate,
@@ -170,7 +170,7 @@ func NewEJSDirectoryTemplator(box *packr.Box, dir string) *DirectoryTemplator {
 	templates := []*template.Template{}
 	for _, file := range getFileNames(box, dir) {
 		templateSource, _ := box.FindString(file)
-		template, err := template.New(file).Delims("<%=", "%>").Funcs(util.FuncMap).Parse(templateSource)
+		template, err := template.New(file).Delims("<%", "%>").Funcs(util.FuncMap).Parse(templateSource)
 		if err != nil {
 			panic(err)
 		}

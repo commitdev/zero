@@ -14,11 +14,15 @@ infrastructure:
     eks:
       clusterName: staging
       deploy: true
+    cognito:
+      deploy: true
+    s3_hosting:
+      deploy: true
 
 frontend:
   framework: {{.FrontendFramework}}
   ci:
-    system: circleci
+    system: github
   app:
     name: {{.ProjectName}}
 

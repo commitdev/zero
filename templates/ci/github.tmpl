@@ -27,3 +27,28 @@ jobs:
       with:
         name: build
         path: build
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: build
+
+      # https://github.com/opspresso/action-s3-sync
+      - name: Publish to AWS S3
+        uses: opspresso/action-s3-sync@master
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "<% .Config.AWS.Region %>"
+          FROM_PATH: "./build"
+          DEST_PATH: "s3://<% .Config.Frontend.App.Name %>"
+          OPTIONS: "--acl public-read"

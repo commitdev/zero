@@ -32,4 +32,9 @@ module "development" {
   eks_worker_ami = "{{ .Config.Infrastructure.AWS.EKS.WorkerAMI }}"
   {{- end }}
 
+  # Client configuration
+  user_pool = "{{ .Config.Name }}-development"
+  hostname = "{{ .Config.Frontend.Hostname }}"
+  s3_hosting_bucket_name = "{{ .Config.Name }}-development"
+
 }
