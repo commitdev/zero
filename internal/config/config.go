@@ -78,7 +78,7 @@ type aws struct {
 	Region    string
 	EKS       eks
 	Cognito   cognito
-	S3Hosting s3Hosting `yaml:"s3_hosting"`
+	S3Hosting s3Hosting `yaml:"s3Hosting"`
 	Terraform terraform
 }
 
@@ -87,17 +87,16 @@ type terraform struct {
 }
 
 type cognito struct {
-	Deploy bool
+	Enabled bool
 }
 
 type s3Hosting struct {
-	Deploy bool
+	Enabled bool // @TODO Remove this option? If they have frontend and AWS enabled we should set up S3, etc.
 }
 
 type eks struct {
 	ClusterName string `yaml:"clusterName"`
 	WorkerAMI   string `yaml:"workerAMI"`
-	Deploy      bool
 }
 
 func LoadConfig(filePath string) *Commit0Config {

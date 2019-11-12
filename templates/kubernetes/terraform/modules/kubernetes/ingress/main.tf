@@ -22,6 +22,7 @@ resource "kubernetes_config_map" "nginx_configuration" {
     use-forwarded-headers = "true",
     use-proxy-protocol    = "false"
   }
+  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 # resource "kubernetes_config_map" "nginx_configuration" {
@@ -33,6 +34,7 @@ resource "kubernetes_config_map" "nginx_configuration" {
 #       "app.kubernetes.io/part-of" = "ingress-nginx"
 #     }
 #   }
+#  depends_on = [kubernetes_namespace.ingress_nginx]
 # }
 
 resource "kubernetes_config_map" "tcp_services" {
@@ -44,6 +46,7 @@ resource "kubernetes_config_map" "tcp_services" {
       "app.kubernetes.io/part-of" = "ingress-nginx"
     }
   }
+  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 resource "kubernetes_config_map" "udp_services" {
@@ -55,6 +58,7 @@ resource "kubernetes_config_map" "udp_services" {
       "app.kubernetes.io/part-of" = "ingress-nginx"
     }
   }
+  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 resource "kubernetes_service_account" "nginx_ingress_serviceaccount" {
@@ -66,6 +70,7 @@ resource "kubernetes_service_account" "nginx_ingress_serviceaccount" {
       "app.kubernetes.io/part-of" = "ingress-nginx"
     }
   }
+  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 resource "kubernetes_cluster_role" "nginx_ingress_clusterrole" {
@@ -138,6 +143,7 @@ resource "kubernetes_role" "nginx_ingress_role" {
     api_groups = [""]
     resources  = ["endpoints"]
   }
+  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 resource "kubernetes_role_binding" "nginx_ingress_role_nisa_binding" {
@@ -159,6 +165,7 @@ resource "kubernetes_role_binding" "nginx_ingress_role_nisa_binding" {
     kind      = "Role"
     name      = "nginx-ingress-role"
   }
+  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 resource "kubernetes_cluster_role_binding" "nginx_ingress_clusterrole_nisa_binding" {
@@ -324,6 +331,7 @@ resource "kubernetes_service" "ingress_nginx" {
     type                    = "LoadBalancer"
     external_traffic_policy = "Local"
   }
+  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 # HTTPS Load balancer
@@ -359,4 +367,5 @@ resource "kubernetes_service" "ingress_nginx" {
 #     }
 #     type = "LoadBalancer"
 #   }
+#  depends_on = [kubernetes_namespace.ingress_nginx]
 # }

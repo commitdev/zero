@@ -23,6 +23,7 @@ resource "kubernetes_config_map" "cluster_info" {
     "cluster.name" = var.cluster_name
     "logs.region"  = var.region
   }
+  depends_on = [kubernetes_namespace.amazon_cloudwatch]
 }
 
 resource "kubernetes_service_account" "fluentd" {
@@ -30,6 +31,7 @@ resource "kubernetes_service_account" "fluentd" {
     name      = "fluentd"
     namespace = "amazon-cloudwatch"
   }
+  depends_on = [kubernetes_namespace.amazon_cloudwatch]
 }
 
 resource "kubernetes_cluster_role" "fluentd_role" {
@@ -57,6 +59,7 @@ resource "kubernetes_cluster_role_binding" "fluentd_role_binding" {
     kind      = "ClusterRole"
     name      = "fluentd-role"
   }
+  depends_on = [kubernetes_service_account.fluentd]
 }
 
 resource "kubernetes_config_map" "fluentd_config" {
@@ -71,6 +74,7 @@ resource "kubernetes_config_map" "fluentd_config" {
     "host.conf"       = data.local_file.host.content
     "systemd.conf"    = data.local_file.systemd.content
   }
+  depends_on = [kubernetes_namespace.amazon_cloudwatch]
 }
 
 resource "kubernetes_daemonset" "fluentd_cloudwatch" {

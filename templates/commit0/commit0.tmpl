@@ -13,11 +13,10 @@ infrastructure:
     region: us-east-1
     eks:
       clusterName: staging
-      deploy: true
     cognito:
-      deploy: true
-    s3_hosting:
-      deploy: true
+      enabled: true
+    s3Hosting:
+      enabled: true
 
 frontend:
   framework: {{.FrontendFramework}}

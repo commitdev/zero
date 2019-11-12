@@ -43,15 +43,21 @@ module "kube2iam" {
   iam_account_id           = data.aws_caller_identity.current.account_id
 }
 
-# {{ if .Config.Infrastructure.AWS.Cognito.Deploy }}
-resource "cognito" "auth" {
+# {{ if .Config.Infrastructure.AWS.Cognito.Enabled }}
+module "cognito" {
+  source      = "../../modules/cognito"
   user_pool   = var.user_pool
   hostname    = var.hostname
 }
+
+output "cognito" {
+  value       = module.cognito
+}
 # {{- end}}
 
-# {{ if .Config.Infrastructure.AWS.S3Hosting.Deploy }}
-resource "s3_hosting" "assets" {
+# {{ if .Config.Infrastructure.AWS.S3Hosting.Enabled }}
+module "s3_hosting" {
+  source        = "../../modules/s3_hosting"
   bucket_name   = var.s3_hosting_bucket_name
 }
 # {{- end}}

@@ -10,10 +10,13 @@ import (
 )
 
 var configPath string
+var runInit bool
+var runApply bool
 
 func init() {
-
 	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", util.CommitYml, "config path")
+	generateCmd.PersistentFlags().BoolVarP(&runInit, "init", "", false, "Initialize config after generating")
+	generateCmd.PersistentFlags().BoolVarP(&runApply, "apply", "", false, "Apply config after generating")
 
 	rootCmd.AddCommand(generateCmd)
 }
@@ -29,7 +32,7 @@ var generateCmd = &cobra.Command{
 		cfg := config.LoadConfig(configPath)
 		cfg.Print()
 
-		generate.GenerateArtifactsHelper(t, cfg, "")
+		generate.GenerateArtifactsHelper(t, cfg, "", runInit, runApply)
 
 	},
 }

@@ -49,5 +49,5 @@ func GenerateArtifacts(projectConfig util.ProjectConfiguration) {
 	cfg := config.LoadConfig(generatedYml)
 	cfg.Print()
 
-	generate.GenerateArtifactsHelper(t, cfg, projectConfig.ProjectName)
+	generate.GenerateArtifactsHelper(t, cfg, projectConfig.ProjectName, false, false)
 }
