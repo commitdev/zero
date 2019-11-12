@@ -5,7 +5,7 @@ module "vpc" {
   cidr = "10.20.0.0/16"
 
   azs              = ["${var.region}a", "${var.region}b", "${var.region}c"] # Most regions have 3+ azs
-  private_subnets  = ["10.20.10.0/22", "10.20.14.0/22", "10.20.18.0/22"]
+  private_subnets  = ["10.20.8.0/22", "10.20.12.0/22", "10.20.16.0/22"]
   public_subnets   = ["10.20.41.0/24", "10.20.43.0/24", "10.20.45.0/24"]
   database_subnets = ["10.20.60.0/24", "10.20.62.0/24", "10.20.64.0/24"]
 

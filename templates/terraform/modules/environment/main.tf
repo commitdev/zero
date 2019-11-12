@@ -44,14 +44,16 @@ module "kube2iam" {
 }
 
 # {{ if .Config.Infrastructure.AWS.Cognito.Enabled }}
-resource "cognito" "auth" {
+module "cognito" {
+  source      = "../../modules/cognito"
   user_pool   = var.user_pool
   hostname    = var.hostname
 }
 # {{- end}}
 
 # {{ if .Config.Infrastructure.AWS.S3Hosting.Enabled }}
-resource "s3_hosting" "assets" {
+module "s3_hosting" {
+  source        = "../../modules/s3_hosting"
   bucket_name   = var.s3_hosting_bucket_name
 }
 # {{- end}}

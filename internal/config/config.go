@@ -78,7 +78,7 @@ type aws struct {
 	Region    string
 	EKS       eks
 	Cognito   cognito
-	S3Hosting s3Hosting `yaml:"s3_hosting"`
+	S3Hosting s3Hosting `yaml:"s3Hosting"`
 	Terraform terraform
 }
 

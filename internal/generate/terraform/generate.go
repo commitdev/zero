@@ -82,7 +82,7 @@ func Execute(cfg *config.Commit0Config, pathPrefix string) {
 
 		pathPrefix = filepath.Join(pathPrefix, "terraform")
 
-		log.Println(aurora.Cyan(":alarm_clock: Applying infrastructure configuration..."))
+		log.Println(aurora.Cyan(emoji.Sprintf(":alarm_clock: Applying infrastructure configuration...")))
 		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging"), envars)
 		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "environments/staging"), envars)
 

@@ -9,6 +9,7 @@ import (
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
+	"github.com/kyokomi/emoji"
 	"github.com/logrusorgru/aurora"
 )
 
@@ -24,7 +25,7 @@ func Execute(cfg *config.Commit0Config, pathPrefix string) {
 
 	pathPrefix = filepath.Join(pathPrefix, "kubernetes/terraform")
 
-	log.Println(aurora.Cyan(":alarm_clock: Applying kubernetes configuration..."))
+	log.Println(aurora.Cyan(emoji.Sprintf(":alarm_clock: Applying kubernetes configuration...")))
 	util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging"), envars)
 	util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "environments/staging"), envars)
 }
