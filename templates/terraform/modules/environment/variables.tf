@@ -32,14 +32,13 @@ variable "eks_worker_ami" {
   description = "The (EKS-optimized) AMI for EKS worker instances"
 }
 
-# {{ if .Config.Infrastructure.AWS.Cognito }}
-variable "auth_namespace" {
-  default = "cognito_auth"
-}
-variable "auth_pool_name" {
+# {{ if .Config.Infrastructure.AWS.Cognito.Deploy }}
+variable "user_pool" {
+  default = "{{ .Config.Name }}"
   description = "AWS Cognito pool name"
-}
-variable "auth_pool_provider" {
-  description = "AWS Cognito pool provider"
-}
+} 
+variable "hostname" {
+  default = "{{ .Config.Frontend.Hostname }}"
+  description = "AWS Cognito pool name"
+} 
 # {{- end}}

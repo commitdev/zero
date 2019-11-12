@@ -3,7 +3,6 @@ package terraform
 import (
 	"log"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"sync"
 
@@ -38,44 +37,21 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGr
 	t.Terraform.TemplateFiles(data, false, wg, pathPrefix)
 }
 
-func ExecuteWithOuput(config *config.Commit0Config, pathPrefix string, outputs []string) map[string]string {
+func GetOutputs(config *config.Commit0Config, pathPrefix string, outputs []string) map[string]string {
 	outputsMap := make(map[string]string)
 
-	if config.Infrastructure.AWS.Cognito.Deploy {
-		log.Println("Preparing aws environment...")
+	log.Println("Preparing aws environment...")
 
-		envars := util.MakeAwsEnvars(util.GetSecrets())
+	envars := util.MakeAwsEnvars(util.GetSecrets())
 
-		path := filepath.Join(pathPrefix, "terraform")
+	path := filepath.Join(pathPrefix, "terraform")
 
-		log.Println(aurora.Cyan(":alarm_clock: Applying infrastructure configuration..."), path)
-		util.ExecuteCommand(exec.Command("terraform", "init"), path, envars)
-		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), path, envars)
-
-		for _, output := range outputs {
-			outputValue := getOutput(exec.Command("terraform", "output", output), path, envars)
-			outputsMap[output] = outputValue
-		}
-
+	for _, output := range outputs {
+		outputValue := util.ExecuteCommandOutput(exec.Command("terraform", "output", output), path, envars)
+		outputsMap[output] = outputValue
 	}
 
 	return outputsMap
-}
-
-func getOutput(cmd *exec.Cmd, pathPrefix string, envars []string) string {
-	dir := util.GetCwd()
-
-	cmd.Dir = path.Join(dir, pathPrefix)
-
-	if envars != nil {
-		cmd.Env = envars
-	}
-
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Fatalf("Executing terraform output failed: %v\n", err)
-	}
-	return string(out)
 }
 
 // Execute terrafrom init & plan

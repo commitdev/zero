@@ -45,29 +45,45 @@ module "kube2iam" {
 
 # @TODO - Move this to a different file
 
-# {{ if .Config.Infrastructure.AWS.Cognito }}
-# ref: https://github.com/squidfunk/terraform-aws-cognito-auth#usage
+# {{ if .Config.Infrastructure.AWS.Cognito.Deploy }}
+resource "aws_cognito_user_pool" "users" {
+  name = "${var.project}-user-pool"
 
-# data "aws_acm_certificate" "wildcard_cert" {
-#   domain   = "*.${var.public_dns_zone}"
-# }
+  username_attributes = [
+    "email",
+  ]
 
-module "cognito-auth" {
-  source  = "squidfunk/cognito-auth/aws"
-  version = "0.4.2"
+  # auto_verified_attributes = ["email"]
+}
 
-  namespace                      = "${var.auth_namespace}"
-  region                         = "${var.region}"
-  cognito_identity_pool_name     = "${var.auth_pool_name}"
-  cognito_identity_pool_provider = "${var.auth_pool_provider}"
+resource "aws_cognito_user_pool_client" "client" {
+  name = "${var.user_pool}-user-pool-client"
 
-  # Optional: Default UI
-  # app_hosted_zone_id             = "<hosted-zone-id>"
-  # app_certificate_arn            = "${data.aws_acm_certificate.wildcard_cert.arn}"
-  # app_domain                     = "<domain>"
-  # app_origin                     = "<origin-domain>"
+  user_pool_id    = "${aws_cognito_user_pool.users.id}"
+  generate_secret = false
 
-  # Optional: Email delivery
-  # ses_sender_address             = "<email>"
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_flows = ["code", "implicit"]
+  allowed_oauth_scopes = ["profile", "openid"]
+
+  supported_identity_providers = ["COGNITO"]
+  refresh_token_validity = "14"
+
+  explicit_auth_flows = [
+    "ADMIN_NO_SRP_AUTH",
+    "USER_PASSWORD_AUTH",
+  ]
+
+  write_attributes = ["email"]
+
+  callback_urls = ["https://auth.${var.hostname}","https://auth.${var.hostname}/oauth2/idpresponse"]
+  logout_urls = ["https://auth.${var.hostname}/logout"]
+}
+
+output "cognito_pool_id" {
+  value = "${aws_cognito_user_pool.users.id}"
+}
+output "cognito_client_id" {
+  value = "${aws_cognito_user_pool_client.client.id}"
 }
 # {{- end}}

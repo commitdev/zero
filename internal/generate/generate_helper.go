@@ -45,26 +45,6 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 		kubernetes.Generate(t, cfg, &wg, pathPrefix)
 	}
 
-	log.Println(aurora.Cyan(emoji.Sprintf("Generating Terraform")))
-	terraform.Generate(t, cfg, &wg, pathPrefix)
-	if cfg.Infrastructure.AWS.Cognito.Deploy {
-
-		outputs := []string{
-			"cognito_pool_id",
-			"cognito_client_id",
-		}
-		outputValues := terraform.ExecuteWithOuput(cfg, pathPrefix, outputs)
-		cfg.Frontend.Env.CognitoPoolID = outputValues["cognito_pool_id"]
-		cfg.Frontend.Env.CognitoClientID = outputValues["cognito_client_id"]
-	}
-
-	// @TODO : This strucuture probably needs to be adjusted. Probably too generic.
-	switch cfg.Frontend.Framework {
-	case util.React:
-		log.Println(aurora.Cyan(emoji.Sprintf("Creating React frontend")))
-		react.Generate(t, cfg, &wg, pathPrefix)
-	}
-
 	util.TemplateFileIfDoesNotExist(pathPrefix, "README.md", t.Readme, &wg, templator.GenericTemplateData{*cfg})
 
 	// Wait for all the templates to be generated
@@ -76,4 +56,22 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 		terraform.Execute(cfg, pathPrefix)
 		kubernetes.Execute(cfg, pathPrefix)
 	}
+
+	if cfg.Infrastructure.AWS.Cognito.Deploy {
+		outputs := []string{
+			"cognito_pool_id",
+			"cognito_client_id",
+		}
+		outputValues := terraform.GetOutputs(cfg, pathPrefix, outputs)
+		cfg.Frontend.Env.CognitoPoolID = outputValues["cognito_pool_id"]
+		cfg.Frontend.Env.CognitoClientID = outputValues["cognito_client_id"]
+	}
+
+	// @TODO : This strucuture probably needs to be adjusted. Probably too generic.
+	switch cfg.Frontend.Framework {
+	case util.React:
+		log.Println(aurora.Cyan(emoji.Sprintf("Creating React frontend")))
+		react.Generate(t, cfg, &wg, pathPrefix)
+	}
+
 }
