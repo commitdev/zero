@@ -34,4 +34,5 @@ module "staging" {
 
   # Client configuration
   user_pool = "{{ .Config.Name }}-staging"
+  s3_hosting_bucket_name = "{{ .Config.Name }}-staging"
 }

@@ -78,6 +78,7 @@ type aws struct {
 	Region    string
 	EKS       eks
 	Cognito   cognito
+	S3Hosting s3Hosting `yaml:"s3_hosting"`
 	Terraform terraform
 }
 
@@ -86,7 +87,11 @@ type terraform struct {
 }
 
 type cognito struct {
-	Deploy   bool
+	Deploy bool
+}
+
+type s3Hosting struct {
+	Deploy bool
 }
 
 type eks struct {

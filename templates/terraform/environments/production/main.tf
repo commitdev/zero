@@ -34,4 +34,6 @@ module "production" {
 
   # Client configuration
   user_pool = "{{ .Config.Name }}-production"
+  s3_hosting_bucket_name = "{{ .Config.Name }}-production"
+
 }
