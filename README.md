@@ -123,3 +123,26 @@ In order to use this you need ensure you have these installed.
 * protoc-gen-swagger [Swagger]
 
 
+### Commit0 Demo
+- clone the repo
+- run `make build-docker-local`
+- add an alias `alias commit0='docker run -it -v "$(pwd):/project" -v "${HOME}/.aws:/root/.aws" commit0:v0'`
+- remember to also add this alias to your bash profile if you want it to persist when you open a new terminal
+- create a temporary directory `mkdir tmp; cd tmp`
+- create the project `commit0 create beier-demo`
+- when prompted, select `Amazon AWS`, `us-west-2`, and your commit AWS profile
+- `cd beier-demo`
+- generate the codebase `commit0 generate --apply` 
+- go to the react repo `cd react` 
+- push to the prepped Github Repo. This repo already has AWS credentials loaded in Github Secrets
+```
+git init
+git add -A
+git commit -m commit0
+git remote add origin git@github.com:commitdev/commit0-demo.git
+git push -u origin master --force
+```
+- Wait for Github Actions to finish
+- View the site at http://beier-demo-staging.s3-website-us-west-2.amazonaws.com/
+- go to signup, just ensure you have a strong enough password it needs caps, symbol and numerics ex `@Testing123` 
+- Alternatively you can run the app locally `npm install; npm start`

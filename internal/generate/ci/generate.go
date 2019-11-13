@@ -48,7 +48,7 @@ func Generate(t *templator.CITemplator, cfg *config.Commit0Config, ciConfig conf
 		ciFilename = ".travis.yml"
 		ciTemp = t.TravisCI
 	case "github":
-		ciConfigPath = fmt.Sprintf("%s/%s", basePath, ".github/workflow/")
+		ciConfigPath = fmt.Sprintf("%s/%s", basePath, ".github/workflows/")
 		ciFilename = "config.yml"
 		ciTemp = t.Github
 	default:
