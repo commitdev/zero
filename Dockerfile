@@ -5,6 +5,8 @@ ENV GOLANG_PROTOBUF_VERSION=1.3.1
 ENV GRPC_GATEWAY_VERSION=1.11.3
 ENV GRPC_WEB_VERSION=1.0.6
 ENV PROTOBUF_VERSION=3.6.1
+ENV TERRAFORM_VERSION=0.12.12
+ENV K8S_VERSION=1.14.8
 
 RUN apk add --update --no-cache build-base curl git upx && \
   rm -rf /var/cache/apk/*
@@ -34,9 +36,17 @@ RUN mkdir -p /tmp/protoc && \
   unzip protoc.zip && \
   mv /tmp/protoc/include /usr/local/include
 
+RUN curl -sSL \
+  https://storage.googleapis.com/kubernetes-release/release/v${K8S_VERSION}/bin/linux/amd64/kubectl \
+  -o /usr/local/bin/kubectl
+
+RUN curl -sSL \
+  https://amazon-eks.s3-us-west-2.amazonaws.com/1.14.6/2019-08-22/bin/linux/amd64/aws-iam-authenticator \
+  -o /usr/local/bin/aws-iam-authenticator
+
 RUN GO111MODULE=off go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 
-RUN curl -sSLo /tmp/terraform.zip "https://releases.hashicorp.com/terraform/0.12.12/terraform_0.12.12_linux_amd64.zip" && \
+RUN curl -sSLo /tmp/terraform.zip "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" && \
 unzip -d /usr/local/bin/ /tmp/terraform.zip
 
 RUN chmod +x /usr/local/bin/* && \
@@ -52,7 +62,7 @@ RUN make build-deps && make build && \
 FROM alpine:3.10
 ENV \
   PROTOBUF_VERSION=3.6.1-r1 \
-  GOPATH=/proto-libs 
+  GOPATH=/proto-libs
 
 RUN apk add --update bash ca-certificates git python && \
 apk add --update -t deps make py-pip
