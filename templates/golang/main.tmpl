@@ -5,7 +5,7 @@ import (
 
 	healthpb "{{ .Service.GitRepo }}/{{ .Config.Name }}-idl/gen/go/health"
 
-	health "{{ .Service.GitRepo }}/{{ .Config.Name }}/server/health"
+	health "{{ .Service.GitRepo }}/{{ .Config.Name }}/service/{{ .Service.Name }}/health"
 
 	"google.golang.org/grpc"
 )
