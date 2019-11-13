@@ -64,8 +64,12 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 	// @TODO : This strucuture probably needs to be adjusted. Probably too generic.
 	switch cfg.Frontend.Framework {
 	case util.React:
-		log.Println(aurora.Cyan(emoji.Sprintf("Creating React frontend")))
-		react.Generate(t, cfg, &wg, pathPrefix)
+		if cfg.Infrastructure.AWS.Cognito.Enabled && cfg.Frontend.Env.CognitoPoolID != "" {
+			log.Println(aurora.Cyan(emoji.Sprintf("Creating React frontend")))
+			react.Generate(t, cfg, &wg, pathPrefix)
+		} else {
+			log.Println(aurora.Yellow(emoji.Sprintf(":warning: Missing React environment variables, skipping generation")))
+		}
 	}
 
 }
