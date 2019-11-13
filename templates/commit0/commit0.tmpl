@@ -9,8 +9,8 @@ maintainers:
 
 infrastructure:
   aws:
-    accountId: 1234
-    region: us-east-1
+    accountId: {{ .Infrastructure.AWS.AccountID }}
+    region: {{ .Infrastructure.AWS.Region }}
     eks:
       clusterName: staging
     cognito:

@@ -9,6 +9,7 @@ import (
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
+	"github.com/commitdev/commit0/internal/util/secrets"
 
 	"github.com/kyokomi/emoji"
 	"github.com/logrusorgru/aurora"
@@ -38,12 +39,12 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGr
 }
 
 // GetOutputs captures the terraform output for the specific variables
-func GetOutputs(config *config.Commit0Config, pathPrefix string, outputs []string) map[string]string {
+func GetOutputs(cfg *config.Commit0Config, pathPrefix string, outputs []string) map[string]string {
 	outputsMap := make(map[string]string)
 
 	log.Println("Preparing aws environment...")
 
-	envars := util.MakeAwsEnvars(util.GetSecrets())
+	envars := secrets.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))
 
 	pathPrefix = filepath.Join(pathPrefix, "environments/staging")
 
@@ -56,12 +57,12 @@ func GetOutputs(config *config.Commit0Config, pathPrefix string, outputs []strin
 }
 
 // Init sets up anything required by Execute
-func Init(config *config.Commit0Config, pathPrefix string) {
+func Init(cfg *config.Commit0Config, pathPrefix string) {
 	// @TODO : Change this check. Most likely we should discover the accountid
-	if config.Infrastructure.AWS.AccountId != "" {
+	if cfg.Infrastructure.AWS.AccountId != "" {
 		log.Println("Preparing aws environment...")
 
-		envars := util.MakeAwsEnvars(util.GetSecrets())
+		envars := secrets.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))
 
 		pathPrefix = filepath.Join(pathPrefix, "terraform")
 
@@ -78,7 +79,7 @@ func Execute(cfg *config.Commit0Config, pathPrefix string) {
 	if cfg.Infrastructure.AWS.AccountId != "" {
 		log.Println("Preparing aws environment...")
 
-		envars := util.MakeAwsEnvars(util.GetSecrets())
+		envars := secrets.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))
 
 		pathPrefix = filepath.Join(pathPrefix, "terraform")
 

@@ -9,6 +9,7 @@ import (
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
+	"github.com/commitdev/commit0/internal/util/secrets"
 	"github.com/kyokomi/emoji"
 	"github.com/logrusorgru/aurora"
 )
@@ -21,7 +22,7 @@ func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGr
 
 // Execute terrafrom init & plan
 func Execute(cfg *config.Commit0Config, pathPrefix string) {
-	envars := util.MakeAwsEnvars(util.GetSecrets())
+	envars := secrets.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))
 
 	pathPrefix = filepath.Join(pathPrefix, "kubernetes/terraform")
 

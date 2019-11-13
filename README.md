@@ -17,7 +17,7 @@ With Commit0:
 
 As there alot of dependencies it will be easier to use this tool within the provided image, clone the repo and then run `make build-docker-local`.
 The best way then to use this is to add an alias, then you can use the CLI as if it was installed as usual on your machine:
-`alias commit0='docker run -v "$(pwd):/project" commit0:v0'`
+`alias commit0='docker run -it -v "$(pwd):/project" -v "${HOME}/.aws:/root/.aws" commit0:v0'`
 
 ## Usage
 
@@ -53,7 +53,7 @@ Based on specified config it will generate:
 It will also live with your project, when you add a new service to the config it will generate everything needed for that new service.
 
 
-## Development 
+## Development
 We are looking for contributors!
 
 Building from the source
@@ -61,14 +61,14 @@ Building from the source
 make build-deps
 make deps-go
 ```
-this will create a commit0 executable in your working direcory. To install install it into your go path use: 
+this will create a commit0 executable in your working direcory. To install install it into your go path use:
 ```
 make install-go
 ```
 
 Compile a new `commit0` binary in the working directory
 ```
-make build 
+make build
 ```
 
 Now you can either add your project directory to your path or just execute it directly
@@ -81,7 +81,7 @@ cd test-app
 ```
 
 ### Architecture
-The project is built with GoLang and requires Docker 
+The project is built with GoLang and requires Docker
 - /cmd - the CLI command entry points
 - /internal/generate
 - /internal/config
@@ -89,14 +89,14 @@ The project is built with GoLang and requires Docker
 
 Example Flow:
 The application starts at `cmd/generate.go`
-1. loads all the templates from packr 
+1. loads all the templates from packr
   - TODO: eventually this should be loaded remotely throug a dependency management system
 2. loads the config from the commit0.yml config file
 3. based on the configs, run the appropriate generators
   - templator is passed in to the Generate function for dependency injection
   - `internal/generate/generate_helper.go` iterates through all the configs and runs each generator
 4. each generator (`react/generate.go`, `ci/generate.go` etc) further delegates and actually executes the templating based on the configs passed in.
-  - `internal/templator/templator.go` is the base class and includes generic templating handling logic 
+  - `internal/templator/templator.go` is the base class and includes generic templating handling logic
   - it CI is required, it'll also call a CI generator and pass in the service specific CI configs
   - TOOD: CI templates have to call separate templates based on the context
   - TODO: templator should be generic and not have any knowledge of the specific templating implementation (go, ci etc), move that logic upstream
