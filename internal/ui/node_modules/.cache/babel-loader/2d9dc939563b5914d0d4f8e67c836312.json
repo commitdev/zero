@@ -1,1 +1,0 @@
-{"ast":null,"code":"export { default } from './Modal';\nexport { default as ModalManager } from './ModalManager';","map":null,"metadata":{},"sourceType":"module"}

@@ -1,1 +1,0 @@
-{"ast":null,"code":"export default function hasClass(element, className) {\n  if (element.classList) return !!className && element.classList.contains(className);\n  return (\" \" + (element.className.baseVal || element.className) + \" \").indexOf(\" \" + className + \" \") !== -1;\n}","map":null,"metadata":{},"sourceType":"module"}
