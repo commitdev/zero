@@ -1,0 +1,1 @@
+{"ast":null,"code":"var common = {\n  black: '#000',\n  white: '#fff'\n};\nexport default common;","map":null,"metadata":{},"sourceType":"module"}

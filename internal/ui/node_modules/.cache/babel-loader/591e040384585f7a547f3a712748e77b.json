@@ -1,0 +1,1 @@
+{"ast":null,"code":"import createMuiTheme from './createMuiTheme';\nvar defaultTheme = createMuiTheme();\nexport default defaultTheme;","map":null,"metadata":{},"sourceType":"module"}

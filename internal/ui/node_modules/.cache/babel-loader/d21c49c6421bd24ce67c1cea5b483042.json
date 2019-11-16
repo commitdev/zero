@@ -1,0 +1,1 @@
+{"ast":null,"code":"var hasSymbol = typeof Symbol === 'function' && Symbol.for;\nexport default hasSymbol ? Symbol.for('mui.nested') : '__THEME_NESTED__';","map":null,"metadata":{},"sourceType":"module"}

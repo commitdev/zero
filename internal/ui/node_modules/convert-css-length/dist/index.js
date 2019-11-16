@@ -1,0 +1,2 @@
+var e=function(e){return parseFloat(e)};module.exports=function(r){return null==r&&(r=r),function(n,t,i,l){null==i&&(i=r),null==l&&(l=i);var u=String(n).match(/[\d.\-\+]*\s*(.*)/)[1]||"";if(u===t)return n;var f=e(n);if("px"!==u)if("em"===u)f=e(n)*e(i);else if("rem"===u)f=e(n)*e(r);else{if("ex"!==u)return n;f=e(n)*e(i)*2}var a=f;if("px"!==t)if("em"===t)a=f/e(l);else if("rem"===t)a=f/e(r);else{if("ex"!==t)return n;a=f/e(l)/2}return parseFloat(a.toFixed(5))+t}};
+//# sourceMappingURL=index.js.map

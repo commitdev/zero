@@ -1,0 +1,1 @@
+{"ast":null,"code":"// We use the same empty object to ref count the styles that don't need a theme object.\nvar noopTheme = {};\nexport default noopTheme;","map":null,"metadata":{},"sourceType":"module"}

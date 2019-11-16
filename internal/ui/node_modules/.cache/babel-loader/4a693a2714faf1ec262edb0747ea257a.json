@@ -1,0 +1,1 @@
+{"ast":null,"code":"export default function chainPropTypes(propType1, propType2) {\n  if (process.env.NODE_ENV === 'production') {\n    return function () {\n      return null;\n    };\n  }\n\n  return function validate() {\n    return propType1.apply(void 0, arguments) || propType2.apply(void 0, arguments);\n  };\n}","map":null,"metadata":{},"sourceType":"module"}
