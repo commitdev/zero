@@ -71,5 +71,6 @@ func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, 
 			log.Println(aurora.Yellow(emoji.Sprintf(":warning: Missing React environment variables, skipping generation")))
 		}
 	}
+	wg.Wait()
 
 }
