@@ -1,0 +1,26 @@
+organization: 
+name: 
+description: 
+maintainers:
+  
+
+infrastructure:
+  aws:
+    accountId: 
+    region: 
+    eks:
+      clusterName: staging
+    cognito:
+      enabled: true
+    s3Hosting:
+      enabled: true
+
+frontend:
+  framework: 
+  ci:
+    system: github
+  app:
+    name: 
+
+services:
+  
