@@ -34,16 +34,18 @@ export default class Providers extends React.Component {
               <ToggleButton key={1} value="aws" aria-label="Amazon AWS">
                 Amazon AWS
               </ToggleButton>
-              <ToggleButton key={2} value="gcp" aria-label="Google Cloud">
+              <ToggleButton key={2} value="gcp" aria-label="Google Cloud" disabled={true}>
                 Google Cloud
               </ToggleButton>
-              <ToggleButton key={3} value="azure" aria-label="Microsoft Azure">
+              <ToggleButton key={3} value="azure" aria-label="Microsoft Azure" disabled={true}>
                 Microsoft Azure
               </ToggleButton>
             </ToggleButtonGroup>
           </Grid>
-
-          {this.state.provider === "aws" && <AWSProvider setProvider={this.props.setProvider} />}
+          {this.state.provider === "aws" && <AWSProvider 
+            setRegion={this.props.setRegion}
+            setProfile={this.props.setProfile}
+            setProvider={this.props.setProvider} />}
           {this.props.provider !== "aws" && <div><p>Only Amazon AWS is supported right now.</p></div>}
         </Grid>
       </div>

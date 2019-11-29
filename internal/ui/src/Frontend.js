@@ -21,16 +21,17 @@ export default class Frontend extends React.Component {
             <ToggleButtonGroup
               value={this.props.frontend}
               exclusive
+              children="true"
               onChange={this.handleChange}
               aria-label="Frontend Framework"
             >
               <ToggleButton key={1} value="react" aria-label="React">
                 React
             </ToggleButton>
-              <ToggleButton key={2} value="angular" aria-label="Angular">
+              <ToggleButton key={2} value="angular" aria-label="Angular" disabled={true}>
                 Angular
             </ToggleButton>
-              <ToggleButton key={3} value="vue" aria-label="Vue">
+              <ToggleButton key={3} value="vue" aria-label="Vue" disabled={true}>
                 Vue
             </ToggleButton>
             </ToggleButtonGroup>

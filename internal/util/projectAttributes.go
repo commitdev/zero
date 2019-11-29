@@ -39,13 +39,13 @@ type ProjectConfiguration struct {
 	Description       string
 	Maintainers       []Maintainer
 	Services          []Service
-	Infrastructure    Infrastructure
+	Infrastructure    Infrastructure `json:"infrastructure"`
 }
 
 type Infrastructure struct {
-	AWS AWS
+	AWS AWS `json:"aws"`
 }
 type AWS struct {
 	AccountID string
-	Region    string
+	Region    string `json:"region"`
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import Divider from '@material-ui/core/Divider';
 
-
+import Project from './Project.js';
 import Providers from './Providers.js';
 import Frontend from './Frontend.js';
 import Services from './Services.js';
@@ -16,8 +16,12 @@ export default class App extends React.Component {
     super(props);
     this.state = {
       success: null,
+      projectName: '',
+      projectDescription: '',
       provider: 'aws',
       frontend: 'react',
+      region: 'us-east-1',
+      profile: 'default',
       services: [
         {
           name: "test service 1",
@@ -28,32 +32,55 @@ export default class App extends React.Component {
     };
   }
 
-  setProvider = (p) => {
-    this.setState({ provider: p });
+  setProjectName = (v) => {
+    this.setState({ projectName: v });
   }
 
-  setFrontend = (f) => {
-    this.setState({ frontend: f });
+  setProjectDescription = (v) => {
+    this.setState({ projectDescription: v });
+  }
+
+  setProvider = (v) => {
+    this.setState({ provider: v });
+  }
+
+  setFrontend = (v) => {
+    this.setState({ frontend: v });
+  }
+
+  setRegion = (v) => {
+    this.setState({ region: v });
+  }
+
+  setProfile = (v) => {
+    this.setState({ profile: v });
   }
 
   addServices = (s) => {
-    this.setState({ services: [1] });
+    let servicesArray = this.state.services.push(s);
+    this.setState({ services: servicesArray });
   }
 
   generate = () => {
     let self = this;
     axios.post('http://localhost:8080/v1/generate', {
-      frontendFramework: this.state.frontend,
+      "projectName": self.state.projectName,
+      "frontendFramework": self.state.frontend,
+      "infrastructure": {
+        "aws": {
+          "region": self.state.region,
+          "profile": self.state.profile
+        }
+      }
     })
       .then(function (response) {
         // handle success
-        console.log(response);
-        this.setState({success: true});
+        self.setState({ success: true });
       })
       .catch(function (error) {
         // handle error
         console.log(error);
-        self.setState({success: false});
+        self.setState({ success: false });
       })
       .finally(function () {
         // always executed
@@ -65,12 +92,17 @@ export default class App extends React.Component {
     return (
       <div className="App">
         <h1>Commit0 - Create a new project</h1>
-        <Providers provider={this.state.provider} setProvider={this.setProvider} />
+        <Project project={this.project} setProjectName={this.setProjectName} setProjectDescription={this.setProjectDescription} />
+        <Providers
+          provider={this.state.provider}
+          setProvider={this.setProvider}
+          setRegion={this.setRegion}
+          setProfile={this.setProfile} />
         <Frontend frontend={this.state.frontend} setFrontend={this.setFrontend} />
         <Services services={this.state.services} addService={this.addService} />
         <Divider variant="middle" />
         <GenerateButton generate={this.generate} />
-        {this.state.success !== null && <Complete succes={this.state.success} />}
+        {this.state.success !== null && <Complete success={this.state.success} />}
       </div>
     );
   }
