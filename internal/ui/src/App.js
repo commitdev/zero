@@ -22,13 +22,7 @@ export default class App extends React.Component {
       frontend: 'react',
       region: 'us-east-1',
       profile: 'default',
-      services: [
-        {
-          name: "test service 1",
-          description: "Things.",
-          language: "go"
-        }
-      ]
+      services: []
     };
   }
 
@@ -56,9 +50,8 @@ export default class App extends React.Component {
     this.setState({ profile: v });
   }
 
-  addServices = (s) => {
-    let servicesArray = this.state.services.push(s);
-    this.setState({ services: servicesArray });
+  setServices = (s) => {
+    this.setState({services: s});
   }
 
   generate = () => {
@@ -66,6 +59,7 @@ export default class App extends React.Component {
     axios.post('http://localhost:8080/v1/generate', {
       "projectName": self.state.projectName,
       "frontendFramework": self.state.frontend,
+      "services": self.state.services,
       "infrastructure": {
         "aws": {
           "region": self.state.region,
@@ -99,7 +93,7 @@ export default class App extends React.Component {
           setRegion={this.setRegion}
           setProfile={this.setProfile} />
         <Frontend frontend={this.state.frontend} setFrontend={this.setFrontend} />
-        <Services services={this.state.services} addService={this.addService} />
+        <Services services={this.state.services} setServices={this.setServices} />
         <Divider variant="middle" />
         <GenerateButton generate={this.generate} />
         {this.state.success !== null && <Complete success={this.state.success} />}
