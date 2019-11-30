@@ -88,7 +88,6 @@ If you're working on the configuration UI locally, you can run just the ui by do
 cd internal/ui
 yarn
 yarn start
-open http://localhost:3000
 ```
 
 If you want to test the full integration with the go app, you'll need to do a build and run the app with `./commit0 ui`.
@@ -96,8 +95,9 @@ If you want to test the full integration with the go app, you'll need to do a bu
 ``` bash
 make build
 ./commit0 ui
-open http://localhost:8080
 ```
+
+[http://localhost:8080/](http://localhost:8080/)
 
 ### Architecture
 The project is built with GoLang and requires Docker

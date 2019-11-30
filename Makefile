@@ -52,6 +52,9 @@ build-example-docker: clean-example
 clean-example:
 	rm -rf example
 
+watch-ui:
+	cd internal/ui && yarn start
+
 # builds 
 build:
 	CGO_ENABLED=0 packr2 build -o commit0
