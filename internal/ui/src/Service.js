@@ -5,8 +5,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import { timeout } from 'q';
-import { timer } from 'rxjs';
 
 export default class Service extends React.Component {
   constructor(props) {

@@ -6,9 +6,6 @@ import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 
 
 export default class Frontend extends React.Component {
-  constructor(props) {
-    super(props);
-  }
   handleChange = (e, v) => {
     this.props.setFrontend(v);
   }

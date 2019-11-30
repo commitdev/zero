@@ -13,13 +13,19 @@ export default class Services extends React.Component {
   }
 
   add = () => {
-    this.state.services.push({ name: "", description: ""});
-    this.props.setServices(this.state.services);
+    let services = this.state.services;
+    services.push({ name: "", description: ""});
+    this.setState({services: services}, () => {
+      this.props.setServices(this.state.services);
+    });
   }
 
   update = (index, data) => {
-    this.state.services[index] = data;
-    this.props.setServices(this.state.services);
+    let services = this.state.services;
+    services[index] = data;
+    this.setState({services: services}, () => {
+      this.props.setServices(this.state.services);
+    });
   }
   render() {
     return (

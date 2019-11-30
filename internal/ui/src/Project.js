@@ -5,9 +5,6 @@ import TextField from '@material-ui/core/TextField';
 
 
 export default class Project extends React.Component {
-  constructor(props) {
-    super(props);
-  }
   updateName = (event) => {
     this.props.setProjectName(event.target.value);
   }
