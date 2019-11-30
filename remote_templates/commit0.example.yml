@@ -1,0 +1,24 @@
+name: hello-world
+
+# Context will populated automatically or could be added manually
+context: 
+  awsCognito: 
+    poolID: 123
+    clientID: ABC
+
+packages: 
+  - source: './remote_templates/infrastructure'
+    params: 
+      apply: true
+
+  - source: './remote_templates/frontend'
+    params: 
+      ci: github
+
+  - source: './remote_templates/services'
+    # alternatively we can recursively support sub packges
+    packages: 
+      - './remote_templates/ci/go'
+
+  
+

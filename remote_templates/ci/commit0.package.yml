@@ -1,0 +1,22 @@
+package: 
+  title: "CI templates"
+  description: ""
+  author: ""
+  icon: ""
+
+# Template variables to populate, these could be overwritten by the file spefic frontmatter variables
+templates: 
+  strictMode: true # will only parse files that includes the .tmpl.* extension, otherwise it will copy file 
+  delimiters:
+    - "<%"
+    - "%>"
+  destination: "{{.Metadata.Directory}}/{{.Metadata.Filename}}"
+
+# parameters required 
+# populates .Params variables
+params: 
+  - name: system
+    options: 
+      - github
+      - circlci
+
