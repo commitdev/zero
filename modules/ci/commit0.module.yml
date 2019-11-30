@@ -1,8 +1,10 @@
-package: 
+module: 
   title: "CI templates"
   description: ""
   author: ""
   icon: ""
+  thumbnail: ""
+  readme: "" # defaults to README.md
 
 # Template variables to populate, these could be overwritten by the file spefic frontmatter variables
 templates: 
