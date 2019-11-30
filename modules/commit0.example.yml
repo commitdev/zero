@@ -17,7 +17,7 @@ modules:
       ci: github
 
   - source: './remote_templates/services'
-    # alternatively we can recursively support sub packges
+    # alternatively we can recursively support sub modules
     modules: 
       - './remote_templates/ci/go'
 
