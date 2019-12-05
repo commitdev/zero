@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import Divider from '@material-ui/core/Divider';
 
 import Project from './Project.js';
