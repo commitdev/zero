@@ -7,3 +7,8 @@ variable "ecr_repositories" {
   type        = list(string)
 }
 
+variable "ecr_principals" {
+  description = "List of principals (most likely users) to give full access to the created ECR repositories"
+  type        = list(string)
+}
+

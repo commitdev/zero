@@ -18,7 +18,9 @@ import (
 
 // Secrets - AWS prompted credentials
 type Secrets struct {
-	AWS AWS
+	AWS         AWS
+	CircleCIKey string
+	GithubToken string
 }
 
 type AWS struct {
@@ -47,21 +49,13 @@ func GetSecrets(baseDir string) Secrets {
 		if err != nil {
 			log.Fatal(err)
 		}
+		credsFile := filepath.Join(usr.HomeDir, ".aws/credentials")
 
-		var awsSecrets Secrets
+		var secrets Secrets
 
 		// Load the credentials file to look for profiles
-		credsFile := filepath.Join(usr.HomeDir, ".aws/credentials")
-		creds, err := ioutil.ReadFile(credsFile)
+		profiles, err := GetAWSProfiles()
 		if err == nil {
-			// Get all profiles
-			re := regexp.MustCompile(`\[(.*)\]`)
-			profileMatches := re.FindAllStringSubmatch(string(creds), -1)
-			profiles := make([]string, len(profileMatches))
-			for i, p := range profileMatches {
-				profiles[i] = p[1]
-			}
-
 			profilePrompt := promptui.Select{
 				Label: "Select AWS Profile",
 				Items: profiles,
@@ -71,7 +65,7 @@ func GetSecrets(baseDir string) Secrets {
 
 			creds, err := credentials.NewSharedCredentials(credsFile, profileResult).Get()
 			if err == nil {
-				awsSecrets = Secrets{
+				secrets = Secrets{
 					AWS: AWS{
 						AccessKeyID:     creds.AccessKeyID,
 						SecretAccessKey: creds.SecretAccessKey,
@@ -81,13 +75,51 @@ func GetSecrets(baseDir string) Secrets {
 		}
 
 		// We couldn't load the credentials file, get the user to just paste them
-		if awsSecrets == (Secrets{}) {
-			awsSecrets = promptCredentials()
+		if secrets.AWS == (AWS{}) {
+			promptAWSCredentials(&secrets)
 		}
 
-		writeSecrets(secretsFile, awsSecrets)
-		return awsSecrets
+		if secrets.CircleCIKey == "" || secrets.GithubToken == "" {
+			ciPrompt := promptui.Select{
+				Label: "Which Continuous integration provider do you want to use?",
+				Items: []string{"CircleCI", "GitHub Actions"},
+			}
+
+			_, ciResult, _ := ciPrompt.Run()
+
+			if ciResult == "CircleCI" {
+				promptCircleCICredentials(&secrets)
+			} else if ciResult == "GitHub Actions" {
+				promptGitHubCredentials(&secrets)
+			}
+		}
+
+		writeSecrets(secretsFile, secrets)
+		return secrets
 	}
+}
+
+// GetAWSProfiles returns a list of AWS forprofiles set up on the user's sytem
+func GetAWSProfiles() ([]string, error) {
+	usr, err := user.Current()
+	if err != nil {
+		return nil, err
+	}
+
+	// Load the credentials file to look for profiles
+	credsFile := filepath.Join(usr.HomeDir, ".aws/credentials")
+	creds, err := ioutil.ReadFile(credsFile)
+	if err != nil {
+		return nil, err
+	}
+	// Get all profiles
+	re := regexp.MustCompile(`\[(.*)\]`)
+	profileMatches := re.FindAllStringSubmatch(string(creds), -1)
+	profiles := make([]string, len(profileMatches))
+	for i, p := range profileMatches {
+		profiles[i] = p[1]
+	}
+	return profiles, nil
 }
 
 func readSecrets(secretsFile string) Secrets {
@@ -122,7 +154,7 @@ func writeSecrets(secretsFile string, s Secrets) {
 	}
 }
 
-func promptCredentials() Secrets {
+func promptAWSCredentials(secrets *Secrets) {
 
 	validateAKID := func(input string) error {
 		// 20 uppercase alphanumeric characters
@@ -167,12 +199,35 @@ func promptCredentials() Secrets {
 		panic(err)
 	}
 
-	awsSecrets := Secrets{}
-	awsSecrets.AWS.AccessKeyID = accessKeyIDResult
-	awsSecrets.AWS.SecretAccessKey = secretAccessKeyResult
+	secrets.AWS.AccessKeyID = accessKeyIDResult
+	secrets.AWS.SecretAccessKey = secretAccessKeyResult
+}
 
-	return awsSecrets
+func promptGitHubCredentials(secrets *Secrets) {
+}
 
+func promptCircleCICredentials(secrets *Secrets) {
+	validateKey := func(input string) error {
+		// 40 base64 characters
+		var awsSecretAccessKeyPat = regexp.MustCompile(`^[A-Za-z0-9]{40}$`)
+		if !awsSecretAccessKeyPat.MatchString(input) {
+			return errors.New("Invalid CircleCI API Key")
+		}
+		return nil
+	}
+
+	prompt := promptui.Prompt{
+		Label:    "Please enter your CircleCI API key (you can create one at https://circleci.com/account/api) ",
+		Validate: validateKey,
+	}
+
+	key, err := prompt.Run()
+
+	if err != nil {
+		log.Fatalf("Prompt failed %v\n", err)
+		panic(err)
+	}
+	secrets.CircleCIKey = key
 }
 
 func fileExists(filename string) bool {

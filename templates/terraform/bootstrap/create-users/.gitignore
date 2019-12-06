@@ -1,0 +1,2 @@
+# The state will have keys in it which can be ignored
+terraform.tfstate*

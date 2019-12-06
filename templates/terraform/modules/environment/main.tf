@@ -21,6 +21,7 @@ data "aws_iam_policy_document" "assumerole_root_policy" {
   }
 }
 
+#{{- if ne .Config.Infrastructure.AWS.EKS.ClusterName "" }}
 # Provision the EKS cluster
 module "eks" {
   source               = "../../modules/eks"
@@ -42,6 +43,21 @@ module "kube2iam" {
   eks_worker_iam_role_name = module.eks.worker_iam_role_name
   iam_account_id           = data.aws_caller_identity.current.account_id
 }
+
+#{{- end}}
+
+data "aws_iam_user" "ci_user" {
+  user_name = "ci-user" # Should have been created in the bootstrap process
+}
+#{{- if .Config.Services }}
+# Set up ECR repositories
+module "ecr" {
+  source            = "../../modules/ecr"
+  environment       = var.environment
+  ecr_repositories  = var.ecr_repositories
+  ecr_principals    = [aws_iam_user.id]
+}
+#{{- end}}
 
 # {{ if .Config.Infrastructure.AWS.Cognito.Enabled }}
 module "cognito" {
