@@ -58,7 +58,6 @@ func GetOutputs(cfg *config.Commit0Config, pathPrefix string, outputs []string) 
 
 // Init sets up anything required by Execute
 func Init(cfg *config.Commit0Config, pathPrefix string) {
-	// @TODO : Change this check. Most likely we should discover the accountid
 	if cfg.Infrastructure.AWS.AccountId != "" {
 		log.Println("Preparing aws environment...")
 
@@ -67,9 +66,9 @@ func Init(cfg *config.Commit0Config, pathPrefix string) {
 		pathPrefix = filepath.Join(pathPrefix, "terraform")
 
 		// @TODO : A check here would be nice to see if this stuff exists first, mostly for testing
-		// log.Println(aurora.Cyan(emoji.Sprintf(":alarm_clock: Initializing remote backend...")))
-		// util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
-		// util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
+		log.Println(aurora.Cyan(emoji.Sprintf(":alarm_clock: Initializing remote backend...")))
+		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
+		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
 
 		log.Println("Creating users...")
 		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/create-users"), envars)
@@ -80,7 +79,6 @@ func Init(cfg *config.Commit0Config, pathPrefix string) {
 
 // Execute terrafrom init & plan. May modify the config passed in
 func Execute(cfg *config.Commit0Config, pathPrefix string) {
-	// @TODO : Change this check. Most likely we should discover the accountid
 	if cfg.Infrastructure.AWS.AccountId != "" {
 		log.Println("Preparing aws environment...")
 
