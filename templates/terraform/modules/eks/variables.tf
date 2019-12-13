@@ -6,6 +6,10 @@ variable "environment" {
   description = "The environment (dev/staging/prod)"
 }
 
+variable "cluster_name" {
+  description = "Name to be given to the EKS cluster"
+}
+
 variable "assume_role_policy" {
   description = "IAM policy document for AssumeRole"
 }
@@ -21,6 +25,10 @@ variable "vpc_id" {
 
 variable "worker_instance_type" {
   description = "Instance type for the EKS workers"
+}
+
+variable "worker_asg_min_size" {
+  description = "Minimum number of instances for the EKS ASG"
 }
 
 variable "worker_asg_max_size" {

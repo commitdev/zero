@@ -89,7 +89,7 @@ resource "kubernetes_daemonset" "kube2iam" {
           # }
           env {
             name  = "AWS_REGION"
-            value = var.environment
+            value = var.region
           }
           security_context {
             privileged = true

@@ -24,6 +24,10 @@ variable "eks_worker_instance_type" {
   description = "Instance type for the EKS workers"
 }
 
+variable "eks_worker_asg_min_size" {
+  description = "Minimum number of instances for the EKS ASG"
+}
+
 variable "eks_worker_asg_max_size" {
   description = "Maximum number of instances for the EKS ASG"
 }
@@ -32,14 +36,18 @@ variable "eks_worker_ami" {
   description = "The (EKS-optimized) AMI for EKS worker instances"
 }
 
-variable "user_pool" {
-  description = "AWS Cognito pool name"
-} 
-
+{{- if .Config.Infrastructure.AWS.Cognito.Enabled }}
 variable "hostname" {
   description = "Application hostname"
-} 
-
-variable "s3_hosting_bucket_name" {
-  description = "S3 hosting bucket name"
 }
+{{- end }}
+variable "s3_hosting_buckets" {
+  description = "S3 hosting buckets"
+  type = set(string)
+}
+
+variable "s3_hosting_cert_domain" {
+  description = "Domain of the ACM certificate to lookup for Cloudfront to use"
+  type = string
+}
+

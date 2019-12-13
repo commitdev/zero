@@ -17,11 +17,11 @@ import (
 
 // @TODO : These are specific to a k8s version. If we make the version a config option we will need to change this
 var amiLookup = map[string]string{
-	"us-east-1":    "ami-0392bafc801b7520f",
-	"us-east-2":    "ami-082bb518441d3954c",
-	"us-west-2":    "ami-05d586e6f773f6abf",
-	"eu-west-1":    "ami-059c6874350e63ca9",
-	"eu-central-1": "ami-0e21bc066a9dbabfa",
+	"us-east-1":    "ami-07d6c8e62ce328a10",
+	"us-east-2":    "ami-053250833d1030033",
+	"us-west-2":    "ami-07be7092831897fd6",
+	"eu-west-1":    "ami-02dca57ad67c7bf57",
+	"eu-central-1": "ami-03fbd442f4f3aa689",
 }
 
 func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup, pathPrefix string) {
@@ -68,7 +68,9 @@ func Init(cfg *config.Commit0Config, pathPrefix string) {
 		// @TODO : A check here would be nice to see if this stuff exists first, mostly for testing
 		log.Println(aurora.Cyan(emoji.Sprintf(":alarm_clock: Initializing remote backend...")))
 		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
-		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
+		// @TODO : Properly loop through environments when we support that
+		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve", "-var", "environment=staging", "-state-out=staging.tfstate"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
+		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve", "-var", "environment=production", "-state-out=staging.tfstate"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
 
 		log.Println("Creating users...")
 		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/create-users"), envars)
