@@ -35,62 +35,82 @@ func Create(projectName string, outDir string, t *templator.Templator) string {
 		log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: Error creating root: %v ", err)))
 	}
 
-	// @TODO : Clean up the following aws stuff
+	projectConfig := defaultProjConfig(projectName)
+
+	chooseCloudProvider(&projectConfig)
+
+	s := secrets.GetSecrets(rootDir)
+
+	fillProviderDetails(&projectConfig, s)
+
+	var wg sync.WaitGroup
+	util.TemplateFileIfDoesNotExist(rootDir, util.CommitYml, t.Commit0, &wg, projectConfig)
+	util.TemplateFileIfDoesNotExist(rootDir, ".gitignore", t.GitIgnore, &wg, projectName)
+
+	wg.Wait()
+	return rootDir
+}
+
+func chooseCloudProvider(projectConfig *util.ProjectConfiguration) {
 	providerPrompt := promptui.Select{
 		Label: "Select Cloud Provider",
 		Items: []string{"Amazon AWS", "Google GCP", "Microsoft Azure"},
 	}
 
-	_, _, err = providerPrompt.Run()
-
-	regionPrompt := promptui.Select{
-		Label: "Select AWS Region ",
-		Items: []string{"us-west-1", "us-west-2", "us-east-1", "us-east-2", "ca-central-1",
-			"eu-central-1", "eu-west-1", "ap-east-1", "ap-south-1"},
-	}
-
-	_, regionResult, err := regionPrompt.Run()
-
+	_, providerResult, err := providerPrompt.Run()
 	if err != nil {
 		log.Fatalf("Prompt failed %v\n", err)
 		panic(err)
 	}
 
-	s := secrets.GetSecrets(rootDir)
+	if providerResult == "Amazon AWS" {
+		// @TODO : Move this stuff from util into another package
+		projectConfig.Infrastructure.AWS = &util.AWS{}
+		regionPrompt := promptui.Select{
+			Label: "Select AWS Region ",
+			Items: []string{"us-west-1", "us-west-2", "us-east-1", "us-east-2", "ca-central-1",
+				"eu-central-1", "eu-west-1", "ap-east-1", "ap-south-1"},
+		}
 
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String(regionResult),
-		Credentials: credentials.NewStaticCredentials(s.AWS.AccessKeyID, s.AWS.SecretAccessKey, ""),
-	})
+		_, regionResult, err := regionPrompt.Run()
 
-	svc := sts.New(sess)
-	input := &sts.GetCallerIdentityInput{}
+		if err != nil {
+			log.Fatalf("Prompt failed %v\n", err)
+			panic(err)
+		}
 
-	awsCaller, err := svc.GetCallerIdentity(input)
-	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			default:
-				log.Fatalf(aerr.Error())
+		projectConfig.Infrastructure.AWS.Region = regionResult
+	} else {
+		log.Fatalf("Only the AWS provider is available at this time")
+	}
+}
+
+func fillProviderDetails(projectConfig *util.ProjectConfiguration, s secrets.Secrets) {
+	if projectConfig.Infrastructure.AWS != nil {
+		sess, err := session.NewSession(&aws.Config{
+			Region:      aws.String(projectConfig.Infrastructure.AWS.Region),
+			Credentials: credentials.NewStaticCredentials(s.AWS.AccessKeyID, s.AWS.SecretAccessKey, ""),
+		})
+
+		svc := sts.New(sess)
+		input := &sts.GetCallerIdentityInput{}
+
+		awsCaller, err := svc.GetCallerIdentity(input)
+		if err != nil {
+			if aerr, ok := err.(awserr.Error); ok {
+				switch aerr.Code() {
+				default:
+					log.Fatalf(aerr.Error())
+				}
+			} else {
+				log.Fatalf(err.Error())
 			}
-		} else {
-			log.Fatalf(err.Error())
+		}
+
+		if awsCaller != nil && awsCaller.Account != nil {
+			projectConfig.Infrastructure.AWS.AccountID = *awsCaller.Account
 		}
 	}
-
-	defaultProjConfig := defaultProjConfig(projectName)
-
-	defaultProjConfig.Infrastructure.AWS.Region = regionResult
-	if awsCaller != nil && awsCaller.Account != nil {
-		defaultProjConfig.Infrastructure.AWS.AccountID = *awsCaller.Account
-	}
-
-	var wg sync.WaitGroup
-	util.TemplateFileIfDoesNotExist(rootDir, util.CommitYml, t.Commit0, &wg, defaultProjConfig)
-	util.TemplateFileIfDoesNotExist(rootDir, ".gitignore", t.GitIgnore, &wg, projectName)
-
-	wg.Wait()
-	return rootDir
 }
 
 func defaultProjConfig(projectName string) util.ProjectConfiguration {
@@ -109,6 +129,9 @@ func defaultProjConfig(projectName string) util.ProjectConfiguration {
 			Language:    "go",
 			GitRepo:     "github.com/test/repo",
 		}},
+		Infrastructure: util.Infrastructure{
+			AWS: nil,
+		},
 	}
 }
 
