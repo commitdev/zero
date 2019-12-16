@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/k0kubun/pp"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type maintainer struct {
@@ -101,19 +101,22 @@ type eks struct {
 
 func LoadConfig(filePath string) *Commit0Config {
 	config := &Commit0Config{}
-	data, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		log.Panicf("failed to read config: %v", err)
-	}
-	err = yaml.Unmarshal(data, &config)
-	if err != nil {
-		log.Panicf("failed to parse config: %v", err)
-	}
+	LoadYamlConfig(filePath, config)
 
 	return config
 }
 
+func LoadYamlConfig(filePath string, out interface{}) {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		log.Panicf("failed to read config: %v", err)
+	}
+	err = yaml.Unmarshal(data, &out)
+	if err != nil {
+		log.Panicf("failed to parse config: %v", err)
+	}
+}
+
 func (c *Commit0Config) Print() {
 	pp.Println(c)
-
 }

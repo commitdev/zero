@@ -1,6 +1,7 @@
 package templator
 
 import (
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -147,6 +148,54 @@ func (d *DirectoryTemplator) TemplateFiles(data interface{}, overwrite bool, wg 
 			util.TemplateFileIfDoesNotExist(d, f, template, wg, data)
 		}
 	}
+}
+
+func NewDirTemplator(dir string, delimiters []string) *DirectoryTemplator {
+	templates := []*template.Template{}
+	leftDelim := delimiters[0]
+	rightDelim := delimiters[1]
+	if leftDelim == "" {
+		leftDelim = "{{"
+	}
+	if rightDelim == "" {
+		rightDelim = "}}"
+	}
+
+	paths, err := GetAllFilePathsInDirectory(dir)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, path := range paths {
+		template, err := template.New(path).Delims(leftDelim, rightDelim).Funcs(util.FuncMap).Parse(path)
+		if err != nil {
+			panic(err)
+		}
+		templates = append(templates, template)
+	}
+
+	return &DirectoryTemplator{
+		Templates: templates,
+	}
+}
+
+// GetAllFilePathsInDirectory Recursively get all file paths in directory, including sub-directories.
+func GetAllFilePathsInDirectory(dirpath string) ([]string, error) {
+	var paths []string
+	err := filepath.Walk(dirpath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			paths = append(paths, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return paths, nil
 }
 
 func NewDirectoryTemplator(box *packr.Box, dir string) *DirectoryTemplator {

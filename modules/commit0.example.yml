@@ -2,15 +2,14 @@ name: hello-world
 
 # Context will populated automatically or could be added manually
 context: 
-  awsCognito: 
-    poolID: 123
-    clientID: ABC
+  cognitoPoolID: 123
+  cognitoClientID: ABC
 
 modules: 
   # module can be in any format the go-getter supports (path, github, url, etc.)
   - source: './remote_templates/infrastructure'
-    params: 
-      apply: true
+  # supports https://github.com/hashicorp/go-getter#url-format
+  # - source: 'github.com/foo/bar'
 
   - source: './remote_templates/frontend'
     params: 
@@ -20,6 +19,3 @@ modules:
     # alternatively we can recursively support sub modules
     modules: 
       - './remote_templates/ci/go'
-
-  
-

@@ -1,23 +1,21 @@
-module: 
-  title: "CI templates"
-  description: ""
-  author: ""
-  icon: ""
-  thumbnail: ""
-  readme: "" # defaults to README.md
+name: "CI templates"
+description: ""
+author: ""
+icon: ""
+thumbnail: ""
 
 # Template variables to populate, these could be overwritten by the file spefic frontmatter variables
-templates: 
+template: 
   strictMode: true # will only parse files that includes the .tmpl.* extension, otherwise it will copy file 
   delimiters:
     - "<%"
     - "%>"
   destination: "{{.Metadata.Directory}}/{{.Metadata.Filename}}"
 
-# parameters required 
-# populates .Params variables
-params: 
-  - name: system
+# parameters required from user to populate the template params
+prompts: 
+  - field: system
+    label: CI System
     options: 
       - github
       - circlci
