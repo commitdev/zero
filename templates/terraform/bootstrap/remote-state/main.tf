@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "terraform_remote_state" {
-  bucket  = "project-{{ .Config.Name }}-terraform-state"
+  bucket  = "{{ .Config.Name }}-${var.environment}-terraform-state"
   acl     = "private"
 
   versioning {
@@ -12,8 +12,7 @@ resource "aws_s3_bucket" "terraform_remote_state" {
 }
 
 resource "aws_s3_bucket_public_access_block" "terraform_remote_state" {
-  bucket = "${aws_s3_bucket.terraform_remote_state.id}"
-
+  bucket = aws_s3_bucket.terraform_remote_state.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -22,7 +21,7 @@ resource "aws_s3_bucket_public_access_block" "terraform_remote_state" {
 }
 
 resource "aws_dynamodb_table" "terraform_state_locks" {
-  name           = "{{ .Config.Name }}-terraform-state-locks"
+  name           = "{{ .Config.Name }}-${var.environment}-terraform-state-locks"
   read_capacity  = 2
   write_capacity = 2
   hash_key       = "LockID"
@@ -31,4 +30,8 @@ resource "aws_dynamodb_table" "terraform_state_locks" {
     name = "LockID"
     type = "S"
   }
+}
+
+variable "environment" {
+  description = "The environment (development/staging/production)"
 }

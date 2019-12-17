@@ -18,12 +18,12 @@ import (
 
 func GenerateArtifactsHelper(t *templator.Templator, cfg *config.Commit0Config, pathPrefix string, runInit bool, runApply bool) {
 	var wg sync.WaitGroup
-	if !util.ValidateLanguage(cfg.Frontend.Framework) {
+	if cfg.Frontend.Framework != "" && !util.ValidateLanguage(cfg.Frontend.Framework) {
 		log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: '%s' is not a supported framework.", cfg.Frontend.Framework)))
 	}
 
 	for _, s := range cfg.Services {
-		if !util.ValidateLanguage(cfg.Frontend.Framework) {
+		if !util.ValidateLanguage(s.Language) {
 			log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: '%s' in service '%s' is not a supported language.", s.Name, s.Language)))
 		}
 	}
