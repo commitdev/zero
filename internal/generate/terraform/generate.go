@@ -73,7 +73,6 @@ func Init(cfg *config.Commit0Config, pathPrefix string) {
 		log.Println("Creating users...")
 		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/create-users"), envars)
 		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/create-users"), envars)
-
 	}
 }
 

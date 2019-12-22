@@ -7,13 +7,10 @@ context:
 
 modules: 
   # module can be in any format the go-getter supports (path, github, url, etc.)
-  - source: './remote_templates/infrastructure'
   # supports https://github.com/hashicorp/go-getter#url-format
-  # - source: 'github.com/foo/bar'
-
-  - source: './remote_templates/frontend'
-    params: 
-      ci: github
+  # - source: './tests/test_data/modules/ci'
+  #   params: 
+  #     ci: github
 
   - source: './remote_templates/services'
     # alternatively we can recursively support sub modules

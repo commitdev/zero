@@ -2,9 +2,12 @@ package module
 
 import (
 	"crypto/md5"
+	"encoding/base64"
 	"io"
 	"log"
 	"os"
+	"path"
+	"regexp"
 	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
@@ -29,16 +32,18 @@ func NewTemplateModule(moduleCfg config.Module) (*TemplateModule, error) {
 	templateModule.Params = moduleCfg.Params
 
 	p := &ProgressTracking{}
-	sourcePath := templateModule.GetSourceDir()
+	sourcePath := GetSourceDir(templateModule.Source)
 
-	if !templateModule.IsLocal() {
+	if !IsLocal(templateModule.Source) {
 		err := getter.Get(sourcePath, templateModule.Source, getter.WithProgress(p))
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	config.LoadModuleConfig(sourcePath, templateModule.Config)
+	configPath := path.Join(sourcePath, "commit0.module.yml")
+	moduleConfig := config.LoadModuleConfig(configPath)
+	templateModule.Config = *moduleConfig
 
 	return &templateModule, nil
 }
@@ -78,41 +83,42 @@ func (m *TemplateModule) PromptParams() error {
 }
 
 // GetSourcePath gets a unique local source directory name. For local modules, it use the local directory
-func (m *TemplateModule) GetSourceDir() string {
-	identifier := m.Source
+func GetSourceDir(source string) string {
+	dir := source
+	if !IsLocal(source) {
+		h := md5.New()
+		io.WriteString(h, source)
+		source = base64.StdEncoding.EncodeToString(h.Sum(nil))
+		dir = path.Join("templates", source)
+	}
 
-	// paths := strings.SplitN(m.Source, "/", -1)
-	// re, _ := regexp.Compile("[^a-zA-Z0-9]+")
-	// return re.ReplaceAllString(strings.Join(idPaths, "_"), "")
-	h := md5.New()
-	io.WriteString(h, m.Source)
-	identifier = string(h.Sum(nil))
-
-	return "templates/" + identifier
+	return path.Join("../../", dir)
 }
 
-func (m *TemplateModule) IsLocal() bool {
-	f := new(getter.FileDetector)
-
+// IsLocal uses the go-getter FileDetector to check if source is a file
+func IsLocal(source string) bool {
 	pwd, err := os.Getwd()
 	if err != nil {
 		log.Panicf("failed to get current working directory: %v", err)
 	}
 
-	_, ok, err := f.Detect(m.Source, pwd)
-	if ok && err != nil {
-		return true
-	} else {
-		return false
+	// ref: https://github.com/hashicorp/go-getter/blob/master/detect_test.go
+	out, err := getter.Detect(source, pwd, getter.Detectors)
+
+	match, err := regexp.MatchString("^file://.*", out)
+	if err != nil {
+		log.Panicf("invalid source format %s", err)
 	}
+
+	return match
 }
 
-// func withPWD(pwd string) func(*getter.Client) error {
-// 	return func(c *getter.Client) error {
-// 		c.Pwd = pwd
-// 		return nil
-// 	}
-// }
+func withPWD(pwd string) func(*getter.Client) error {
+	return func(c *getter.Client) error {
+		c.Pwd = pwd
+		return nil
+	}
+}
 
 func (p *ProgressTracking) TrackProgress(src string, currentSize, totalSize int64, stream io.ReadCloser) (body io.ReadCloser) {
 	p.Lock()

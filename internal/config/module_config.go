@@ -1,5 +1,13 @@
 package config
 
+import (
+	"io/ioutil"
+	"log"
+
+	"github.com/k0kubun/pp"
+	yaml "gopkg.in/yaml.v2"
+)
+
 type ModuleConfig struct {
 	Name        string
 	Description string
@@ -13,7 +21,7 @@ type ModuleConfig struct {
 type Prompt struct {
 	Field   string
 	Label   string
-	Options map[string]string
+	Options []string
 }
 
 type TemplateConfig struct {
@@ -22,7 +30,16 @@ type TemplateConfig struct {
 	Destination string
 }
 
-func LoadModuleConfig(filePath string, out interface{}) {
+func LoadModuleConfig(filePath string) *ModuleConfig {
 	config := &ModuleConfig{}
-	LoadYamlConfig(filePath, config)
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		log.Panicf("failed to read config: %v", err)
+	}
+	err = yaml.Unmarshal(data, &config)
+	if err != nil {
+		log.Panicf("failed to parse config: %v", err)
+	}
+	pp.Println(config)
+	return config
 }

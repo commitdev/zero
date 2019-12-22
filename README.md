@@ -80,6 +80,11 @@ cd test-app
 ../../commit0 generate -c commit0.yml
 ```
 
+Example how run a single test for development
+```
+go test -run TestGenerateModules "github.com/commitdev/commit0/internal/generate" -v
+```
+
 ### Architecture
 The project is built with GoLang and requires Docker
 - /cmd - the CLI command entry points

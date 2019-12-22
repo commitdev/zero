@@ -2,12 +2,10 @@ package generate
 
 import (
 	"testing"
+	// config "github.com/commitdev/commit0/internal/config"
 )
 
 func TestGenerateModules(t *testing.T) {
-	// var config GeneratorConfig
-
-	// config.LoadGeneratorConfig("../../modules/commit0.example.yml", &config)
-
-	// GenerateModules(config)
+	// generatorConfig := config.LoadGeneratorConfig("../../tests/test_data/configs/commit0_basic.yml")
+	// GenerateModules(generatorConfig)
 }
