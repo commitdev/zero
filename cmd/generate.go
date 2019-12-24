@@ -3,20 +3,19 @@ package cmd
 import (
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/generate"
-	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
-	"github.com/gobuffalo/packr/v2"
 	"github.com/spf13/cobra"
 )
 
 var configPath string
-var runInit bool
-var runApply bool
+
+// var runInit bool
+// var runApply bool
 
 func init() {
 	generateCmd.PersistentFlags().StringVarP(&configPath, "config", "c", util.CommitYml, "config path")
-	generateCmd.PersistentFlags().BoolVarP(&runInit, "init", "", false, "Initialize config after generating")
-	generateCmd.PersistentFlags().BoolVarP(&runApply, "apply", "", false, "Apply config after generating")
+	// generateCmd.PersistentFlags().BoolVarP(&runInit, "init", "", false, "Initialize config after generating")
+	// generateCmd.PersistentFlags().BoolVarP(&runApply, "apply", "", false, "Apply config after generating")
 
 	rootCmd.AddCommand(generateCmd)
 }
@@ -26,13 +25,9 @@ var generateCmd = &cobra.Command{
 	Short: "Generate idl & application folders",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		templates := packr.New("templates", "../templates")
-		t := templator.NewTemplator(templates)
+		cfg := config.LoadGeneratorConfig(configPath)
+		// cfg.Print()
 
-		cfg := config.LoadConfig(configPath)
-		cfg.Print()
-
-		generate.GenerateArtifactsHelper(t, cfg, "", runInit, runApply)
-
+		generate.GenerateModules(cfg)
 	},
 }

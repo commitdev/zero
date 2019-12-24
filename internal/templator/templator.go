@@ -1,7 +1,6 @@
 package templator
 
 import (
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -168,10 +167,12 @@ func NewDirTemplator(moduleDir string, delimiters []string) *DirectoryTemplator 
 	if err != nil {
 		panic(err)
 	}
-	log.Println("moduleDir", moduleDir)
-	log.Println("1. template paths", paths)
 
 	for _, path := range paths {
+		// TODO make more robust
+		if strings.Contains(path, "commit0.module.yml") {
+			continue
+		}
 		template, err := template.New(path).Delims(leftDelim, rightDelim).Funcs(util.FuncMap).ParseFiles(path)
 		if err != nil {
 			panic(err)

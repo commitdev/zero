@@ -18,14 +18,14 @@ const (
 )
 
 // Fatal terminates execution using fatal exit code.
-func Fatal(format string, err error) {
-	flog.Errorf(format, err)
+func Fatal(format string, a ...interface{}) {
+	flog.Errorf(format, a...)
 	os.Exit(CodeFatal)
 }
 
 // Error terminates execution using unsuccessful execution exit code.
-func Error(format string, err error) {
-	flog.Errorf(format, err)
+func Error(format string, a ...interface{}) {
+	flog.Errorf(format, a...)
 	os.Exit(CodeError)
 }
 

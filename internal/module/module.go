@@ -88,7 +88,7 @@ func GetSourceDir(source string) string {
 		h := md5.New()
 		io.WriteString(h, source)
 		source = base64.StdEncoding.EncodeToString(h.Sum(nil))
-		return path.Join("tmp", source)
+		return path.Join("tmp/templates", source)
 	} else {
 		return source
 	}

@@ -25,9 +25,9 @@ type Prompt struct {
 }
 
 type TemplateConfig struct {
-	StrictMode  bool
-	Delimiters  []string
-	Destination string
+	StrictMode bool
+	Delimiters []string
+	Output     string
 }
 
 func LoadModuleConfig(filePath string) *ModuleConfig {
