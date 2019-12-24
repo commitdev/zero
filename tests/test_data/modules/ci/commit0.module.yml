@@ -6,11 +6,11 @@ thumbnail: ""
 
 # Template variables to populate, these could be overwritten by the file spefic frontmatter variables
 template: 
-  strictMode: true # will only parse files that includes the .tmpl.* extension, otherwise it will copy file 
+  # strictMode: true # will only parse files that includes the .tmpl.* extension, otherwise it will copy file 
   delimiters:
     - "<%"
     - "%>"
-  destination: "{{.Metadata.Directory}}/{{.Metadata.Filename}}"
+  # destination: "{{.Metadata.Directory}}/{{.Metadata.Filename}}"
 
 # parameters required from user to populate the template params
 prompts: 

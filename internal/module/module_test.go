@@ -20,7 +20,7 @@ func TestIsLocal(t *testing.T) {
 
 func TestGetSourceDir(t *testing.T) {
 	source := "tests/test_data/modules/ci"
-	relativeSource := "../../" + source
+	relativeSource := source
 	dir := GetSourceDir(source)
 
 	t.Log("dir", dir)

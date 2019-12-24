@@ -8,7 +8,7 @@ context:
 modules: 
   # module can be in any format the go-getter supports (path, github, url, etc.)
   # supports https://github.com/hashicorp/go-getter#url-format
-  - source: './tests/test_data/modules/ci'
+  - source: 'tests/test_data/modules/ci'
     params:
       ci: github
 

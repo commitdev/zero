@@ -84,15 +84,14 @@ func (m *TemplateModule) PromptParams() error {
 
 // GetSourcePath gets a unique local source directory name. For local modules, it use the local directory
 func GetSourceDir(source string) string {
-	dir := source
 	if !IsLocal(source) {
 		h := md5.New()
 		io.WriteString(h, source)
 		source = base64.StdEncoding.EncodeToString(h.Sum(nil))
-		dir = path.Join("templates", source)
+		return path.Join("tmp", source)
+	} else {
+		return source
 	}
-
-	return path.Join("../../", dir)
 }
 
 // IsLocal uses the go-getter FileDetector to check if source is a file

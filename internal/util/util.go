@@ -66,7 +66,6 @@ func TemplateFileAndOverwrite(fileDir string, fileName string, template *templat
 		log.Println(aurora.Red(emoji.Sprintf(":exclamation: Error creating directory %v: %v", fullFilePath, err)))
 	}
 	createTemplatedFile(fullFilePath, template, wg, data)
-
 }
 
 func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *template.Template, wg *sync.WaitGroup, data interface{}) {

@@ -1,6 +1,7 @@
 package templator
 
 import (
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -9,6 +10,8 @@ import (
 	"text/template"
 
 	"github.com/commitdev/commit0/internal/util"
+	"github.com/commitdev/commit0/pkg/util/flog"
+	"github.com/commitdev/commit0/pkg/util/fs"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/packr/v2/file"
 )
@@ -138,19 +141,19 @@ type DirectoryTemplator struct {
 func (d *DirectoryTemplator) TemplateFiles(data interface{}, overwrite bool, wg *sync.WaitGroup, pathPrefix string) {
 	for _, template := range d.Templates {
 		templatePath := path.Join(pathPrefix, template.Name())
-		d, f := filepath.Split(templatePath)
-		if strings.HasSuffix(f, ".tmpl") {
-			f = strings.Replace(f, ".tmpl", "", -1)
+		dir, file := filepath.Split(templatePath)
+		if strings.HasSuffix(file, ".tmpl") {
+			file = strings.Replace(file, ".tmpl", "", -1)
 		}
 		if overwrite {
-			util.TemplateFileAndOverwrite(d, f, template, wg, data)
+			util.TemplateFileAndOverwrite(dir, file, template, wg, data)
 		} else {
-			util.TemplateFileIfDoesNotExist(d, f, template, wg, data)
+			util.TemplateFileIfDoesNotExist(dir, file, template, wg, data)
 		}
 	}
 }
 
-func NewDirTemplator(dir string, delimiters []string) *DirectoryTemplator {
+func NewDirTemplator(moduleDir string, delimiters []string) *DirectoryTemplator {
 	templates := []*template.Template{}
 	leftDelim := delimiters[0]
 	rightDelim := delimiters[1]
@@ -161,13 +164,15 @@ func NewDirTemplator(dir string, delimiters []string) *DirectoryTemplator {
 		rightDelim = "}}"
 	}
 
-	paths, err := GetAllFilePathsInDirectory(dir)
+	paths, err := GetAllFilePathsInDirectory(moduleDir)
 	if err != nil {
 		panic(err)
 	}
+	log.Println("moduleDir", moduleDir)
+	log.Println("1. template paths", paths)
 
 	for _, path := range paths {
-		template, err := template.New(path).Delims(leftDelim, rightDelim).Funcs(util.FuncMap).Parse(path)
+		template, err := template.New(path).Delims(leftDelim, rightDelim).Funcs(util.FuncMap).ParseFiles(path)
 		if err != nil {
 			panic(err)
 		}
@@ -180,9 +185,9 @@ func NewDirTemplator(dir string, delimiters []string) *DirectoryTemplator {
 }
 
 // GetAllFilePathsInDirectory Recursively get all file paths in directory, including sub-directories.
-func GetAllFilePathsInDirectory(dirpath string) ([]string, error) {
+func GetAllFilePathsInDirectory(moduleDir string) ([]string, error) {
 	var paths []string
-	err := filepath.Walk(dirpath, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(moduleDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -196,6 +201,51 @@ func GetAllFilePathsInDirectory(dirpath string) ([]string, error) {
 	}
 
 	return paths, nil
+}
+
+func ExecuteTemplate(templatePath string, outputPath string, data interface{}) error {
+	tmplt, err := template.ParseFiles(templatePath)
+	if err != nil {
+		return err
+	}
+	f, err := os.Create(outputPath)
+	if err != nil {
+		return err
+	}
+	return tmplt.Execute(f, data)
+}
+
+func (d *DirectoryTemplator) ExecuteTemplates(data interface{}, overwrite bool, pathPrefix string) {
+	var wg sync.WaitGroup
+
+	for _, template := range d.Templates {
+		templatePath := template.Name()
+		_, file := filepath.Split(templatePath)
+		if strings.HasSuffix(file, ".tmpl") {
+			file = strings.Replace(file, ".tmpl", "", -1)
+		}
+		outputPath := fs.PrependBaseDir(templatePath, pathPrefix)
+
+		if !overwrite {
+			if exists, _ := fs.FileExists(outputPath); exists {
+				flog.Warnf("%v already exists. skipping.", outputPath)
+				continue
+			}
+		}
+
+		err := fs.CreateDirs(outputPath)
+		if err != nil {
+			err = ExecuteTemplate(templatePath, outputPath, data)
+		}
+
+		if err != nil {
+			flog.Errorf("Error templating '%s': %v", templatePath, err)
+		} else {
+			flog.Successf("Finished templating : %s", outputPath)
+		}
+	}
+
+	wg.Wait()
 }
 
 func NewDirectoryTemplator(box *packr.Box, dir string) *DirectoryTemplator {

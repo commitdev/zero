@@ -2,7 +2,6 @@ package generate
 
 import (
 	"log"
-	"sync"
 
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/module"
@@ -26,7 +25,7 @@ func GenerateModules(cfg *config.GeneratorConfig) {
 	for _, mod := range templateModules {
 		err := mod.PromptParams()
 		if err != nil {
-			log.Panicf("module %s: prompt failed %s", mod.Source, err)
+			log.Printf("[Warning] module %s: params prompt failed", mod.Source)
 		}
 
 		err = Generate(mod)
@@ -37,9 +36,7 @@ func GenerateModules(cfg *config.GeneratorConfig) {
 }
 
 func Generate(mod *module.TemplateModule) error {
-	var wg sync.WaitGroup
 	t := templator.NewDirTemplator(module.GetSourceDir(mod.Source), mod.Config.Template.Delimiters)
-	t.TemplateFiles(mod.Params, false, &wg, "pathPrefix")
-	wg.Wait()
+	t.ExecuteTemplates(mod.Params, false, "output") // TODO change output path
 	return nil
 }
