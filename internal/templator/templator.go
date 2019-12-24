@@ -224,7 +224,7 @@ func (d *DirectoryTemplator) ExecuteTemplates(data interface{}, overwrite bool, 
 		if strings.HasSuffix(file, ".tmpl") {
 			file = strings.Replace(file, ".tmpl", "", -1)
 		}
-		outputPath := fs.PrependBaseDir(templatePath, pathPrefix)
+		outputPath := fs.PrependPath(templatePath, pathPrefix)
 
 		if !overwrite {
 			if exists, _ := fs.FileExists(outputPath); exists {

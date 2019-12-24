@@ -37,7 +37,8 @@ func FileExists(path string) (bool, error) {
 	return true, nil
 }
 
-func PrependBaseDir(filepath string, prefix string) string {
+// PrependPath prepends a path with prefix while disregarding back directories ../
+func PrependPath(filepath string, prefix string) string {
 	re := regexp.MustCompile(`(\.\.\/)+`)
 	cleanPath := path.Clean(filepath)
 	baseDir := re.FindString(cleanPath)

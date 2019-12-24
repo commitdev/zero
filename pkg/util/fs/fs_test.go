@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-var prependBaseDirTests = []struct {
+var prependPathTests = []struct {
 	in     string
 	prefix string
 	out    string
@@ -13,13 +13,14 @@ var prependBaseDirTests = []struct {
 	{"../opps/../../dir/file.ext", "prefix", "../../prefix/dir/file.ext"},
 	{"../opps/../../dir/file.ext", "", "../../dir/file.ext"},
 	{"dir/file.ext", "prefix", "prefix/dir/file.ext"},
+	{"dir/file.ext", "../prefix", "../prefix/dir/file.ext"},
 	{"./dir/file.ext", "prefix", "prefix/dir/file.ext"},
 }
 
-func TestPrependBaseDir(t *testing.T) {
-	for _, tt := range prependBaseDirTests {
+func TestPrependPath(t *testing.T) {
+	for _, tt := range prependPathTests {
 		t.Run(tt.in, func(t *testing.T) {
-			out := PrependBaseDir(tt.in, tt.prefix)
+			out := PrependPath(tt.in, tt.prefix)
 			if out != tt.out {
 				t.Errorf("got %q, want %q", out, tt.out)
 			}
