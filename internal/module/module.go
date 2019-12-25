@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/commitdev/commit0/configs"
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/hashicorp/go-getter"
 	"github.com/manifoldco/promptui"
@@ -88,7 +89,7 @@ func GetSourceDir(source string) string {
 		h := md5.New()
 		io.WriteString(h, source)
 		source = base64.StdEncoding.EncodeToString(h.Sum(nil))
-		return path.Join("tmp/templates", source)
+		return path.Join(configs.TemplatesDir, source)
 	} else {
 		return source
 	}
