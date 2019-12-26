@@ -5,13 +5,13 @@ import (
 	"encoding/base64"
 	"io"
 	"log"
-	"os"
 	"path"
 	"regexp"
 	"sync"
 
 	"github.com/commitdev/commit0/configs"
 	"github.com/commitdev/commit0/internal/config"
+	"github.com/commitdev/commit0/internal/util"
 	"github.com/hashicorp/go-getter"
 	"github.com/manifoldco/promptui"
 )
@@ -97,10 +97,7 @@ func GetSourceDir(source string) string {
 
 // IsLocal uses the go-getter FileDetector to check if source is a file
 func IsLocal(source string) bool {
-	pwd, err := os.Getwd()
-	if err != nil {
-		log.Panicf("failed to get current working directory: %v", err)
-	}
+	pwd := util.GetCwd()
 
 	// ref: https://github.com/hashicorp/go-getter/blob/master/detect_test.go
 	out, err := getter.Detect(source, pwd, getter.Detectors)
