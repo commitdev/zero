@@ -92,10 +92,17 @@ The project is built with GoLang and requires Docker
 - /internal/config
 - /internal/templator - the templating service
 
-Example Flow:
-The application starts at `cmd/generate.go`
-1. loads all the templates from packr
-  - TODO: eventually this should be loaded remotely throug a dependency management system
+Usage:
+User either launch the web UI or start the command line
+- `commit0 create <project_name>` create a `commit0.yml` in the project directory
+  - prompts for the infrastructure configs as well as the credentials
+  - creates a `secrets.yml`
+- `commit0 generate` generates all the selected projects as defined in the `commit0.yml`
+- `commit0 ui` launches the locally hosted web UI (Static SPA) and the API server
+
+Execution Flow:
+The application starts at `cmd/create.go`
+1. creates a basic 
 2. loads the config from the commit0.yml config file
 3. based on the configs, run the appropriate generators
   - templator is passed in to the Generate function for dependency injection

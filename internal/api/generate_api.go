@@ -20,7 +20,7 @@ func generateProject(w http.ResponseWriter, req *http.Request) {
 			panic(err)
 		}
 		log.Println(projectConfig.ProjectName)
-		createProject(projectConfig)
+		// createProject(projectConfig)
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte(`{"message": "Post successful"}`))
 

@@ -1,9 +1,0 @@
-module {{ .Service.GitRepo }}/{{ .Config.Name }}
-
-go 1.12
-
-replace {{ .Service.GitRepo }}/{{ .Config.Name }}-idl => ./{{ .Config.Name }}-idl
-
-require (
-  {{ .Service.GitRepo }}/{{ .Config.Name }}-idl v0.0.0
-)
