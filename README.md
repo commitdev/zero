@@ -80,6 +80,25 @@ cd test-app
 ../../commit0 generate -c commit0.yml
 ```
 
+### Configuration UI
+
+If you're working on the configuration UI locally, you can run just the ui by doing the following.
+
+``` bash
+cd internal/ui
+yarn
+yarn start
+```
+
+If you want to test the full integration with the go app, you'll need to do a build and run the app with `./commit0 ui`.
+
+``` bash
+make build
+./commit0 ui
+```
+
+[http://localhost:8080/](http://localhost:8080/)
+
 ### Architecture
 The project is built with GoLang and requires Docker
 - /cmd - the CLI command entry points

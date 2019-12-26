@@ -2,9 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 
 	"github.com/commitdev/commit0/internal/util"
 )
@@ -19,7 +21,7 @@ func generateProject(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		log.Println(projectConfig.ProjectName)
+		log.Println(projectConfig)
 		createProject(projectConfig)
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte(`{"message": "Post successful"}`))
@@ -28,13 +30,23 @@ func generateProject(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(`{"message": "Not found"}`))
 	}
-
 }
 
 func Commit0Api() {
+	// React Frontend is served on port 3000 while in development mode.
+	allowOrigins := handlers.AllowedOrigins([]string{"http://localhost:3000"})
+	allowedMethods := handlers.AllowedMethods([]string{"POST", "OPTIONS"})
+	allowedHeaders := handlers.AllowedHeaders([]string{"content-type"})
+
 	var router = mux.NewRouter()
 	var api = router.PathPrefix("/v1/generate").Subrouter()
 	api.NotFoundHandler = http.HandlerFunc(generateProject)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("internal/ui/build/static")))
+	router.PathPrefix("/static/").Handler(staticHandler)
+
+	buildHandler := http.FileServer(http.Dir("internal/ui/build"))
+	router.PathPrefix("/").Handler(buildHandler)
+
+	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(allowOrigins, allowedMethods, allowedHeaders)(router)))
 }
