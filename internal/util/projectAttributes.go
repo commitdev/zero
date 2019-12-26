@@ -22,26 +22,9 @@ func ValidateLanguage(language string) bool {
 	return false
 }
 
-type Maintainer struct {
-	Name  string
-	Email string
-}
-
-type Service struct {
-	Name        string
-	Description string
-	Language    string
-	GitRepo     string `json:"gitRepo"`
-}
-
 type ProjectConfiguration struct {
-	ProjectName       string `json:"projectName"`
-	FrontendFramework string `json:"frontendFramework"`
-	Organization      string
-	Description       string
-	Maintainers       []Maintainer
-	Services          []Service
-	Infrastructure    Infrastructure
+	ProjectName    string `json:"projectName"`
+	Infrastructure Infrastructure
 }
 
 type Infrastructure struct {

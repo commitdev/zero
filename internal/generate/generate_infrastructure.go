@@ -9,7 +9,7 @@ package generate
 // 	"github.com/commitdev/commit0/internal/config"
 // 	"github.com/commitdev/commit0/internal/templator"
 // 	"github.com/commitdev/commit0/internal/util"
-// 	"github.com/commitdev/commit0/internal/util/secrets"
+// 	"github.com/commitdev/commit0/pkg/credentials"
 
 // 	"github.com/kyokomi/emoji"
 // 	"github.com/logrusorgru/aurora"
@@ -44,7 +44,7 @@ package generate
 
 // 	log.Println("Preparing aws environment...")
 
-// 	envars := secrets.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))
+// 	envars := credentials.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))
 
 // 	pathPrefix = filepath.Join(pathPrefix, "environments/staging")
 
