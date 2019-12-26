@@ -10,15 +10,15 @@ import (
 
 type Commit0Config struct {
 	Name           string
-	Infrastructure infrastructure // TODO simplify and flatten / rename?
+	Infrastructure Infrastructure // TODO simplify and flatten / rename?
 }
 
-type infrastructure struct {
-	AWS aws
+type Infrastructure struct {
+	AWS *AWS
 }
 
-type aws struct {
-	AccountId string `yaml:"accountId"`
+type AWS struct {
+	AccountID string `yaml:"accountId"`
 	Region    string
 	Terraform terraform // TODO simplify and flatten?
 }

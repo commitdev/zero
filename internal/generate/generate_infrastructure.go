@@ -58,7 +58,7 @@ package generate
 
 // // Init sets up anything required by Execute
 // func Init(cfg *config.Commit0Config, pathPrefix string) {
-// 	if cfg.Infrastructure.AWS.AccountId != "" {
+// 	if cfg.Infrastructure.AWS.AccountID != "" {
 // 		log.Println("Preparing aws environment...")
 
 // 		envars := secrets.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))
@@ -78,7 +78,7 @@ package generate
 
 // // Execute terrafrom init & plan. May modify the config passed in
 // func Execute(cfg *config.Commit0Config, pathPrefix string) {
-// 	if cfg.Infrastructure.AWS.AccountId != "" {
+// 	if cfg.Infrastructure.AWS.AccountID != "" {
 // 		log.Println("Preparing aws environment...")
 
 // 		envars := secrets.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))

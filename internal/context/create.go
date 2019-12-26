@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/internal/util"
 	projCreds "github.com/commitdev/commit0/pkg/credentials"
@@ -40,7 +41,7 @@ func Create(projectName string, outDir string, t *templator.DirectoryTemplator) 
 	return rootDir
 }
 
-func chooseCloudProvider(projectConfig *util.ProjectConfiguration) {
+func chooseCloudProvider(projectConfig *config.Commit0Config) {
 	// @TODO move options into configs
 	providerPrompt := promptui.Select{
 		Label: "Select Cloud Provider",
@@ -73,7 +74,7 @@ func chooseCloudProvider(projectConfig *util.ProjectConfiguration) {
 	}
 }
 
-func fillProviderDetails(projectConfig *util.ProjectConfiguration, s projCreds.Secrets) {
+func fillProviderDetails(projectConfig *config.Commit0Config, s projCreds.Secrets) {
 	if projectConfig.Infrastructure.AWS != nil {
 		sess, err := session.NewSession(&aws.Config{
 			Region:      aws.String(projectConfig.Infrastructure.AWS.Region),
@@ -101,10 +102,10 @@ func fillProviderDetails(projectConfig *util.ProjectConfiguration, s projCreds.S
 	}
 }
 
-func defaultProjConfig(projectName string) util.ProjectConfiguration {
-	return util.ProjectConfiguration{
-		ProjectName: projectName,
-		Infrastructure: util.Infrastructure{
+func defaultProjConfig(projectName string) config.Commit0Config {
+	return config.Commit0Config{
+		Name: projectName,
+		Infrastructure: config.Infrastructure{
 			AWS: nil,
 		},
 	}

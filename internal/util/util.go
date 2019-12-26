@@ -1,5 +1,7 @@
 package util
 
+// @TODO split up and move into /pkg directory
+
 import (
 	"fmt"
 	"io"
@@ -11,8 +13,7 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/kyokomi/emoji"
-	"github.com/logrusorgru/aurora"
+	"github.com/commitdev/commit0/pkg/util/flog"
 )
 
 func CreateDirIfDoesNotExist(path string) error {
@@ -46,15 +47,16 @@ func GetCwd() string {
 func createTemplatedFile(fullFilePath string, template *template.Template, wg *sync.WaitGroup, data interface{}) {
 	f, err := os.Create(fullFilePath)
 	if err != nil {
-		log.Println(aurora.Red(emoji.Sprintf(":exclamation: Error creating file '%s' : %v", fullFilePath, err)))
+		flog.Errorf("Error creating file '%s' : %v", fullFilePath, err)
 	}
 	wg.Add(1)
 	go func() {
 		err = template.Execute(f, data)
 		if err != nil {
-			log.Println(aurora.Red(emoji.Sprintf(":exclamation: Error templating '%s': %v", fullFilePath, err)))
+			flog.Errorf("Error templating '%s': %v", fullFilePath, err)
+		} else {
+			flog.Infof("Finished templating : %v", fullFilePath)
 		}
-		log.Println(aurora.Green(emoji.Sprintf(":white_check_mark: Finished templating : %v", fullFilePath)))
 		wg.Done()
 	}()
 }
@@ -63,7 +65,7 @@ func TemplateFileAndOverwrite(fileDir string, fileName string, template *templat
 	fullFilePath := fmt.Sprintf("%v/%v", fileDir, fileName)
 	err := os.MkdirAll(fileDir, os.ModePerm)
 	if err != nil {
-		log.Println(aurora.Red(emoji.Sprintf(":exclamation: Error creating directory %v: %v", fullFilePath, err)))
+		flog.Errorf("Error creating directory %v: %v", fullFilePath, err)
 	}
 	createTemplatedFile(fullFilePath, template, wg, data)
 }
@@ -75,12 +77,12 @@ func TemplateFileIfDoesNotExist(fileDir string, fileName string, template *templ
 		if fileDir != "" {
 			err := CreateDirIfDoesNotExist(fileDir)
 			if err != nil {
-				log.Println(aurora.Red(emoji.Sprintf(":exclamation: Error creating directory %v: %v", fullFilePath, err)))
+				flog.Errorf("Error creating directory %v: %v", fullFilePath, err)
 			}
 		}
 		createTemplatedFile(fullFilePath, template, wg, data)
 	} else {
-		log.Println(aurora.Yellow(emoji.Sprintf("%v already exists. skipping.", fullFilePath)))
+		flog.Warnf("%v already exists. skipping.", fullFilePath)
 	}
 }
 

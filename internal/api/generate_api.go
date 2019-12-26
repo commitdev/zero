@@ -2,11 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 
-	"github.com/commitdev/commit0/internal/util"
+	"github.com/commitdev/commit0/internal/config"
+	"github.com/gorilla/mux"
 )
 
 func generateProject(w http.ResponseWriter, req *http.Request) {
@@ -14,12 +14,12 @@ func generateProject(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "POST":
 		decoder := json.NewDecoder(req.Body)
-		var projectConfig util.ProjectConfiguration
+		var projectConfig config.Commit0Config
 		err := decoder.Decode(&projectConfig)
 		if err != nil {
 			panic(err)
 		}
-		log.Println(projectConfig.ProjectName)
+		log.Println(projectConfig.Name)
 		// createProject(projectConfig)
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte(`{"message": "Post successful"}`))
