@@ -19,11 +19,13 @@ infrastructure:
       enabled: true
 
 frontend:
-  framework: {{.FrontendFramework}}
+  framework: {{.FrontendFramework }}
   ci:
     system: github
   app:
-    name: {{.ProjectName}}
+    name: {{.ProjectName }}
+  app:
+    name: {{.FrontendHostname }}
 
 services:
   {{range .Services}}

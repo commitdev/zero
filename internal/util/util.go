@@ -12,6 +12,7 @@ import (
 	"text/template"
 
 	"github.com/kyokomi/emoji"
+	"github.com/google/uuid"
 	"github.com/logrusorgru/aurora"
 )
 
@@ -31,6 +32,7 @@ var FuncMap = template.FuncMap{
 	"Title":             strings.Title,
 	"ToLower":           strings.ToLower,
 	"CleanGoIdentifier": CleanGoIdentifier,
+	"GenerateUUID":      uuid.New,
 }
 
 func GetCwd() string {

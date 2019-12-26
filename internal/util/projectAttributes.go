@@ -1,5 +1,7 @@
 package util
 
+// @TODO : Move this stuff from util into another package
+
 const (
 	Go         = "go"
 	React      = "react"
@@ -43,7 +45,7 @@ type ProjectConfiguration struct {
 }
 
 type Infrastructure struct {
-	AWS AWS `json:"aws"`
+	AWS *AWS `json:"aws"`
 }
 type AWS struct {
 	AccountID string
