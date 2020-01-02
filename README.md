@@ -58,14 +58,8 @@ We are looking for contributors!
 
 Building from the source
 ```
-make build-deps
-make deps-go
-```
-this will create a commit0 executable in your working direcory. To install install it into your go path use:
-```
 make install-go
 ```
-
 Compile a new `commit0` binary in the working directory
 ```
 make build

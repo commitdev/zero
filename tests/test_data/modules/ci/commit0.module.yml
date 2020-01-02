@@ -10,7 +10,7 @@ template:
   delimiters:
     - "<%"
     - "%>"
-  output: "tmp/generated"
+  output: "tmp/test"
 
 # parameters required from user to populate the template params
 prompts: 

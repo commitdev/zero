@@ -39,6 +39,6 @@ func GenerateModules(cfg *config.GeneratorConfig) {
 
 func Generate(mod *module.TemplateModule) error {
 	t := templator.NewDirTemplator(module.GetSourceDir(mod.Source), mod.Config.Template.Delimiters)
-	t.ExecuteTemplates(mod.Params, false, mod.Config.Template.Output)
+	t.ExecuteTemplates(mod.Params, false, mod.Config.Template.Output, module.GetSourceDir(mod.Source))
 	return nil
 }

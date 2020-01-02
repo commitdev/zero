@@ -10,6 +10,7 @@ import (
 
 	"github.com/commitdev/commit0/configs"
 	"github.com/commitdev/commit0/internal/util"
+	"github.com/commitdev/commit0/pkg/util/exit"
 	"github.com/commitdev/commit0/pkg/util/flog"
 	"github.com/commitdev/commit0/pkg/util/fs"
 )
@@ -57,8 +58,7 @@ func NewDirTemplator(moduleDir string, delimiters []string) *DirectoryTemplator 
 		}
 		template, err := template.New(path).Delims(leftDelim, rightDelim).Funcs(util.FuncMap).ParseFiles(path)
 		if err != nil {
-			flog.Errorf("Failed to initialize template %s", path)
-			panic(err)
+			exit.Fatal("Failed to initialize template %s", path)
 		}
 		templates = append(templates, template)
 	}
@@ -99,7 +99,7 @@ func ExecuteTemplate(templatePath string, outputPath string, data interface{}) e
 	return tmplt.Execute(f, data)
 }
 
-func (d *DirectoryTemplator) ExecuteTemplates(data interface{}, overwrite bool, pathPrefix string) {
+func (d *DirectoryTemplator) ExecuteTemplates(data interface{}, overwrite bool, pathPrefix string, sourcePath string) {
 	var wg sync.WaitGroup
 
 	for _, template := range d.Templates {
@@ -108,7 +108,7 @@ func (d *DirectoryTemplator) ExecuteTemplates(data interface{}, overwrite bool, 
 		if strings.HasSuffix(file, ".tmpl") {
 			file = strings.Replace(file, ".tmpl", "", -1)
 		}
-		outputPath := fs.PrependPath(templatePath, pathPrefix)
+		outputPath := fs.ReplacePath(templatePath, sourcePath, pathPrefix)
 
 		if !overwrite {
 			if exists, _ := fs.FileExists(outputPath); exists {

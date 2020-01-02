@@ -35,7 +35,7 @@ func Create(projectName string, outDir string, t *templator.DirectoryTemplator) 
 	s := project.GetSecrets(rootDir)
 	fillProviderDetails(&projectConfig, s)
 
-	t.ExecuteTemplates(projectConfig, false, "")
+	t.ExecuteTemplates(projectConfig, false, "", "")
 
 	return rootDir
 }

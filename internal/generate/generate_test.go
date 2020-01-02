@@ -8,7 +8,7 @@ import (
 )
 
 func setupTeardown(t *testing.T) func(t *testing.T) {
-	outputPath := "../../tmp/generated"
+	outputPath := "tmp/test"
 	os.RemoveAll(outputPath)
 	return func(t *testing.T) {
 		os.RemoveAll(outputPath)
