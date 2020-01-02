@@ -12,8 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/templator"
-	"github.com/commitdev/commit0/internal/util"
-	projCreds "github.com/commitdev/commit0/pkg/credentials"
+	project "github.com/commitdev/commit0/pkg/credentials"
 	"github.com/commitdev/commit0/pkg/util/exit"
 	"github.com/commitdev/commit0/pkg/util/flog"
 	"github.com/manifoldco/promptui"
@@ -33,7 +32,7 @@ func Create(projectName string, outDir string, t *templator.DirectoryTemplator) 
 	projectConfig := defaultProjConfig(projectName)
 	chooseCloudProvider(&projectConfig)
 
-	s := projCreds.GetSecrets(rootDir)
+	s := project.GetSecrets(rootDir)
 	fillProviderDetails(&projectConfig, s)
 
 	t.ExecuteTemplates(projectConfig, false, "")
@@ -55,7 +54,7 @@ func chooseCloudProvider(projectConfig *config.Commit0Config) {
 	}
 
 	if providerResult == "Amazon AWS" {
-		projectConfig.Infrastructure.AWS = &util.AWS{}
+		projectConfig.Infrastructure.AWS = &config.AWS{}
 		regionPrompt := promptui.Select{
 			Label: "Select AWS Region ",
 			Items: []string{"us-west-1", "us-west-2", "us-east-1", "us-east-2", "ca-central-1",
@@ -74,7 +73,7 @@ func chooseCloudProvider(projectConfig *config.Commit0Config) {
 	}
 }
 
-func fillProviderDetails(projectConfig *config.Commit0Config, s projCreds.Secrets) {
+func fillProviderDetails(projectConfig *config.Commit0Config, s project.Secrets) {
 	if projectConfig.Infrastructure.AWS != nil {
 		sess, err := session.NewSession(&aws.Config{
 			Region:      aws.String(projectConfig.Infrastructure.AWS.Region),

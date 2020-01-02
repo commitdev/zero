@@ -2,12 +2,13 @@ package templator
 
 import (
 	"os"
-	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"text/template"
 
+	"github.com/commitdev/commit0/configs"
 	"github.com/commitdev/commit0/internal/util"
 	"github.com/commitdev/commit0/pkg/util/flog"
 	"github.com/commitdev/commit0/pkg/util/fs"
@@ -17,21 +18,21 @@ type DirectoryTemplator struct {
 	Templates []*template.Template
 }
 
-// @TODO deprecate
-func (d *DirectoryTemplator) TemplateFiles(data interface{}, overwrite bool, wg *sync.WaitGroup, pathPrefix string) {
-	for _, template := range d.Templates {
-		templatePath := path.Join(pathPrefix, template.Name())
-		dir, file := filepath.Split(templatePath)
-		if strings.HasSuffix(file, ".tmpl") {
-			file = strings.Replace(file, ".tmpl", "", -1)
-		}
-		if overwrite {
-			util.TemplateFileAndOverwrite(dir, file, template, wg, data)
-		} else {
-			util.TemplateFileIfDoesNotExist(dir, file, template, wg, data)
-		}
-	}
-}
+// // @TODO deprecate
+// func (d *DirectoryTemplator) TemplateFiles(data interface{}, overwrite bool, wg *sync.WaitGroup, pathPrefix string) {
+// 	for _, template := range d.Templates {
+// 		templatePath := path.Join(pathPrefix, template.Name())
+// 		dir, file := filepath.Split(templatePath)
+// 		if strings.HasSuffix(file, ".tmpl") {
+// 			file = strings.Replace(file, ".tmpl", "", -1)
+// 		}
+// 		if overwrite {
+// 			util.TemplateFileAndOverwrite(dir, file, template, wg, data)
+// 		} else {
+// 			util.TemplateFileIfDoesNotExist(dir, file, template, wg, data)
+// 		}
+// 	}
+// }
 
 func NewDirTemplator(moduleDir string, delimiters []string) *DirectoryTemplator {
 	templates := []*template.Template{}
@@ -50,12 +51,13 @@ func NewDirTemplator(moduleDir string, delimiters []string) *DirectoryTemplator 
 	}
 
 	for _, path := range paths {
-		// TODO make more robust
-		if strings.Contains(path, "commit0.module.yml") {
+		ignoredPaths, _ := regexp.Compile(configs.IgnoredPaths)
+		if ignoredPaths.MatchString(path) {
 			continue
 		}
 		template, err := template.New(path).Delims(leftDelim, rightDelim).Funcs(util.FuncMap).ParseFiles(path)
 		if err != nil {
+			flog.Errorf("Failed to initialize template %s", path)
 			panic(err)
 		}
 		templates = append(templates, template)

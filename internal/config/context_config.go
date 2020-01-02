@@ -11,6 +11,7 @@ import (
 type Commit0Config struct {
 	Name           string
 	Infrastructure Infrastructure // TODO simplify and flatten / rename?
+	Context        map[string]string
 }
 
 type Infrastructure struct {

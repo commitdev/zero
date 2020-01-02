@@ -1,30 +1,28 @@
 package generate
 
-// import (
-// 	"log"
-// 	"os/exec"
-// 	"path/filepath"
-// 	"sync"
+import (
+	"log"
+	"os/exec"
+	"path/filepath"
 
-// 	"github.com/commitdev/commit0/internal/config"
-// 	"github.com/commitdev/commit0/internal/templator"
-// 	"github.com/commitdev/commit0/internal/util"
-// 	"github.com/commitdev/commit0/pkg/credentials"
+	"github.com/commitdev/commit0/internal/config"
+	"github.com/commitdev/commit0/internal/util"
+	"github.com/commitdev/commit0/pkg/credentials"
+	project "github.com/commitdev/commit0/pkg/credentials"
+	"github.com/commitdev/commit0/pkg/util/flog"
+)
 
-// 	"github.com/kyokomi/emoji"
-// 	"github.com/logrusorgru/aurora"
-// )
+// @TODO: These are specific to a k8s version. If we make the version a config option we will need to change this
+var amiLookup = map[string]string{
+	"us-east-1":    "ami-0392bafc801b7520f",
+	"us-east-2":    "ami-082bb518441d3954c",
+	"us-west-2":    "ami-05d586e6f773f6abf",
+	"eu-west-1":    "ami-059c6874350e63ca9",
+	"eu-central-1": "ami-0e21bc066a9dbabfa",
+}
 
-// // @TODO : These are specific to a k8s version. If we make the version a config option we will need to change this
-// var amiLookup = map[string]string{
-// 	"us-east-1":    "ami-0392bafc801b7520f",
-// 	"us-east-2":    "ami-082bb518441d3954c",
-// 	"us-west-2":    "ami-05d586e6f773f6abf",
-// 	"eu-west-1":    "ami-059c6874350e63ca9",
-// 	"eu-central-1": "ami-0e21bc066a9dbabfa",
-// }
-
-// func Generate(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup, pathPrefix string) {
+// @TODO deprecate & remove
+// func GenerateInfrastructure(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup, pathPrefix string) {
 // 	if cfg.Infrastructure.AWS.EKS.WorkerAMI == "" {
 // 		ami, found := amiLookup[cfg.Infrastructure.AWS.Region]
 // 		if !found {
@@ -38,65 +36,60 @@ package generate
 // 	t.Terraform.TemplateFiles(data, false, wg, pathPrefix)
 // }
 
-// // GetOutputs captures the terraform output for the specific variables
-// func GetOutputs(cfg *config.Commit0Config, pathPrefix string, outputs []string) map[string]string {
-// 	outputsMap := make(map[string]string)
+// GetOutputs captures the terraform output for the specific variables
+func GetOutputs(cfg *config.Commit0Config, pathPrefix string, outputs []string) map[string]string {
+	outputsMap := make(map[string]string)
+	envars := credentials.MakeAwsEnvars(cfg, project.GetSecrets(util.GetCwd()))
+	pathPrefix = filepath.Join(pathPrefix, "environments/staging")
 
-// 	log.Println("Preparing aws environment...")
+	for _, output := range outputs {
+		outputValue := util.ExecuteCommandOutput(exec.Command("terraform", "output", output), pathPrefix, envars)
+		outputsMap[output] = outputValue
+	}
 
-// 	envars := credentials.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))
+	return outputsMap
+}
 
-// 	pathPrefix = filepath.Join(pathPrefix, "environments/staging")
+// Init sets up anything required by Execute
+func Init(cfg *config.Commit0Config, pathPrefix string) {
+	if cfg.Infrastructure.AWS.AccountID != "" {
+		flog.Infof("Preparing aws environment...")
 
-// 	for _, output := range outputs {
-// 		outputValue := util.ExecuteCommandOutput(exec.Command("terraform", "output", output), pathPrefix, envars)
-// 		outputsMap[output] = outputValue
-// 	}
+		envars := project.MakeAwsEnvars(cfg, project.GetSecrets(util.GetCwd()))
 
-// 	return outputsMap
-// }
+		pathPrefix = filepath.Join(pathPrefix, "terraform")
 
-// // Init sets up anything required by Execute
-// func Init(cfg *config.Commit0Config, pathPrefix string) {
-// 	if cfg.Infrastructure.AWS.AccountID != "" {
-// 		log.Println("Preparing aws environment...")
+		// @TODO : A check here would be nice to see if this stuff exists first, mostly for testing
+		flog.Infof(":alarm_clock: Initializing remote backend...")
+		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
+		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
 
-// 		envars := secrets.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))
+		// flog.Infof("Creating users...")
+		// util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/create-users"), envars)
+		// util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/create-users"), envars)
+	}
+}
 
-// 		pathPrefix = filepath.Join(pathPrefix, "terraform")
+// Execute terrafrom init & plan. May modify the config passed in
+func Execute(cfg *config.Commit0Config, pathPrefix string) {
+	if cfg.Infrastructure.AWS.AccountID != "" {
+		log.Println("Preparing aws environment...")
 
-// 		// @TODO : A check here would be nice to see if this stuff exists first, mostly for testing
-// 		log.Println(aurora.Cyan(emoji.Sprintf(":alarm_clock: Initializing remote backend...")))
-// 		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
-// 		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/remote-state"), envars)
+		envars := project.MakeAwsEnvars(cfg, project.GetSecrets(util.GetCwd()))
 
-// 		log.Println("Creating users...")
-// 		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "bootstrap/create-users"), envars)
-// 		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "bootstrap/create-users"), envars)
-// 	}
-// }
+		pathPrefix = filepath.Join(pathPrefix, "terraform")
 
-// // Execute terrafrom init & plan. May modify the config passed in
-// func Execute(cfg *config.Commit0Config, pathPrefix string) {
-// 	if cfg.Infrastructure.AWS.AccountID != "" {
-// 		log.Println("Preparing aws environment...")
+		flog.Infof(":alarm_clock: Applying infrastructure configuration...")
+		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging"), envars)
+		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "environments/staging"), envars)
 
-// 		envars := secrets.MakeAwsEnvars(cfg, secrets.GetSecrets(util.GetCwd()))
-
-// 		pathPrefix = filepath.Join(pathPrefix, "terraform")
-
-// 		log.Println(aurora.Cyan(emoji.Sprintf(":alarm_clock: Applying infrastructure configuration...")))
-// 		util.ExecuteCommand(exec.Command("terraform", "init"), filepath.Join(pathPrefix, "environments/staging"), envars)
-// 		util.ExecuteCommand(exec.Command("terraform", "apply", "-auto-approve"), filepath.Join(pathPrefix, "environments/staging"), envars)
-
-// 		if cfg.Infrastructure.AWS.Cognito.Enabled {
-// 			outputs := []string{
-// 				"cognito_pool_id",
-// 				"cognito_client_id",
-// 			}
-// 			outputValues := GetOutputs(cfg, pathPrefix, outputs)
-// 			cfg.Frontend.Env.CognitoPoolID = outputValues["cognito_pool_id"]
-// 			cfg.Frontend.Env.CognitoClientID = outputValues["cognito_client_id"]
-// 		}
-// 	}
-// }
+		// @TODO get output fields from `mapOutputs` param in configs, can't be hardcoded
+		outputs := []string{
+			"cognito_pool_id",
+			"cognito_client_id",
+		}
+		outputValues := GetOutputs(cfg, pathPrefix, outputs)
+		cfg.Context["cognito_pool_id"] = outputValues["cognito_pool_id"]
+		cfg.Context["cognito_client_id"] = outputValues["cognito_client_id"]
+	}
+}
