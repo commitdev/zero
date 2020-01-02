@@ -25,7 +25,7 @@ func TestDirectoryTemplates(t *testing.T) {
 		"ci": "github",
 	}
 
-	templator.ExecuteTemplates(data, false, "tmp")
+	templator.ExecuteTemplates(data, false, "tmp", "")
 }
 
 // func TestExecuteTemplate(t *testing.T) {
