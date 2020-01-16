@@ -11,14 +11,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/commitdev/commit0/internal/config"
-	"github.com/commitdev/commit0/internal/templator"
 	project "github.com/commitdev/commit0/pkg/credentials"
 	"github.com/commitdev/commit0/pkg/util/exit"
 	"github.com/commitdev/commit0/pkg/util/flog"
 	"github.com/manifoldco/promptui"
 )
 
-func Create(projectName string, outDir string, t *templator.DirectoryTemplator) string {
+// Create t *templator.DirectoryTemplator
+func Create(projectName string, outDir string) string {
 	rootDir := path.Join(outDir, projectName)
 	flog.Infof(":tada: Creating project %s.", projectName)
 
@@ -35,7 +35,7 @@ func Create(projectName string, outDir string, t *templator.DirectoryTemplator) 
 	s := project.GetSecrets(rootDir)
 	fillProviderDetails(&projectConfig, s)
 
-	t.ExecuteTemplates(projectConfig, false, "", "")
+	// t.ExecuteTemplates(projectConfig, false, "", "")
 
 	return rootDir
 }

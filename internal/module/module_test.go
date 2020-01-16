@@ -34,3 +34,26 @@ func TestGetSourceDir(t *testing.T) {
 		t.Errorf("Error, remote sources should be converted to a local dir: %s", source)
 	}
 }
+
+// var testData = "../../tests/test_data/ci/"
+
+// func setupTeardown(t *testing.T) func(t *testing.T) {
+// 	outputPath := "../../tmp/tests"
+// 	os.RemoveAll(outputPath)
+// 	return func(t *testing.T) {
+// 		os.RemoveAll(outputPath)
+// 	}
+// }
+
+// func TestDirectoryTemplates(t *testing.T) {
+// 	teardown := setupTeardown(t)
+// 	defer teardown(t)
+
+// 	// TODO organize test utils and write assertions
+// 	templator := NewDirTemplator("../../tests/test_data/modules/ci", []string{"{{", "}}"})
+// 	var data = map[string]string{
+// 		"ci": "github",
+// 	}
+
+// 	templator.ExecuteTemplates(data, false, "tmp", "")
+// }

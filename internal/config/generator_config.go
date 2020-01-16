@@ -11,10 +11,10 @@ import (
 type GeneratorConfig struct {
 	Name    string
 	Context map[string]string
-	Modules []Module
+	Modules []ModuleInstance
 }
 
-type Module struct {
+type ModuleInstance struct {
 	Source string
 	Params map[string]string
 }

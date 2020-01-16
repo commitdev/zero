@@ -16,8 +16,9 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
+// TemplateModule merges a module instance params with the static configs
 type TemplateModule struct {
-	config.Module
+	config.ModuleInstance
 	Config config.ModuleConfig
 }
 
@@ -27,7 +28,7 @@ type ProgressTracking struct {
 }
 
 // Init downloads the remote template files and parses the module config yaml
-func NewTemplateModule(moduleCfg config.Module) (*TemplateModule, error) {
+func NewTemplateModule(moduleCfg config.ModuleInstance) (*TemplateModule, error) {
 	var templateModule TemplateModule
 	templateModule.Source = moduleCfg.Source
 	templateModule.Params = moduleCfg.Params

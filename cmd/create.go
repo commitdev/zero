@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/commitdev/commit0/internal/context"
-	"github.com/commitdev/commit0/internal/templator"
+	// "github.com/commitdev/commit0/internal/context"
+	// "github.com/commitdev/commit0/internal/templator"
 	"github.com/commitdev/commit0/pkg/util/exit"
 	"github.com/spf13/cobra"
 )
@@ -19,10 +19,10 @@ var createCmd = &cobra.Command{
 			exit.Fatal("Project name cannot be empty!")
 		}
 
-		t := templator.NewDirTemplator("../templates/commit0", []string{"{{", "}}"})
+		// t := templator.NewDirTemplator("../templates/commit0", []string{"{{", "}}"})
 
-		projectName := args[0]
+		// projectName := args[0]
 
-		context.Create(projectName, "./", t)
+		// context.Create(projectName, "./", t)
 	},
 }
