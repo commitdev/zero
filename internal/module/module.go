@@ -77,6 +77,9 @@ func (m *TemplateModule) PromptParams() error {
 			return err
 		}
 
+		if m.Params == nil {
+			m.Params = make(map[string]string)
+		}
 		m.Params[promptConfig.Field] = result
 	}
 

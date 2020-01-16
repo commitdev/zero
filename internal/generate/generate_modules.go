@@ -9,8 +9,6 @@ import (
 )
 
 func GenerateModules(cfg *config.GeneratorConfig) {
-	// TODO swap default yaml parser with a dedicated configurator loader https://github.com/jinzhu/configor
-	// TODO display go-getter progress
 	var templateModules []*module.TemplateModule
 
 	// Initiate all the modules defined in the config
@@ -23,7 +21,7 @@ func GenerateModules(cfg *config.GeneratorConfig) {
 		templateModules = append(templateModules, mod)
 	}
 
-	// Prompt for params and execute each of the generator modules
+	// Prompt for module params and execute each of the generator modules
 	for _, mod := range templateModules {
 		err := mod.PromptParams()
 		if err != nil {

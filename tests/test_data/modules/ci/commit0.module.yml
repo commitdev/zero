@@ -10,12 +10,18 @@ template:
   delimiters:
     - "<%"
     - "%>"
-  output: "tmp/test"
+  output: "github/test"
+
+# required context parameters: will throw a warning message at the end if any of the context parameters are not present
+# contextRequired: 
+#   - cognitoPoolID
+#   - cognitoClientID
 
 # parameters required from user to populate the template params
 prompts: 
-  - field: system
-    label: CI System
+  - field: platform
+    label: CI Platform
+    # default: github
     options: 
       - github
       - circlci

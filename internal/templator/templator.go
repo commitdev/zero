@@ -2,6 +2,7 @@ package templator
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -18,22 +19,6 @@ import (
 type DirectoryTemplator struct {
 	Templates []*template.Template
 }
-
-// // @TODO deprecate
-// func (d *DirectoryTemplator) TemplateFiles(data interface{}, overwrite bool, wg *sync.WaitGroup, pathPrefix string) {
-// 	for _, template := range d.Templates {
-// 		templatePath := path.Join(pathPrefix, template.Name())
-// 		dir, file := filepath.Split(templatePath)
-// 		if strings.HasSuffix(file, ".tmpl") {
-// 			file = strings.Replace(file, ".tmpl", "", -1)
-// 		}
-// 		if overwrite {
-// 			util.TemplateFileAndOverwrite(dir, file, template, wg, data)
-// 		} else {
-// 			util.TemplateFileIfDoesNotExist(dir, file, template, wg, data)
-// 		}
-// 	}
-// }
 
 func NewDirTemplator(moduleDir string, delimiters []string) *DirectoryTemplator {
 	templates := []*template.Template{}
@@ -87,26 +72,14 @@ func GetAllFilePathsInDirectory(moduleDir string) ([]string, error) {
 	return paths, nil
 }
 
-func ExecuteTemplate(templatePath string, outputPath string, data interface{}) error {
-	tmplt, err := template.ParseFiles(templatePath)
-	if err != nil {
-		return err
-	}
-	f, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-	return tmplt.Execute(f, data)
-}
-
 func (d *DirectoryTemplator) ExecuteTemplates(data interface{}, overwrite bool, pathPrefix string, sourcePath string) {
 	var wg sync.WaitGroup
 
 	for _, template := range d.Templates {
 		templatePath := template.Name()
 		_, file := filepath.Split(templatePath)
-		if strings.HasSuffix(file, ".tmpl") {
-			file = strings.Replace(file, ".tmpl", "", -1)
+		if strings.HasSuffix(file, configs.TemplateExtn) {
+			file = strings.Replace(file, configs.TemplateExtn, "", -1)
 		}
 		outputPath := fs.ReplacePath(templatePath, sourcePath, pathPrefix)
 
@@ -117,10 +90,16 @@ func (d *DirectoryTemplator) ExecuteTemplates(data interface{}, overwrite bool, 
 			}
 		}
 
-		err := fs.CreateDirs(outputPath)
+		outputDir, _ := path.Split(outputPath)
+		err := fs.CreateDirs(outputDir)
 		if err != nil {
-			err = ExecuteTemplate(templatePath, outputPath, data)
+			flog.Errorf("Error creating directory '%s': %v", templatePath, err)
 		}
+		f, err := os.Create(outputPath)
+		if err != nil {
+			flog.Errorf("Error initializing file '%s'", err)
+		}
+		err = template.Execute(f, data)
 
 		if err != nil {
 			flog.Errorf("Error templating '%s': %v", templatePath, err)
