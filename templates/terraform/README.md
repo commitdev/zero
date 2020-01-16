@@ -93,3 +93,9 @@
  environment/development$ terraform init
  environment/development$ terraform plan
  ```
+
+## To use kubectl with the created EKS cluster:
+
+ Exchange your aws credentials for kubernetes credentials.
+ This will add a new context to your kubeconfig.
+ `aws eks update-kubeconfig --name <cluster name> --region <aws region>`
