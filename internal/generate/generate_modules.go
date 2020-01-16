@@ -58,7 +58,7 @@ func Generate(mod *module.TemplateModule, generatorCfg *config.GeneratorConfig) 
 	delimiters := mod.Config.Template.Delimiters
 	overwrite := true // @TODO get from configs
 	outputDir := mod.Config.Template.Output
-	// mod.Params
+
 	templateData := TemplateParams{}
 	templateData.Name = generatorCfg.Name
 	templateData.Context = generatorCfg.Context
