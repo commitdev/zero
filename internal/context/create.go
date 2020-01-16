@@ -17,7 +17,7 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-// Create t *templator.DirectoryTemplator
+// Create cloud provider context
 func Create(projectName string, outDir string) string {
 	rootDir := path.Join(outDir, projectName)
 	flog.Infof(":tada: Creating project %s.", projectName)
@@ -34,8 +34,6 @@ func Create(projectName string, outDir string) string {
 
 	s := project.GetSecrets(rootDir)
 	fillProviderDetails(&projectConfig, s)
-
-	// t.ExecuteTemplates(projectConfig, false, "", "")
 
 	return rootDir
 }
