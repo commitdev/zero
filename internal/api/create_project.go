@@ -18,7 +18,7 @@ func createProject(projectConfig util.ProjectConfiguration) string {
 	t := templator.NewTemplator(templates)
 	outDir := "./"
 	rootDir := path.Join(outDir, projectConfig.ProjectName)
-	log.Printf("Creating project %s.", projectConfig)
+	log.Printf("Creating project %s.", projectConfig.ProjectName)
 	err := os.MkdirAll(rootDir, os.ModePerm)
 
 	if os.IsExist(err) {
