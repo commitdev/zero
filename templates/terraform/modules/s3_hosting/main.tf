@@ -67,8 +67,15 @@ resource "aws_s3_bucket_policy" "client_assets" {
   policy = data.aws_iam_policy_document.assets_origin[each.value].json
 }
 
+# To use an ACM cert with CF it has to exist in us-east-1
+provider "aws" {
+  region = "us-east-1"
+  alias  = "east1"
+}
+
 # Find an already created ACM cert for this domain
 data "aws_acm_certificate" "wildcard_cert" {
+  provider    = "aws.east1"
   domain      = var.cert_domain
   most_recent = "true"
 }

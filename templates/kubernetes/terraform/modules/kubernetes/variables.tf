@@ -23,6 +23,6 @@ variable "external_dns_owner_id" {
 }
 
 variable "external_dns_assume_roles" {
-  type        = "list"
   description = "List of roles that should be able to assume the external dns role (most likely the role of the cluster worker nodes)"
+  type        = list(string)
 }

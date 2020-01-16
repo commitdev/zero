@@ -31,4 +31,7 @@ module "vpc" {
     environment = var.environment
   }
 
+  vpc_tags = {
+    "kubernetes.io/cluster/${var.kubernetes_cluster_name}" = "shared"
+  }
 }
