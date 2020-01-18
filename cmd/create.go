@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/commitdev/commit0/internal/config"
 	"github.com/commitdev/commit0/internal/context"
 	"github.com/commitdev/commit0/pkg/util/exit"
 	"github.com/spf13/cobra"
@@ -20,5 +21,8 @@ var createCmd = &cobra.Command{
 
 		projectName := args[0]
 		context.Create(projectName, "./")
+
+		// TODO create a commit0.yml
+		config.CreateExample(projectName)
 	},
 }
