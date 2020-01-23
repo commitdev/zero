@@ -1,151 +1,117 @@
+
 # Configuring Commit0
 
 This is a guide on how to configure your project manually with a single file `commit0.yml`. Simply write this file to the root of your project directory and run the commit0 CLI tool against it to generate your project files.
 
-You can see a complete commit0.yml in our [full example](TODO: Create example).
+You can see a complete commit0.yml in our [full example](TODO: Create example). 
 
+# Table of Contents
 
-## Table of Contents
+*  [commit0.yml](#commit0-yaml)
+	*  [name*](#name)
+	*  [context](#context)
+	*  [modules*](#modules)
+		* [source*](#module-source)
+		* [params*](#module-params)
+*  [commit0.module.yml](#commit0-module-yaml)
+	*  [name*](#module-name)
+	*  [description](#module-description)
+	*  [template](#template)
+		*  [extension](#template-extension)
+		*  [delimiters](#template-delimiters)
+		*  [output](#template-output)
 
-* [organization](#ogranization)
-* [name](#name)
-* [description](#description)
-* [maintainers](#maintainers)
-* [infrastructure](#infrastructure)
-  * [\<cloud provider\>](#provider)
-* [frontend](#frontend)
-  * [framework](#framework)
-  * [ci](#ci)
-* [services](#services)
-  * [\<service\>](#service)
-    * name
-    * description
-    * language
-    * gitRepo
-    * dockerRepo
-    * ci
-* [network](#network)
-  * grpc
-    * host
-    * port
-  * http
-    * enabled
-    * port
-  * web
-    * enabled
-    * port
-
-## organization<a name="organization"></a>
-
-Name of the github organization to store your code in.
-[]() | |
---- | ---
-Required | True
-Type | String
+# Commit0.yaml<a name="commit0-yaml"></a>
+Your project config file. It describes the project 
+Example:
+```
+name: hello-world
+context: 
+	cognitoPoolID: xxx
+modules: 
+	#- source: "../tests/modules/ci"
+	- source: "github.com/zthomas/react-mui-kit"	
+``` 
 
 ## name<a name="name"></a>
-
 Name of your project. This will be used to name the github repos as well as in other parts of the generated code.
 []() | |
 --- | ---
 Required | True
 Type | String
 
-## description<a name="description"></a>
+## context<a name="context"></a>
+A key value map of global context parameters to use in the templates. 
+[]() | |
+--- | ---
+Required | False
+Type | Map[String]
 
-Description of the project. This will be used to tell others what your project does, but can easily be updated later.
+## modules<a name="modules"></a>
+List of modules template modules to import
+[]() | |
+--- | ---
+Required | True
+Type | Map[Module]
+
+## source<a name="module-source"></a>
+We are using go-getter to parse the sources, we you can use any URL or file formats that [go-getter](https://github.com/hashicorp/go-getter#url-format) supports.
+[]() | |
+--- | ---
+Required | True
+Type | String
+
+# Commit0.module.yaml<a name="commit0-module-yaml"></a>
+The module config file. You can configure how the templating engine should process the files in the current repository.
+Example:
+```
+name: react-mui-kit
+template: 
+	extension: '.tmplt'
+	delimiters: 
+		- '<%'
+		- '%>'
+	output: web-app
+``` 
+
+## name<a name="module-name"></a>
+Name of your module. This will be used as the default module directory as well as a display name in the prompts.
+[]() | |
+--- | ---
+Required | True
+Type | String
+
+## description<a name="module-description"></a>
+Short description of the module
 []() | |
 --- | ---
 Required | False
 Type | String
 
-## maintainers<a name="maintainers"></a>
-
-List of people who are maintaining the project.
+## template<a name="template"></a>
+Template configurations
 []() | |
 --- | ---
 Required | False
 Type | Map
 
-## infrastructure<a name="infrastructure"></a>
-
-This section describes how we will set up your infrastructure. First you'll pick a cloud provider in which to create the infrastructure, then depending on the provider, you'll need to pick a few other options so we know how to configure it.
-
-### cloud provider<a name="provider"></a>
-
-Select one of the available cloud providers to host your infrastructure. Currently we only support AWS, but more may be added in the future for different use-cases.
+## extension<a name="template-extension"></a>
+File extension to signify that a file is a template. If this is defined, non-template files will not be parsed and will be copied over directly. The default value is `.tmplt`
 []() | |
 --- | ---
-Required | True
-Type | enum
-Options | aws
+Required | False
+Type | Map
 
-### AWS<a name="aws"></a>
-
-Key | Required | Type | Description
---- | --- | --- | ---
-accountId | True | Number | ID for the amazon account you are using.
-region | True | String | This is the geographical region your infrastructure will be hosted in. Depending on who is connecting to your project you may want to base it closer to the majority of your users. See [AWS Regions](https://aws.amazon.com/about-aws/global-infrastructure/regions_az/).
-eks | False | Map | Options for using Amazon's hosted Kubernetes, Elastic Kubernetes Service.
-cognito | False | Map | 
-s3Hosting | False | Map
-
-#### eks
-
-Key | Required | Type | Description
---- | --- | --- | ---
-clusterName | True  | String | Name of the cluster
-
-#### cognito
-
-Key | Required | Type | Description
---- | --- | --- | ---
-enabled | True  | Boolean | Whether or not to use Cognito
-
-
-#### s3Hosting
-
-Key | Required | Type | Description
---- | --- | --- | ---
-enabled | True  | Boolean | Whether or not to enable S3 Hosting
-
-## frontend<a name="frontend"></a>
-
-This is where you specify which javascript frontend framework you will use (if any) with your application. This will often be a preference as most frameworks will allow you to achieve what you want. It's more about how you structure your frontend components and how you bring in data to be displayed.
-
-### framework<a name="framework"></a>
-
-Frontend framework to use. Currently only React is supported.
+## delimiters<a name="template-delimiters"></a>
+An pair of delimiters that the template engine should use. The default values are: `{{`, `}}`
 []() | |
 --- | ---
-Required | True
-Type | enum
-Options | react
+Required | False
+Type | Map[String]
 
-
-### ci<a name="ci"></a>
-
-Key | Required | Type | Description
---- | --- | --- | ---
-system | True | Enum | github, circleci, jenkins, travis
-buildImage | False | String | Docker image that you want to build with
-buildTag | False | String | Docker image tag, requires an image to be specified too.
-buildCommand | False | String | Command to build your application. Default: `make build`
-testCommand | False | String | Command to test your application. Default: `make test`
-
-## services<a name="services"></a>
-
-### service<a name="service"></a>
-
-Key | Required | Type | Description
---- | --- | --- | ---
-name | True | String | 
-description | True | String | 
-language | True | Enum | go, java, node
-gitRepo | True | String | Name of the repo for this service. This is different from your infrastructure repo.
-dockerRepo | True | String | Where to store docker image once built.
-ci | True | Enum | github, circleci, jenkins, travis
-
-## network<a name="network"></a>
-
-Network options.
+## output<a name="template-output"></a>
+Template output directory that you want the template engine to write to.
+[]() | |
+--- | ---
+Required | False
+Type | String
