@@ -10,6 +10,7 @@ import (
 	"path"
 	"strings"
 	"text/template"
+	"github.com/google/uuid"
 )
 
 func CreateDirIfDoesNotExist(path string) error {
@@ -29,6 +30,7 @@ var FuncMap = template.FuncMap{
 	"Title":             strings.Title,
 	"ToLower":           strings.ToLower,
 	"CleanGoIdentifier": CleanGoIdentifier,
+	"GenerateUUID":      uuid.New,
 }
 
 func GetCwd() string {

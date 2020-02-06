@@ -1,10 +1,10 @@
 terraform {
   backend "s3" {
-    bucket         = "project-{{ .Config.Name }}-terraform-state"
+    bucket         = "{{ .Config.Name }}-staging-terraform-state"
     key            = "infrastructure/terraform/environments/staging/kubernetes"
     encrypt        = true
     region         = "{{ .Config.Infrastructure.AWS.Region }}"
-    dynamodb_table = "{{ .Config.Name }}-terraform-state-locks"
+    dynamodb_table = "{{ .Config.Name }}-staging-terraform-state-locks"
   }
 }
 
@@ -20,6 +20,10 @@ module "kubernetes" {
 
   # Assume-role policy used by monitoring fluentd daemonset
   assume_role_policy = data.aws_iam_policy_document.assumerole_root_policy.json
+
+  external_dns_zone = "{{ .Config.Frontend.Hostname }}"
+  external_dns_owner_id = "{{ GenerateUUID }}"
+  external_dns_assume_roles = [ "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/k8s-{{ .Config.Infrastructure.AWS.EKS.ClusterName }}-workers" ]
 }
 
 # Data sources for EKS IAM

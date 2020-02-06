@@ -12,18 +12,18 @@ infrastructure:
     accountId: {{ .Infrastructure.AWS.AccountID }}
     region: {{ .Infrastructure.AWS.Region }}
     eks:
-      clusterName: staging
+      clusterName: {{.ProjectName}}-staging-{{ .Infrastructure.AWS.Region }}
     cognito:
       enabled: true
     s3Hosting:
       enabled: true
 
 frontend:
-  framework: {{.FrontendFramework}}
+  framework: {{.FrontendFramework }}
   ci:
     system: github
   app:
-    name: {{.ProjectName}}
+    name: {{.ProjectName }}
 
 services:
   {{range .Services}}
