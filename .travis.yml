@@ -1,10 +1,8 @@
 language: go
 
 script:
-  - GO111MODULE=on make build-deps
   - GO111MODULE=on make build
   - GO111MODULE=on make check
 
 go:
-  - 1.12.x
   - 1.13.x

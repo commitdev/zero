@@ -2,8 +2,4 @@ main-packr.go
 packrd
 /commit0
 .history/
-tmp/
-
-# Generated files from Config UI.
-intenral/ui/node_modules
-intenral/ui/build
+tmp

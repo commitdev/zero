@@ -1,0 +1,28 @@
+name: "CI templates"
+description: ""
+author: ""
+icon: ""
+thumbnail: ""
+
+# Template variables to populate, these could be overwritten by the file spefic frontmatter variables
+template: 
+  # strictMode: true # will only parse files that includes the .tmpl.* extension, otherwise it will copy file 
+  delimiters:
+    - "<%"
+    - "%>"
+  output: "github/test"
+
+# required context parameters: will throw a warning message at the end if any of the context parameters are not present
+# contextRequired: 
+#   - cognitoPoolID
+#   - cognitoClientID
+
+# parameters required from user to populate the template params
+prompts: 
+  - field: platform
+    label: CI Platform
+    # default: github
+    options: 
+      - github
+      - circlci
+

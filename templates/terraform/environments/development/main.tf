@@ -17,7 +17,7 @@ module "development" {
   # Project configuration
   project             = "{{ .Config.Name }}"
   region              = "{{ .Config.Infrastructure.AWS.Region }}"
-  allowed_account_ids = ["{{ .Config.Infrastructure.AWS.AccountId }}"]
+  allowed_account_ids = ["{{ .Config.Infrastructure.AWS.AccountID }}"]
 
   {{- if ne .Config.Infrastructure.AWS.EKS.ClusterName "" }}
   # ECR configuration

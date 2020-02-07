@@ -1,0 +1,18 @@
+name: hello-world
+
+# Context will populated automatically or could be added manually
+context: 
+  cognitoPoolID: 123
+  cognitoClientID: ABC
+
+modules: 
+  # module can be in any format the go-getter supports (path, github, url, etc.)
+  # supports https://github.com/hashicorp/go-getter#url-format
+  # - source: './tests/test_data/modules/ci'
+  #   params: 
+  #     ci: github
+
+  - source: './remote_templates/services'
+    # alternatively we can recursively support sub modules
+    modules: 
+      - './remote_templates/ci/go'
