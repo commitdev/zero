@@ -7,8 +7,6 @@ import (
 	"github.com/logrusorgru/aurora"
 )
 
-// TODO support log levels
-
 // Warnf logs a formatted error message
 func Infof(format string, a ...interface{}) {
 	log.Println(aurora.Cyan(emoji.Sprintf(format, a...)))

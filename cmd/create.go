@@ -22,7 +22,6 @@ var createCmd = &cobra.Command{
 		projectName := args[0]
 		context.Create(projectName, "./")
 
-		// TODO create a commit0.yml
 		config.CreateExample(projectName)
 	},
 }
