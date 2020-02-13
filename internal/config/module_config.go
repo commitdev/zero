@@ -40,6 +40,6 @@ func LoadModuleConfig(filePath string) *ModuleConfig {
 	if err != nil {
 		log.Panicf("failed to parse config: %v", err)
 	}
-	pp.Println(config)
+	pp.Println("Module Config:", config)
 	return config
 }

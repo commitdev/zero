@@ -56,8 +56,11 @@ type TemplateParams struct {
 func Generate(mod *module.TemplateModule, generatorCfg *config.GeneratorConfig) error {
 	moduleDir := module.GetSourceDir(mod.Source)
 	delimiters := mod.Config.Template.Delimiters
-	overwrite := true // @TODO get from configs
-	outputDir := mod.Config.Template.Output
+	overwrite := mod.Overwrite
+	outputDir := mod.Output
+	if outputDir == "" {
+		outputDir = mod.Config.Template.Output
+	}
 
 	templateData := TemplateParams{}
 	templateData.Name = generatorCfg.Name

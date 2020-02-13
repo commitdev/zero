@@ -32,6 +32,8 @@ func NewTemplateModule(moduleCfg config.ModuleInstance) (*TemplateModule, error)
 	var templateModule TemplateModule
 	templateModule.Source = moduleCfg.Source
 	templateModule.Params = moduleCfg.Params
+	templateModule.Overwrite = moduleCfg.Overwrite
+	templateModule.Output = moduleCfg.Output
 
 	p := &ProgressTracking{}
 	sourcePath := GetSourceDir(templateModule.Source)

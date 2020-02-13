@@ -21,7 +21,7 @@ As there some dependencies it will be easier to use this tool within the provide
 The best way then to use this is to add an alias, then you can use the CLI as if it was installed as usual on your machine:
 `alias commit0='docker run -it -v "$(pwd):/project" -v "${HOME}/.aws:/root/.aws" commit0:v0'`
 
-## Usage
+# Usage
 
 1) To create a project run `commit0 create [PROJECT_NAME]`
 2) It will prompt you to select a cloud provider and an account profile to use
@@ -31,12 +31,9 @@ The best way then to use this is to add an alias, then you can use the CLI as if
 6) `commit0 ui` launches the locally hosted web UI (Static SPA) and the API server
 
 
-# Configuring Commit0
+## Configuring Commit0
 
 This is a guide on how to configure your project manually with a single file `commit0.yml`. Simply write this file to the root of your project directory and run the commit0 CLI tool against it to generate your project files.
-
-
-# Table of Contents
 
 *  [commit0.yml](#commit0-yaml)
 	*  [name*](#name)
@@ -45,25 +42,30 @@ This is a guide on how to configure your project manually with a single file `co
 		* [source*](#module-source)
 		* [params*](#module-params)
 		* [output](#module-output)
+    * [overwrite](#module-overwrite)
 *  [commit0.module.yml](#commit0-module-yaml)
 	*  [name*](#module-name)
 	*  [description](#module-description)
+	*  [prompts](#module-prompts)
+		*  [field*](#prompt-field)
+		*  [label](#prompt-label)
+		*  [options](#prompt-options)
 	*  [template](#template)
 		*  [extension](#template-extension)
 		*  [delimiters](#template-delimiters)
 		*  [output](#template-output)
 
-# Commit0.yaml<a name="commit0-yaml"></a>
+## Commit0.yaml<a name="commit0-yaml"></a>
 Your project config file. It describes the project 
 Example:
 ```
-name: hello-world
+name: foobar
 context: 
-	cognitoPoolID: xxx
+  cognitoPoolID: xxx
 modules: 
-	#- source: "../tests/modules/ci"
-	- source: "github.com/zthomas/react-mui-kit"	
-	- output: "web-app"
+  #- source: "../tests/modules/ci"
+  - source: "github.com/zthomas/react-mui-kit"	
+  - output: "web-app"
 ``` 
 
 ## name<a name="name"></a>
@@ -114,18 +116,27 @@ Template output directory that the current module should write to.
 Required | False
 Type | String
 
+## output<a name="module-overwrite"></a>
+Whether to overwrite existing files when generating files from templates
 
-# Commit0.module.yaml<a name="commit0-module-yaml"></a>
+[]() | |
+--- | ---
+Required | False
+Type | Boolean
+Default | False
+
+
+## Commit0.module.yaml<a name="commit0-module-yaml"></a>
 The module config file. You can configure how the templating engine should process the files in the current repository.
 Example:
 ```
 name: react-mui-kit
 template: 
-	extension: '.tmplt'
-	delimiters: 
-		- '<%'
-		- '%>'
-	output: web-app
+  extension: '.tmplt'
+  delimiters: 
+    - '<%'
+    - '%>'
+  output: web-app
 ``` 
 
 ## name<a name="module-name"></a>
@@ -175,8 +186,38 @@ The default template output directory that you want the template engine to write
 Required | False
 Type | String
 
+## Prompts<a name="prompts"></a>
+User prompts to generate to collect additional module specific params
+[]() | |
+--- | ---
+Required | False
+Type | Map
 
-## Development
+## Field<a name="prompt-field"></a>
+The name of the field that the param should be written to
+
+[]() | |
+--- | ---
+Required | True
+Type | String
+
+## Label<a name="prompt-label"></a>
+The message that will be presented to the user
+
+[]() | |
+--- | ---
+Required | False
+Type | String
+
+## options<a name="prompt-label"></a>
+A list of options to select from. If not given, then it will be rendered as a text input prompt.
+
+[]() | |
+--- | ---
+Required | False
+Type | Map[String]
+
+# Development
 We are looking for contributors!
 
 Building from the source
