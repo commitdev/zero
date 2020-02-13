@@ -14,7 +14,9 @@ context:
 
 # module can be in any format the go-getter supports (path, github, url, etc.)
 # supports https://github.com/hashicorp/go-getter#url-format
-# - source: "../tests/test_data/modules/ci"
+# Example:
+# - source: "../development/modules/ci"
+# - output: "github-actions"
 
 modules:
   - source: "github.com/zthomas/commit0-terraform-basic"`
