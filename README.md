@@ -23,9 +23,9 @@ With Commit0:
 Commit0 CLI is an opinionated, yet fully modular code generation tool with declarative syntax that allows developers to easily integrate user prompts and interactions. 
 
 Problems we encountered: 
-- It was tedious to creating reusable templates and hard to maintain
+- It was tedious to create reusable templates and hard to maintain
 - Lack of standardization and integration interface between the templates
-- Difficult to integrate multiple templated codebase
+- Difficult to integrate individually templated codebases
 
 How we aim to address those issues: 
 - Make templating behaviour simple and declarative
