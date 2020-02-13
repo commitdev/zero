@@ -6,14 +6,37 @@
 
 Status: Proof of Concept
 
-Commit0 is an open source Push-To-Deploy tool designed to provide an amazing deployment process for developers while not compromising on dev ops best practices. Instead of using a Platform as a Service that simplifies your development but locks you in, we recreate the entire seamless workflow using open source technolgies and generate the infrastructure code for you while providing you with a simple interface.
+## About Commit0
+Commit0 is a project skaffolding framework and ecosystem created to:
+
+1. Maximize knowledge sharing across an organization 
+2. Easily maintain a state of the art and easily reusable implementations of production grade solutions to recurring problems
+3. Re-create the seamless deployment experience offered by PaaS solutions but with a fully open source stack that follows industry best practices
 
 With Commit0:
-- You get the same simple Push-To-Deploy workflow that you are accustomed to with premium PaaS offerings
-- Based on your configurations we'll generate all the infrastructure code that is needed to deploy and scale your application (Kubenetes manifests, Terraform, CI/CI configs etc.) and deploy to your own cloud provider.
-- There's no vendor lock-in. It's all done with open source tools and generated code
-- You don't need to know any dev ops to use Commit0 but if you are a dev ops engineer you can rest assured that you have a solid starting point and you can customize it as your project grows.
-- We also include a set of commonly used open source microservices for tasks like authentication, user management, image resizing etc. so you can start developing the core application right away.
+- Easily deploy and integrate various boilerplate solutions
+- Instantly integrate commonly used open source microservices for authentication, user management, file encryption, image resizing etc. 
+- Get a simple Push-To-Deploy workflow that you are accustomed to with popular PaaS solutions [TODO]
+- There's no vendor lock-in. It's all implemented with open source tools and deployed to your own cloud provider.
+
+## Commit0 Generator CLI 
+Commit0 CLI is an opinionated, yet fully modular code generation tool with declarative syntax that allows developers to easily integrate user prompts and interactions. 
+
+Problems we encountered: 
+- It was tedious to creating reusable templates and hard to maintain
+- Lack of standardization and integration interface between the templates
+- Difficult to integrate multiple templated codebase
+
+How we aim to address those issues: 
+- Make templating behaviour simple and declarative
+- Clear strategy and guideline around what are clear and reusable templates
+- Standardize how templated code should get dependent parameters and start up
+
+This is inspired by: 
+- [Yeoman Generator](https://github.com/yeoman/generator)
+- [JHipster](https://github.com/jhipster/generator-jhipster)
+- [Boilr](https://github.com/tmrts/boilr)
+
 
 ## Installation
 
@@ -59,13 +82,14 @@ This is a guide on how to configure your project manually with a single file `co
 Your project config file. It describes the project 
 Example:
 ```
-name: foobar
+name: newProject
 context: 
   cognitoPoolID: xxx
 modules: 
-  #- source: "../tests/modules/ci"
-  - source: "github.com/zthomas/react-mui-kit"	
-  - output: "web-app"
+  - source: "github.com/zthomas/commit0-terraform-basic"	
+  	output: "infrastructure"
+	- source: "github.com/zthomas/react-mui-kit"	
+		output: "web-app"
 ``` 
 
 ## name<a name="name"></a>
