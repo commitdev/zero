@@ -15,8 +15,10 @@ type GeneratorConfig struct {
 }
 
 type ModuleInstance struct {
-	Source string
-	Params map[string]string
+	Source    string
+	Output    string
+	Overwrite bool
+	Params    map[string]string
 }
 
 func LoadGeneratorConfig(filePath string) *GeneratorConfig {
@@ -31,6 +33,6 @@ func LoadGeneratorConfig(filePath string) *GeneratorConfig {
 		log.Panicf("failed to parse config: %v", err)
 	}
 
-	pp.Println(config)
+	pp.Println("Generator Config:", config)
 	return config
 }

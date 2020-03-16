@@ -21,21 +21,6 @@ var amiLookup = map[string]string{
 	"eu-central-1": "ami-0e21bc066a9dbabfa",
 }
 
-// @TODO deprecate & remove
-// func GenerateInfrastructure(t *templator.Templator, cfg *config.Commit0Config, wg *sync.WaitGroup, pathPrefix string) {
-// 	if cfg.Infrastructure.AWS.EKS.WorkerAMI == "" {
-// 		ami, found := amiLookup[cfg.Infrastructure.AWS.Region]
-// 		if !found {
-// 			log.Fatalln(aurora.Red(emoji.Sprintf(":exclamation: Unable to look up an AMI for the chosen region")))
-// 		}
-
-// 		cfg.Infrastructure.AWS.EKS.WorkerAMI = ami
-// 	}
-// 	data := templator.GenericTemplateData{Config: *cfg}
-
-// 	t.Terraform.TemplateFiles(data, false, wg, pathPrefix)
-// }
-
 // GetOutputs captures the terraform output for the specific variables
 func GetOutputs(cfg *config.Commit0Config, pathPrefix string, outputs []string) map[string]string {
 	outputsMap := make(map[string]string)

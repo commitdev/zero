@@ -56,8 +56,11 @@ type TemplateParams struct {
 func Generate(mod *module.TemplateModule, generatorCfg *config.GeneratorConfig) error {
 	moduleDir := module.GetSourceDir(mod.Source)
 	delimiters := mod.Config.Template.Delimiters
-	overwrite := true // @TODO get from configs
-	outputDir := mod.Config.Template.Output
+	overwrite := mod.Overwrite
+	outputDir := mod.Output
+	if outputDir == "" {
+		outputDir = mod.Config.Template.Output
+	}
 
 	templateData := TemplateParams{}
 	templateData.Name = generatorCfg.Name
@@ -163,7 +166,6 @@ func ExecuteTemplates(templates []*TemplateConfig, data interface{}, delimiters 
 		// @TODO if strict mode then only copy file
 		name := path.Base(source)
 		template, err := template.New(name).Delims(leftDelim, rightDelim).Funcs(util.FuncMap).ParseFiles(source)
-		// flog.Infof("Templating %s: %s => %s", name, source, dest)
 		err = template.Execute(f, data)
 
 		if err != nil {

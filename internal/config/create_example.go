@@ -8,15 +8,18 @@ import (
 )
 
 const exampleConfig = `name: %s
-	
-# Context will populated automatically or could be added manually
+
+# Context is normally populated automatically but could be used to inject global params
 context: 
 
-modules: 
-	# module can be in any format the go-getter supports (path, github, url, etc.)
-	# supports https://github.com/hashicorp/go-getter#url-format
-	# - source: "../tests/test_data/modules/ci"
-	- source: "github.com/zthomas/react-mui-kit"`
+# module can be in any format the go-getter supports (path, github, url, etc.)
+# supports https://github.com/hashicorp/go-getter#url-format
+# Example:
+# - source: "../development/modules/ci"
+# - output: "github-actions"
+
+modules:
+  - source: "github.com/zthomas/commit0-terraform-basic"`
 
 func CreateExample(projectName string) {
 	content := []byte(fmt.Sprintf(exampleConfig, projectName))
