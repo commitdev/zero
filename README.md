@@ -87,12 +87,12 @@ context:
   cognitoPoolID: xxx
 modules: 
   - source: "github.com/zthomas/commit0-terraform-basic"	
-  	output: "infrastructure"
-	- source: "github.com/zthomas/react-mui-kit"	
-		output: "web-app"
+    output: "infrastructure"
+  - source: "github.com/zthomas/react-mui-kit"	
+    output: "web-app"
 ``` 
 
-## name<a name="name"></a>
+## Name<a name="name"></a>
 Name of your project. This will be used to name the github repos as well as in other parts of the generated code.
 
 []() | |
@@ -100,7 +100,7 @@ Name of your project. This will be used to name the github repos as well as in o
 Required | True
 Type | String
 
-## context<a name="context"></a>
+## Context<a name="context"></a>
 A key value map of global context parameters to use in the templates. 
 
 []() | |
@@ -108,7 +108,7 @@ A key value map of global context parameters to use in the templates.
 Required | False
 Type | Map[String]
 
-## modules<a name="modules"></a>
+## Modules<a name="modules"></a>
 List of modules template modules to import
 
 []() | |
@@ -116,7 +116,7 @@ List of modules template modules to import
 Required | True
 Type | Map[Module]
 
-## source<a name="module-source"></a>
+## Source<a name="module-source"></a>
 We are using go-getter to parse the sources, we you can use any URL or file formats that [go-getter](https://github.com/hashicorp/go-getter#url-format) supports.
 
 []() | |
@@ -124,7 +124,7 @@ We are using go-getter to parse the sources, we you can use any URL or file form
 Required | True
 Type | String
 
-## module<a name="module-params"></a>
+## Params<a name="module-params"></a>
 Module parameters to use during templating
 
 []() | |
@@ -132,7 +132,7 @@ Module parameters to use during templating
 Required | True
 Type | String
 
-## output<a name="module-output"></a>
+## Output<a name="module-output"></a>
 Template output directory that the current module should write to.
 
 []() | |
@@ -140,7 +140,7 @@ Template output directory that the current module should write to.
 Required | False
 Type | String
 
-## output<a name="module-overwrite"></a>
+## Overwrite<a name="module-overwrite"></a>
 Whether to overwrite existing files when generating files from templates
 
 []() | |
@@ -163,7 +163,7 @@ template:
   output: web-app
 ``` 
 
-## name<a name="module-name"></a>
+## Name<a name="module-name"></a>
 Name of your module. This will be used as the default module directory as well as a display name in the prompts.
 
 []() | |
@@ -171,7 +171,7 @@ Name of your module. This will be used as the default module directory as well a
 Required | True
 Type | String
 
-## description<a name="module-description"></a>
+## Description<a name="module-description"></a>
 Short description of the module
 
 []() | |
@@ -186,7 +186,7 @@ Template configurations
 Required | False
 Type | Map
 
-## extension<a name="template-extension"></a>
+## Extension<a name="template-extension"></a>
 File extension to signify that a file is a template. If this is defined, non-template files will not be parsed and will be copied over directly. The default value is `.tmplt`
 
 []() | |
@@ -194,7 +194,7 @@ File extension to signify that a file is a template. If this is defined, non-tem
 Required | False
 Type | Map
 
-## delimiters<a name="template-delimiters"></a>
+## Delimiters<a name="template-delimiters"></a>
 An pair of delimiters that the template engine should use. The default values are: `{{`, `}}`
 
 []() | |
@@ -202,7 +202,7 @@ An pair of delimiters that the template engine should use. The default values ar
 Required | False
 Type | Map[String]
 
-## output<a name="template-output"></a>
+## Output<a name="template-output"></a>
 The default template output directory that you want the template engine to write to. This will be overwritten by the 
 
 []() | |
@@ -233,7 +233,7 @@ The message that will be presented to the user
 Required | False
 Type | String
 
-## options<a name="prompt-label"></a>
+## Options<a name="prompt-options"></a>
 A list of options to select from. If not given, then it will be rendered as a text input prompt.
 
 []() | |
