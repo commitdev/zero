@@ -9,10 +9,6 @@ RUN apk add --update --no-cache build-base curl git upx && \
 RUN apk add --update nodejs npm
 
 RUN curl -sSL \
-  https://storage.googleapis.com/kubernetes-release/release/v${K8S_VERSION}/bin/linux/amd64/kubectl \
-  -o /usr/local/bin/kubectl
-
-RUN curl -sSL \
   https://amazon-eks.s3-us-west-2.amazonaws.com/1.14.6/2019-08-22/bin/linux/amd64/aws-iam-authenticator \
   -o /usr/local/bin/aws-iam-authenticator
 
@@ -24,10 +20,15 @@ unzip -d /usr/local/bin/ /tmp/terraform.zip
 RUN chmod +x /usr/local/bin/* && \
   upx --lzma /usr/local/bin/*
 
+# Hydrate the dependency cache. This way, if the go.mod or go.sum files do not
+# change we can cache the depdency layer without having to reinstall them.
 WORKDIR /tmp/commit0
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
 
-RUN make build-deps && make build && \
+RUN make build && \
   mv commit0 /usr/local/bin && \
   upx --lzma /usr/local/bin/commit0
 
@@ -37,11 +38,10 @@ ENV \
   GOPATH=/proto-libs
 
 RUN apk add --update bash ca-certificates git python && \
-apk add --update -t deps make py-pip
+  apk add --update -t deps make py-pip
 
 RUN mkdir ${GOPATH}
 COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /usr/local/include /usr/local/include
 COPY --from=builder /go/src/github.com/grpc-ecosystem/grpc-gateway ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
 WORKDIR /project
 
