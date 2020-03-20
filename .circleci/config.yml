@@ -157,8 +157,8 @@ workflows:
         - build_and_push:
             requires:
               - unit_test
-            # filters:
-            #   branches:
-            #     only:  # only branches matching the below regex filters will run
-            #       - /^master$/
+            filters:
+              branches:
+                only:  # only branches matching the below regex filters will run
+                  - /^master$/
 

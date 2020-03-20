@@ -1,5 +1,3 @@
-VERSION:= 0.0.1
-
 check:
 	go test ./...
 
@@ -26,5 +24,5 @@ ci-docker-build:
 	docker build . -t commitdev/commit0:${VERSION_TAG} -t commitdev/commit0:latest
  
 ci-docker-push:
-	echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USER}" --password-stdin
+	echo "${DOCKERHUB_PASS}" | docker login -u commitdev --password-stdin
 	docker push commitdev/commit0:${VERSION_TAG}
