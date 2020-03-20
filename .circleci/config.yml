@@ -129,6 +129,10 @@ jobs:
       - run: *checkout-shallow
       - version-tag/create
       - run:
+          name: Update Version command
+          command: |
+            ./updateVersion.sh "$VERSION_TAG"
+      - run:
           name: Build Docker image
           command: |
             make ci-docker-build
@@ -152,8 +156,8 @@ workflows:
         - build_and_push:
             requires:
               - unit_test
-            filters:
-              branches:
-                only:  # only branches matching the below regex filters will run
-                  - /^master$/
+            # filters:
+            #   branches:
+            #     only:  # only branches matching the below regex filters will run
+            #       - /^master$/
 
