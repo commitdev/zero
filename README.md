@@ -86,7 +86,7 @@ name: newProject
 context: 
   cognitoPoolID: xxx
 modules: 
-  - source: "github.com/zthomas/commit0-terraform-basic"	
+  - source: "github.com/commit0/commit0-aws-eks-stack"	
     output: "infrastructure"
   - source: "github.com/zthomas/react-mui-kit"	
     output: "web-app"

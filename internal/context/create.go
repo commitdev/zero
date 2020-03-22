@@ -51,22 +51,7 @@ func chooseCloudProvider(projectConfig *config.Commit0Config) {
 		panic(err)
 	}
 
-	if providerResult == "Amazon AWS" {
-		projectConfig.Infrastructure.AWS = &config.AWS{}
-		regionPrompt := promptui.Select{
-			Label: "Select AWS Region ",
-			Items: []string{"us-west-1", "us-west-2", "us-east-1", "us-east-2", "ca-central-1",
-				"eu-central-1", "eu-west-1", "ap-east-1", "ap-south-1"},
-		}
-
-		_, regionResult, err := regionPrompt.Run()
-
-		if err != nil {
-			exit.Fatal("Prompt failed %v\n", err)
-		}
-
-		projectConfig.Infrastructure.AWS.Region = regionResult
-	} else {
+	if providerResult != "Amazon AWS" {
 		exit.Fatal("Only the AWS provider is available at this time")
 	}
 }

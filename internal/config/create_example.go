@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-	"github.com/commitdev/commit0/pkg/util/exit"
 	"io/ioutil"
 	"path"
+
+	"github.com/commitdev/commit0/pkg/util/exit"
 )
 
 const exampleConfig = `name: %s
@@ -19,7 +20,7 @@ context:
 # - output: "github-actions"
 
 modules:
-  - source: "github.com/zthomas/commit0-terraform-basic"`
+  - source: "github.com/commit0/commit0-aws-eks-stack"`
 
 func CreateExample(projectName string) {
 	content := []byte(fmt.Sprintf(exampleConfig, projectName))
