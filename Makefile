@@ -1,5 +1,3 @@
-VERSION:= 0.0.1
-
 check:
 	go test ./...
 
@@ -20,3 +18,11 @@ build:
 # Installs the CLI int your GOPATH
 install-go:
 	go build -o ${GOPATH}/bin/commit0
+
+# CI Commands used on CircleCI
+ci-docker-build:
+	docker build . -t commitdev/commit0:${VERSION_TAG} -t commitdev/commit0:latest
+ 
+ci-docker-push:
+	echo "${DOCKERHUB_PASS}" | docker login -u commitdev --password-stdin
+	docker push commitdev/commit0:${VERSION_TAG}

@@ -1,0 +1,164 @@
+---
+version: 2.1
+orbs:
+  slack-message: commitdev/slack-message@0.0.3
+  version-tag: commitdev/version-tag@0.0.3
+
+variables:
+  - &workspace /home/circleci/project
+  - &build-image circleci/golang:1.13.8
+
+aliases:
+  # Shallow Clone - this allows us to cut the 2 minute repo clone down to about 10 seconds for repos with 50,000 commits+
+  - &checkout-shallow
+    name: Checkout (Shallow)
+    command: |
+      #!/bin/sh
+      set -e
+
+      # Workaround old docker images with incorrect $HOME
+      # check https://github.com/docker/docker/issues/2968 for details
+      if [ "${HOME}" = "/" ]
+      then
+        export HOME=$(getent passwd $(id -un) | cut -d: -f6)
+      fi
+
+      mkdir -p ~/.ssh
+
+      echo 'github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+      bitbucket.org ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==' >> ~/.ssh/known_hosts
+
+      (umask 077; touch ~/.ssh/id_rsa)
+      chmod 0600 ~/.ssh/id_rsa
+      (cat \<<EOF > ~/.ssh/id_rsa
+      $CHECKOUT_KEY
+      EOF
+      )
+
+      # use git+ssh instead of https
+      git config --global url."ssh://git@github.com".insteadOf "https://github.com" || true
+
+      if [ -e /home/circleci/project/.git ]
+      then
+          cd /home/circleci/project
+          git remote set-url origin "$CIRCLE_REPOSITORY_URL" || true
+      else
+          mkdir -p /home/circleci/project
+          cd /home/circleci/project
+          git clone --depth=1 "$CIRCLE_REPOSITORY_URL" .
+      fi
+
+      if [ -n "$CIRCLE_TAG" ]
+      then
+        git fetch --depth=10 --force origin "refs/tags/${CIRCLE_TAG}"
+      elif [[ "$CIRCLE_BRANCH" =~ ^pull\/* ]]
+      then
+      # For PR from Fork
+        git fetch --depth=10 --force origin "$CIRCLE_BRANCH/head:remotes/origin/$CIRCLE_BRANCH"
+      else
+        git fetch --depth=10 --force origin "$CIRCLE_BRANCH:remotes/origin/$CIRCLE_BRANCH"
+      fi
+
+      if [ -n "$CIRCLE_TAG" ]
+      then
+          git reset --hard "$CIRCLE_SHA1"
+          git checkout -q "$CIRCLE_TAG"
+      elif [ -n "$CIRCLE_BRANCH" ]
+      then
+          git reset --hard "$CIRCLE_SHA1"
+          git checkout -q -B "$CIRCLE_BRANCH"
+      fi
+
+      git reset --hard "$CIRCLE_SHA1"
+      pwd
+
+jobs:
+  checkout_code:
+    docker:
+      - image: *build-image
+    steps:
+      - run: *checkout-shallow
+      - persist_to_workspace:
+          root: /home/circleci/project
+          paths:
+            - .
+
+  unit_test:
+    docker:
+      - image: *build-image
+    working_directory: *workspace
+    steps: # steps that comprise the `build` job
+      - attach_workspace:
+          at: *workspace
+
+      - restore_cache: # restores saved cache if no changes are detected since last run
+          keys:
+            - v1-pkg-cache-{{ checksum "go.sum" }}
+            - v1-pkg-cache-
+
+      - run:
+          name: Run unit tests
+          # store the results of our tests in the $TEST_RESULTS directory
+          command: |
+            go get -u github.com/jstemmer/go-junit-report
+            mkdir -p test-reports
+            PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
+            echo "Tests: $PACKAGE_NAMES"
+            go test -v $PACKAGE_NAMES | go-junit-report > test-reports/junit.xml
+
+      - save_cache: # Store cache in the /go/pkg directory
+          key: v1-pkg-cache-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg"
+
+      - store_test_results:
+          path: test-reports
+
+      - store_artifacts:
+          path: test-reports
+
+      # Requires the SLACK_WEBHOOK
+      # - slack/notify-on-failure
+
+  build_and_push:
+    machine:
+      image: circleci/classic:latest
+      # docker_layer_caching: true # only for performance plan circleci accounts
+    steps:
+      - attach_workspace:
+          at: *workspace
+      - run: *checkout-shallow
+      - version-tag/create
+      - run:
+          name: Update Version command
+          command: |
+            ./updateVersion.sh "$VERSION_TAG"
+      - run:
+          name: Build Docker image
+          command: |
+            make ci-docker-build
+      - run:
+          name: Push to Docker Hub
+          command: |
+            make ci-docker-push
+
+
+workflows:
+    version: 2
+    # The main workflow. Check out the code, build it, push it, deploy to staging, test, deploy to production
+    build_test_and_deploy:
+      jobs:
+        - checkout_code
+
+        - unit_test:
+            requires:
+              - checkout_code
+
+        - build_and_push:
+            requires:
+              - unit_test
+            filters:
+              branches:
+                only:  # only branches matching the below regex filters will run
+                  - /^master$/
+

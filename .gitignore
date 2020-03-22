@@ -4,3 +4,6 @@ packrd
 .history/
 tmp
 .vscode
+example/
+test-reports/
+.circleci/config-compiled.yml
