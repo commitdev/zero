@@ -94,8 +94,6 @@ func GetSecrets(baseDir string) Secrets {
 			}
 		}
 
-		// @TODO deprecate
-		// writeSecrets(secretsFile, secrets)
 		return secrets
 	}
 }
