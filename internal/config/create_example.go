@@ -20,7 +20,7 @@ context:
 # - output: "github-actions"
 
 modules:
-  - source: "github.com/commit0/commit0-aws-eks-stack"`
+  - source: "github.com/commitdev/commit0-aws-eks-stack"`
 
 func CreateExample(projectName string) {
 	content := []byte(fmt.Sprintf(exampleConfig, projectName))
