@@ -1,3 +1,8 @@
+VERSION = 0.0.1
+BUILD ?=$(shell git rev-parse --short HEAD)
+PKG ?=github.com/commitdev/commit0
+BUILD_ARGS=-v -ldflags=all="-X ${PKG}/cmd.appVersion=${VERSION} -X ${PKG}/cmd.appBuild=${BUILD}"
+
 check:
 	go test ./...
 
@@ -13,7 +18,7 @@ build-example-docker: clean-example
 	docker run -v "$(shell pwd)/example/hello-world:/project" --user $(shell id -u):$(shell id -g) commit0:v0 generate -l go
 
 build:
-	go build -o commit0
+	go build ${BUILD_ARGS} 
 
 # Installs the CLI int your GOPATH
 install-go:
