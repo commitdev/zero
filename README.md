@@ -1,5 +1,9 @@
 # Commit0 [POC]
 
+**NOTE** This is a proof of concept application. Before you start using this
+tool please talk to the team in the `#product-commit0` slack channel so we can
+give you better instructions on how to get started.
+
 [![Build Status](https://travis-ci.org/commitdev/commit0.svg)](https://travis-ci.org/commitdev/commit0)
 [![Go Report Card](https://goreportcard.com/badge/github.com/commitdev/commit0?style=flat-square)](https://goreportcard.com/report/github.com/commitdev/commit0)
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/commitdev/commit0)
