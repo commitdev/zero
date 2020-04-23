@@ -1,6 +1,6 @@
 # Commit0 [POC]
 
-**NOTE** This is a proof of concept application. Before you start using this
+**NOTE** 🛑 This is a proof of concept application. Before you start using this
 tool please talk to the team in the `#product-commit0` slack channel so we can
 give you better instructions on how to get started.
 
