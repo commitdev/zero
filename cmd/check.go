@@ -42,6 +42,23 @@ func (e *commandError) Error() string {
 	return fmt.Sprintf("%s", e.ErrorText)
 }
 
+func printErrors(errors []commandError) {
+	// initialize tabwriter
+	w := new(tabwriter.Writer)
+
+	// minwidth, tabwidth, padding, padchar, flags
+	w.Init(os.Stdout, 10, 12, 2, ' ', 0)
+
+	defer w.Flush()
+
+	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "Command", "Error", "Info")
+	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "---------", "---------", "---------")
+
+	for _, e := range errors {
+		fmt.Fprintf(w, "\n%s\t%s\t%s\t", e.Command, e.ErrorText, e.Suggestion)
+	}
+}
+
 var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Print the check number of commit0",
@@ -200,6 +217,8 @@ var checkCmd = &cobra.Command{
 		fmt.Println("Checking Zero Requirements...")
 		for _, r := range required {
 			fmt.Printf("%s", r.name)
+			// In future we could parse the stderr and stdout separately, but for now it's nice to see
+			// the full output on a failure.
 			out, err := exec.Command(r.command, r.args...).CombinedOutput()
 			if err != nil {
 				cerr := commandError{
@@ -226,21 +245,10 @@ var checkCmd = &cobra.Command{
 		}
 
 		if len(errors) > 0 {
-			// initialize tabwriter
-			w := new(tabwriter.Writer)
-
-			// minwidth, tabwidth, padding, padchar, flags
-			w.Init(os.Stdout, 10, 12, 2, ' ', 0)
-
-			defer w.Flush()
-
-			fmt.Fprintf(w, "\n %s\t%s\t%s\t", "Command", "Error", "Info")
-			fmt.Fprintf(w, "\n %s\t%s\t%s\t", "---------", "---------", "---------")
-
-			for _, e := range errors {
-				fmt.Fprintf(w, "\n%s\t%s\t%s\t", e.Command, e.ErrorText, e.Suggestion)
-			}
+			printErrors((errors))
+			os.Exit(1)
 		}
+
 		fmt.Println()
 	},
 }
