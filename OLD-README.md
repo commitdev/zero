@@ -13,30 +13,30 @@ Status: Proof of Concept
 ## About Commit0
 Commit0 is a project skaffolding framework and ecosystem created to:
 
-1. Maximize knowledge sharing across an organization 
+1. Maximize knowledge sharing across an organization
 2. Easily maintain a state of the art and easily reusable implementations of production grade solutions to recurring problems
 3. Re-create the seamless deployment experience offered by PaaS solutions but with a fully open source stack that follows industry best practices
 
 With Commit0:
 - Easily deploy and integrate various boilerplate solutions
-- Instantly integrate commonly used open source microservices for authentication, user management, file encryption, image resizing etc. 
+- Instantly integrate commonly used open source microservices for authentication, user management, file encryption, image resizing etc.
 - Get a simple Push-To-Deploy workflow that you are accustomed to with popular PaaS solutions [TODO]
 - There's no vendor lock-in. It's all implemented with open source tools and deployed to your own cloud provider.
 
-## Commit0 Generator CLI 
-Commit0 CLI is an opinionated, yet fully modular code generation tool with declarative syntax that allows developers to easily integrate user prompts and interactions. 
+## Commit0 Generator CLI
+Commit0 CLI is an opinionated, yet fully modular code generation tool with declarative syntax that allows developers to easily integrate user prompts and interactions.
 
-Problems we encountered: 
+Problems we encountered:
 - It was tedious to create reusable templates and hard to maintain
 - Lack of standardization and integration interface between the templates
 - Difficult to integrate individually templated codebases
 
-How we aim to address those issues: 
+How we aim to address those issues:
 - Make templating behaviour simple and declarative
 - Clear strategy and guideline around what are clear and reusable templates
 - Standardize how templated code should get dependent parameters and start up
 
-This is inspired by: 
+This is inspired by:
 - [Yeoman Generator](https://github.com/yeoman/generator)
 - [JHipster](https://github.com/jhipster/generator-jhipster)
 - [Boilr](https://github.com/tmrts/boilr)
@@ -83,18 +83,18 @@ This is a guide on how to configure your project manually with a single file `co
 		*  [output](#template-output)
 
 ## Commit0.yaml<a name="commit0-yaml"></a>
-Your project config file. It describes the project 
+Your project config file. It describes the project
 Example:
 ```
 name: newProject
-context: 
+context:
   cognitoPoolID: xxx
-modules: 
-  - source: "github.com/commitdev/commit0-aws-eks-stack"	
+modules:
+  - source: "github.com/commitdev/commit0-aws-eks-stack"
     output: "infrastructure"
-  - source: "github.com/zthomas/react-mui-kit"	
+  - source: "github.com/zthomas/react-mui-kit"
     output: "web-app"
-``` 
+```
 
 ## Name<a name="name"></a>
 Name of your project. This will be used to name the github repos as well as in other parts of the generated code.
@@ -105,7 +105,7 @@ Required | True
 Type | String
 
 ## Context<a name="context"></a>
-A key value map of global context parameters to use in the templates. 
+A key value map of global context parameters to use in the templates.
 
 []() | |
 --- | ---
@@ -159,13 +159,13 @@ The module config file. You can configure how the templating engine should proce
 Example:
 ```
 name: react-mui-kit
-template: 
+template:
   extension: '.tmplt'
-  delimiters: 
+  delimiters:
     - '<%'
     - '%>'
   output: web-app
-``` 
+```
 
 ## Name<a name="module-name"></a>
 Name of your module. This will be used as the default module directory as well as a display name in the prompts.
@@ -207,7 +207,7 @@ Required | False
 Type | Map[String]
 
 ## Output<a name="template-output"></a>
-The default template output directory that you want the template engine to write to. This will be overwritten by the 
+The default template output directory that you want the template engine to write to. This will be overwritten by the
 
 []() | |
 --- | ---
@@ -268,7 +268,7 @@ cd test-app
 
 To run a single test for development
 ```
-go test -run TestGenerateModules "github.com/commitdev/commit0/internal/generate" -v
+go test -run TestGenerateModules "github.com/commitdev/zero/internal/generate" -v
 ```
 
 ### Building locally

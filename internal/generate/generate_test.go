@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	config "github.com/commitdev/commit0/internal/config"
+	config "github.com/commitdev/zero/internal/config"
 )
 
 func setupTeardown(t *testing.T) func(t *testing.T) {

@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/commitdev/commit0/internal/config"
-	"github.com/commitdev/commit0/internal/context"
-	"github.com/commitdev/commit0/pkg/util/exit"
+	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/context"
+	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/spf13/cobra"
 )
 

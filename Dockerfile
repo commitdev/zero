@@ -22,15 +22,15 @@ RUN chmod +x /usr/local/bin/* && \
 
 # Hydrate the dependency cache. This way, if the go.mod or go.sum files do not
 # change we can cache the depdency layer without having to reinstall them.
-WORKDIR /tmp/commit0
+WORKDIR /tmp/zero
 COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
 
 RUN make build && \
-  mv commit0 /usr/local/bin && \
-  upx --lzma /usr/local/bin/commit0
+  mv zero /usr/local/bin && \
+  upx --lzma /usr/local/bin/zero
 
 FROM alpine:3.10
 ENV \
@@ -45,4 +45,4 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /go/src/github.com/grpc-ecosystem/grpc-gateway ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
 WORKDIR /project
 
-ENTRYPOINT ["/usr/local/bin/commit0"]
+ENTRYPOINT ["/usr/local/bin/zero"]

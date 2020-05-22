@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/commitdev/commit0/configs"
-	"github.com/commitdev/commit0/internal/config"
-	"github.com/commitdev/commit0/internal/generate"
+	"github.com/commitdev/zero/configs"
+	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/generate"
 	"github.com/spf13/cobra"
 )
 

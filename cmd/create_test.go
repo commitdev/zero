@@ -25,6 +25,6 @@ func TestCreateWorks(t *testing.T) {
 	// }
 
 	// if st.Size() == 0 {
-	// 	t.Fatalf("commit0.yml is empty")
+	// 	t.Fatalf("zero.yml is empty")
 	// }
 }

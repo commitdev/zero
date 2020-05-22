@@ -9,9 +9,9 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/commitdev/commit0/configs"
-	"github.com/commitdev/commit0/internal/config"
-	"github.com/commitdev/commit0/internal/util"
+	"github.com/commitdev/zero/configs"
+	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/util"
 	"github.com/hashicorp/go-getter"
 	"github.com/manifoldco/promptui"
 )
@@ -45,7 +45,7 @@ func NewTemplateModule(moduleCfg config.ModuleInstance) (*TemplateModule, error)
 		}
 	}
 
-	configPath := path.Join(sourcePath, "commit0.module.yml")
+	configPath := path.Join(sourcePath, "zero-module.yml")
 	moduleConfig := config.LoadModuleConfig(configPath)
 	templateModule.Config = *moduleConfig
 

@@ -17,7 +17,7 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of commit0",
+	Short: "Print the version number of zero",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("version: %v\n", appVersion)
 		fmt.Printf("build: %v\n", appBuild)
