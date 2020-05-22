@@ -5,10 +5,10 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
-	"strconv"
 	"strings"
 	"text/tabwriter"
 
+	"github.com/coreos/go-semver/semver"
 	"github.com/spf13/cobra"
 )
 
@@ -17,11 +17,12 @@ func init() {
 }
 
 type requirement struct {
-	name    string
-	command string
-	args    []string
-	docsURL string
-	checker func([]byte) (string, error)
+	name       string
+	command    string
+	args       []string
+	minVersion string
+	regexStr   string
+	docsURL    string
 }
 
 type versionError struct {
@@ -59,6 +60,37 @@ func printErrors(errors []commandError) {
 	}
 }
 
+// getSemver uses the regular expression from the requirement to parse the
+// output of a command and extract the version from it. Returns the version
+// or an error if the version string could not be parsed.
+func getSemver(req requirement, out []byte) (*semver.Version, error) {
+	re := regexp.MustCompile(req.regexStr)
+	v := re.FindStringSubmatch(string(out))
+	if len(v) < 4 {
+		return nil, &commandError{
+			req.command,
+			"Could not find version number in output",
+			fmt.Sprintf("Try running %s %s locally and checking it works.", req.command, strings.Join(req.args, " ")),
+		}
+	}
+	versionString := fmt.Sprintf("%s.%s.%s", v[1], v[2], v[3])
+	version, err := semver.NewVersion(versionString)
+	if err != nil {
+		return version, err
+	}
+	return version, nil
+}
+
+// checkSemver validates that the version of a tool meets the minimum required
+// version listed in your requirement. Returns a boolean.
+// For more information on parsing semver, see semver.org
+// If your tool doesn't do full semver then you may need to add custom logic
+// to support it.
+func checkSemver(req requirement, actualVersion *semver.Version) bool {
+	requiredVersion := semver.New(req.minVersion)
+	return actualVersion.LessThan(*requiredVersion)
+}
+
 var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Print the check number of commit0",
@@ -66,149 +98,45 @@ var checkCmd = &cobra.Command{
 		// Add any new requirements to this slice.
 		required := []requirement{
 			{
-				name:    "AWS CLI\t\t",
-				command: "aws",
-				args:    []string{"--version"},
-				docsURL: "",
-				checker: func(output []byte) (string, error) {
-					ver := ""
-					re := regexp.MustCompile(`aws-cli/([0-9]+)\.([0-9]+)\.([0-9]+)`)
-					m := re.FindStringSubmatch(string(output))
-					major, err := strconv.ParseInt(m[1], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-					minor, err := strconv.ParseInt(m[2], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-					patch, err := strconv.ParseInt(m[3], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-
-					ver = fmt.Sprintf("%d.%d.%d", major, minor, patch)
-
-					if major < 1 || (major == 1 && minor < 16) {
-						return ver, &versionError{"Requires 1.16 or greater."}
-					}
-
-					return ver, err
-				}},
-			{
-				name:    "Kubectl\t\t",
-				command: "kubectl",
-				args:    []string{"version", "--client=true"},
-				docsURL: "https://kubernetes.io/docs/tasks/tools/install-kubectl/",
-				checker: func(output []byte) (string, error) {
-					ver := ""
-					re := regexp.MustCompile(`version\.Info{Major:"([0-9]+)", Minor:"([0-9]+)"`)
-					m := re.FindStringSubmatch(string(output))
-					major, err := strconv.ParseInt(m[1], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-					minor, err := strconv.ParseInt(m[2], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-
-					ver = fmt.Sprintf("%d.%d", major, minor)
-
-					if major < 1 || (major == 1 && minor < 12) {
-						return ver, &versionError{"Requires 2.12 or greater."}
-					}
-
-					return ver, err
-				},
+				name:       "AWS CLI\t\t",
+				command:    "aws",
+				args:       []string{"--version"},
+				regexStr:   `aws-cli\/(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)`,
+				minVersion: "1.16.0",
+				docsURL:    "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html",
 			},
 			{
-				name:    "Terraform\t",
-				command: "terraform",
-				args:    []string{"version"},
-				docsURL: "https://www.terraform.io/downloads.html",
-				checker: func(output []byte) (string, error) {
-					ver := ""
-					re := regexp.MustCompile(`Terraform v([0-9]+)\.([0-9]+)\.([0-9]+)`)
-					m := re.FindStringSubmatch(string(output))
-					major, err := strconv.ParseInt(m[1], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-					minor, err := strconv.ParseInt(m[2], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-					patch, err := strconv.ParseInt(m[3], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-
-					ver = fmt.Sprintf("%d.%d.%d", major, minor, patch)
-
-					if major < 0 || (major == 0 && minor < 12) {
-						return ver, &versionError{"Zero requires terraform 0.12 or greater."}
-					}
-
-					return ver, err
-				},
+				name:       "Kubectl\t\t",
+				command:    "kubectl",
+				args:       []string{"version", "--client=true", "--short"},
+				regexStr:   `Client Version: v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)`,
+				minVersion: "1.15.2",
+				docsURL:    "https://kubernetes.io/docs/tasks/tools/install-kubectl/",
 			},
 			{
-				name:    "jq\t\t",
-				command: "jq",
-				args:    []string{"--version"},
-				docsURL: "https://stedolan.github.io/jq/download/",
-				checker: func(output []byte) (string, error) {
-					ver := ""
-					re := regexp.MustCompile(`jq-([0-9]+)\.([0-9]+)-`)
-					m := re.FindStringSubmatch(string(output))
-					major, err := strconv.ParseInt(m[1], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-					minor, err := strconv.ParseInt(m[2], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-
-					ver = fmt.Sprintf("%d.%d", major, minor)
-
-					if major < 1 || (major == 1 && minor < 5) {
-						return ver, &versionError{"Requires jq version 1.15 or greater."}
-					}
-
-					return ver, err
-				}},
+				name:       "Terraform\t",
+				command:    "terraform",
+				args:       []string{"version"},
+				regexStr:   `Terraform v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)`,
+				minVersion: "0.12.0",
+				docsURL:    "https://www.terraform.io/downloads.html",
+			},
 			{
-				name:    "Git\t\t",
-				command: "git",
-				args:    []string{"version"},
-				docsURL: "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git",
-				checker: func(output []byte) (string, error) {
-					ver := ""
-					re := regexp.MustCompile(`git version ([0-9]+)\.([0-9]+)\.([0-9]+)`)
-					m := re.FindStringSubmatch(string(output))
-					major, err := strconv.ParseInt(m[1], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-					minor, err := strconv.ParseInt(m[2], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-					patch, err := strconv.ParseInt(m[3], 0, 64)
-					if err != nil {
-						return ver, err
-					}
-
-					ver = fmt.Sprintf("%d.%d.%d", major, minor, patch)
-
-					if major < 2 || (major == 2 && minor < 12) {
-						return ver, &versionError{"Zero requires git version 2.12 or greater."}
-					}
-
-					return ver, err
-				}},
+				name:       "jq\t\t",
+				command:    "jq",
+				args:       []string{"--version"},
+				regexStr:   `jq-(0|[1-9]\d*)\.(0|[1-9]\d*)-(0|[1-9]\d*)`,
+				minVersion: "1.5.0",
+				docsURL:    "https://stedolan.github.io/jq/download/",
+			},
+			{
+				name:       "Git\t\t",
+				command:    "git",
+				args:       []string{"version"},
+				regexStr:   `^git version (0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)`,
+				minVersion: "2.17.1",
+				docsURL:    "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git",
+			},
 		}
 
 		// Store and errors from the commands we run.
@@ -230,11 +158,21 @@ var checkCmd = &cobra.Command{
 				fmt.Printf("\033[0;31mFAIL\033[0m\t\t%s\n", "-")
 				continue
 			}
-			version, err := r.checker(out)
+			version, err := getSemver(r, out)
 			if err != nil {
 				cerr := commandError{
 					r.command,
 					err.Error(),
+					r.docsURL,
+				}
+				errors = append(errors, cerr)
+				fmt.Printf("\033[0;31mFAIL\033[0m\t\t%s\n", version)
+				continue
+			}
+			if checkSemver(r, version) {
+				cerr := commandError{
+					r.command,
+					fmt.Sprintf("Version does not meet required. Want: %s; Got: %s", r.minVersion, version),
 					r.docsURL,
 				}
 				errors = append(errors, cerr)
@@ -245,7 +183,7 @@ var checkCmd = &cobra.Command{
 		}
 
 		if len(errors) > 0 {
-			printErrors((errors))
+			printErrors(errors)
 			os.Exit(1)
 		}
 
