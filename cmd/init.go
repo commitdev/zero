@@ -20,8 +20,7 @@ var initCmd = &cobra.Command{
 		}
 
 		projectName := args[0]
-		context.Create(projectName, "./")
-
-		config.CreateExample(projectName)
+		projectContext := context.Init(projectName, config.RootDir)
+		config.Init(config.RootDir, projectName, projectContext)
 	},
 }

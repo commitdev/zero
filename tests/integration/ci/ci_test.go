@@ -34,7 +34,7 @@ package ci_test
 
 // 	var waitgroup sync.WaitGroup
 
-// 	testConf := &config.Commit0Config{}
+// 	testConf := &config.ZeroProjectConfig{}
 // 	testCI := config.CI{
 // 		System:       "jenkins",
 // 		BuildImage:   "golang/golang",
@@ -72,7 +72,7 @@ package ci_test
 
 // 	var waitgroup sync.WaitGroup
 
-// 	testConf := &config.Commit0Config{}
+// 	testConf := &config.ZeroProjectConfig{}
 // 	testCI := config.CI{
 // 		System:       "circleci",
 // 		BuildImage:   "golang/golang",
@@ -110,7 +110,7 @@ package ci_test
 
 // 	var waitgroup sync.WaitGroup
 
-// 	testConf := &config.Commit0Config{}
+// 	testConf := &config.ZeroProjectConfig{}
 // 	testCI := config.CI{
 // 		System:       "travisci",
 // 		Language:     "go",

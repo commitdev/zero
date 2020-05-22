@@ -35,7 +35,9 @@ func GenerateModules(cfg *config.GeneratorConfig) {
 
 	// Prompt for module params and execute each of the generator modules
 	for _, mod := range templateModules {
-		err := mod.PromptParams()
+		// FIXME:(david) generate flow probably wont need prompts anymore
+		// added an empty map to fix test temporarily
+		err := mod.PromptParams(map[string]string{})
 		if err != nil {
 			flog.Warnf("module %s: params prompt failed", mod.Source)
 		}

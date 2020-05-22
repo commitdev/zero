@@ -3,8 +3,11 @@ package module
 import (
 	"crypto/md5"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"log"
+	"os"
+	"os/exec"
 	"path"
 	"regexp"
 	"sync"
@@ -52,8 +55,23 @@ func NewTemplateModule(moduleCfg config.ModuleInstance) (*TemplateModule, error)
 	return &templateModule, nil
 }
 
+func appendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []string {
+	for key, val := range envMap {
+		if val != "" {
+			envList = append(envList, fmt.Sprintf("%s=%s", key, val))
+		}
+	}
+	return envList
+}
+
+// aws cli prints output with linebreak in them
+func sanitizePromptResult(str string) string {
+	re := regexp.MustCompile("\\n")
+	return re.ReplaceAllString(str, "")
+}
+
 // PromptParams renders series of prompt UI based on the config
-func (m *TemplateModule) PromptParams() error {
+func (m *TemplateModule) PromptParams(projectContext map[string]string) error {
 	for _, promptConfig := range m.Config.Prompts {
 
 		label := promptConfig.Label
@@ -70,6 +88,17 @@ func (m *TemplateModule) PromptParams() error {
 			}
 			_, result, err = prompt.Run()
 
+		} else if promptConfig.Execute != "" {
+			// TODO: this could perhaps be set as a default for part of regular prompt
+			cmd := exec.Command("bash", "-c", promptConfig.Execute)
+			cmd.Env = appendProjectEnvToCmdEnv(projectContext, os.Environ())
+			out, err := cmd.Output()
+
+			if err != nil {
+				log.Fatalf("Failed to execute  %v\n", err)
+				panic(err)
+			}
+			result = string(out)
 		} else {
 			prompt := promptui.Prompt{
 				Label: label,
@@ -80,10 +109,12 @@ func (m *TemplateModule) PromptParams() error {
 			return err
 		}
 
+		result = sanitizePromptResult(result)
 		if m.Params == nil {
 			m.Params = make(map[string]string)
 		}
 		m.Params[promptConfig.Field] = result
+		projectContext[promptConfig.Field] = result
 	}
 
 	return nil

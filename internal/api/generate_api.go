@@ -15,7 +15,7 @@ func generateProject(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "POST":
 		decoder := json.NewDecoder(req.Body)
-		var projectConfig config.Commit0Config
+		var projectConfig config.ZeroProjectConfig
 		err := decoder.Decode(&projectConfig)
 		if err != nil {
 			panic(err)

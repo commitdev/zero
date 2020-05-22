@@ -3,6 +3,7 @@ module github.com/commitdev/zero
 go 1.12
 
 require (
+	github.com/766b/go-outliner v0.0.0-20180511142203-fc6edecdadd7 // indirect
 	github.com/aws/aws-sdk-go v1.25.33
 	github.com/commitdev/commit0 v0.0.0-20200522203431-5176cd09c654
 	github.com/coreos/go-semver v0.2.0

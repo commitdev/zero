@@ -15,13 +15,15 @@ type ModuleConfig struct {
 	Icon        string
 	Thumbnail   string
 	Template    TemplateConfig
-	Prompts     []Prompt
+	Credentials []string `yaml:"requiredCredentials"`
+	Prompts     []Prompt `yaml:"parameters"`
 }
 
 type Prompt struct {
-	Field   string
+	Field   string `yaml:"field,omitempty"`
 	Label   string
-	Options []string
+	Options []string `yaml:"options,omitempty"`
+	Execute string   `yaml:"execute,omitempty"`
 }
 
 type TemplateConfig struct {

@@ -8,10 +8,11 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-type Commit0Config struct {
+type ZeroProjectConfig struct {
 	Name           string
 	Infrastructure Infrastructure // TODO simplify and flatten / rename?
 	Context        map[string]string
+	Modules        []string
 }
 
 type Infrastructure struct {
@@ -28,8 +29,8 @@ type terraform struct {
 	RemoteState bool
 }
 
-func LoadConfig(filePath string) *Commit0Config {
-	config := &Commit0Config{}
+func LoadConfig(filePath string) *ZeroProjectConfig {
+	config := &ZeroProjectConfig{}
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Panicf("failed to read config: %v", err)
@@ -42,6 +43,6 @@ func LoadConfig(filePath string) *Commit0Config {
 	return config
 }
 
-func (c *Commit0Config) Print() {
+func (c *ZeroProjectConfig) Print() {
 	pp.Println(c)
 }
