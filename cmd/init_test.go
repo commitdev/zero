@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestCreateWorks(t *testing.T) {
+func TestInitWorks(t *testing.T) {
 	// @TODO : Figure out a way to test this
 	// tmpdir, err := ioutil.TempDir("", "commit0-")
 	// if err != nil {

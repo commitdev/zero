@@ -73,6 +73,12 @@ func getSemver(req requirement, out []byte) (*semver.Version, error) {
 			fmt.Sprintf("Try running %s %s locally and checking it works.", req.command, strings.Join(req.args, " ")),
 		}
 	}
+
+	// Default patch version number to 0 if it doesn't exist
+	if v[3] == "" {
+		v[3] = "0"
+	}
+
 	versionString := fmt.Sprintf("%s.%s.%s", v[1], v[2], v[3])
 	version, err := semver.NewVersion(versionString)
 	if err != nil {
@@ -125,7 +131,7 @@ var checkCmd = &cobra.Command{
 				name:       "jq\t\t",
 				command:    "jq",
 				args:       []string{"--version"},
-				regexStr:   `jq-(0|[1-9]\d*)\.(0|[1-9]\d*)-(0|[1-9]\d*)`,
+				regexStr:   `jq-(0|[1-9]\d*)\.(0|[1-9]\d*)\-?(0|[1-9]\d*)?`,
 				minVersion: "1.5.0",
 				docsURL:    "https://stedolan.github.io/jq/download/",
 			},
