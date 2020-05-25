@@ -20,7 +20,7 @@ func TestGenerateModules(t *testing.T) {
 	defer teardown(t)
 
 	// TODO organize test utils and write assertions
-	generatorConfig := config.LoadGeneratorConfig("../../tests/test_data/configs/commit0_basic.yml")
+	generatorConfig := config.LoadGeneratorConfig("../../tests/test_data/configs/zero-basic.yml")
 
 	GenerateModules(generatorConfig)
 }
