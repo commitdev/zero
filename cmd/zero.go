@@ -8,8 +8,8 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "commit0",
-	Short: "Commit0 is a modular service generator.",
+	Use:   "zero",
+	Short: "zero gets you to writing code quicker.",
 	Long:  `TODO`,
 	Run: func(cmd *cobra.Command, args []string) {
 	},

@@ -3,7 +3,7 @@ package exit
 import (
 	"os"
 
-	"github.com/commitdev/commit0/pkg/util/flog"
+	"github.com/commitdev/zero/pkg/util/flog"
 )
 
 const (

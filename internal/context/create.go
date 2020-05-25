@@ -10,10 +10,10 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/commitdev/commit0/internal/config"
-	project "github.com/commitdev/commit0/pkg/credentials"
-	"github.com/commitdev/commit0/pkg/util/exit"
-	"github.com/commitdev/commit0/pkg/util/flog"
+	"github.com/commitdev/zero/internal/config"
+	project "github.com/commitdev/zero/pkg/credentials"
+	"github.com/commitdev/zero/pkg/util/exit"
+	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/manifoldco/promptui"
 )
 

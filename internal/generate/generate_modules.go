@@ -9,15 +9,15 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/commitdev/commit0/internal/config"
-	"github.com/commitdev/commit0/internal/module"
-	"github.com/commitdev/commit0/internal/util"
-	"github.com/commitdev/commit0/pkg/util/exit"
-	"github.com/commitdev/commit0/pkg/util/flog"
+	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/module"
+	"github.com/commitdev/zero/internal/util"
+	"github.com/commitdev/zero/pkg/util/exit"
+	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/k0kubun/pp"
 
-	"github.com/commitdev/commit0/configs"
-	"github.com/commitdev/commit0/pkg/util/fs"
+	"github.com/commitdev/zero/configs"
+	"github.com/commitdev/zero/pkg/util/fs"
 )
 
 func GenerateModules(cfg *config.GeneratorConfig) {

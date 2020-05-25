@@ -1,17 +1,17 @@
 package cmd
 
 import (
-	"github.com/commitdev/commit0/internal/api"
+	"github.com/commitdev/zero/internal/api"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	rootCmd.AddCommand(commit0api)
+	rootCmd.AddCommand(zeroApi)
 }
 
-var commit0api = &cobra.Command{
+var zeroApi = &cobra.Command{
 	Use:   "ui",
-	Short: "Run Commit0 Api",
+	Short: "Run zero Api",
 	Run: func(cmd *cobra.Command, args []string) {
 		api.Commit0Api()
 	},

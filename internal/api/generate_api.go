@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/commitdev/commit0/internal/config"
+	"github.com/commitdev/zero/internal/config"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )

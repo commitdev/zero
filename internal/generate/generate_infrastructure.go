@@ -5,11 +5,11 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/commitdev/commit0/internal/config"
-	"github.com/commitdev/commit0/internal/util"
-	"github.com/commitdev/commit0/pkg/credentials"
-	project "github.com/commitdev/commit0/pkg/credentials"
-	"github.com/commitdev/commit0/pkg/util/flog"
+	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/util"
+	"github.com/commitdev/zero/pkg/credentials"
+	project "github.com/commitdev/zero/pkg/credentials"
+	"github.com/commitdev/zero/pkg/util/flog"
 )
 
 // @TODO: These are specific to a k8s version. If we make the version a config option we will need to change this

@@ -11,7 +11,7 @@ import (
 	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/commitdev/commit0/internal/config"
+	"github.com/commitdev/zero/internal/config"
 	"github.com/manifoldco/promptui"
 	"gopkg.in/yaml.v2"
 )

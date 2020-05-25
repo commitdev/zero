@@ -1,8 +1,8 @@
-# Commit0 Api
+# zero Api
 
 ## Usage
  - To run:
- `commit0 api`
+ `zero api`
  - Endpoint:
     - POST `localhost:8080/{version}/generate`
  - Post request body json example:

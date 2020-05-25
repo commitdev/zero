@@ -8,9 +8,9 @@ package ci_test
 // 	"sync"
 // 	"testing"
 
-// 	"github.com/commitdev/commit0/internal/config"
-// 	"github.com/commitdev/commit0/internal/generate/ci"
-// 	"github.com/commitdev/commit0/internal/templator"
+// 	"github.com/commitdev/zero/internal/config"
+// 	"github.com/commitdev/zero/internal/generate/ci"
+// 	"github.com/commitdev/zero/internal/templator"
 // 	"github.com/gobuffalo/packr/v2"
 // )
 
