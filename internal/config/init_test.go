@@ -23,7 +23,8 @@ func TestInit(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config.Init(config.RootDir, projectName, nil)
+	projectConfig := config.ZeroProjectConfig{}
+	config.Init(config.RootDir, projectName, &projectConfig)
 
 	if _, err := os.Stat(path.Join(testDirPath, configs.ZeroProjectYml)); err != nil {
 		t.Fatal(err)

@@ -1,7 +1,6 @@
 package context
 
 import (
-	"log"
 	"os"
 	"path"
 
@@ -18,6 +17,8 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
+type Registry map[string][]string
+
 // Create cloud provider context
 func Init(projectName string, outDir string) *config.ZeroProjectConfig {
 	rootDir := path.Join(outDir, projectName)
@@ -31,11 +32,11 @@ func Init(projectName string, outDir string) *config.ZeroProjectConfig {
 	}
 
 	projectConfig := defaultProjConfig(projectName)
-	promptProjectName(projectName, &projectConfig)
-	chooseStack(&projectConfig)
-
-	// TODO: load ~/.zero/config.yml (or credentials)
-	// TODO: prompt global credentials
+	projectConfig.Name = promptProjectName(projectName)
+	projectConfig.Context["ShouldPushRepoUpstream"] = promptPushRepoUpstream()
+	projectConfig.Context["GithubRootOrg"] = promptGithubRootOrg()
+	projectConfig.Context["githubPersonalToken"] = promptGithubPersonalToken(projectName)
+	projectConfig.Modules = chooseStack(getRegistry())
 
 	// chooseCloudProvider(&projectConfig)
 	// fmt.Println(&projectConfig)
@@ -44,6 +45,8 @@ func Init(projectName string, outDir string) *config.ZeroProjectConfig {
 	// fmt.Println(&projectConfig)
 
 	promptAllModules(&projectConfig)
+	// TODO: load ~/.zero/config.yml (or credentials)
+	// TODO: prompt global credentials
 
 	return &projectConfig
 }
@@ -55,19 +58,74 @@ func promptAllModules(projectConfig *config.ZeroProjectConfig) {
 		mod, _ := module.NewTemplateModule(config.ModuleInstance{Source: moduleSource})
 		err := mod.PromptParams(projectConfig.Context)
 		if err != nil {
-			log.Fatalf("Exiting prompt:  %v\n", err)
-			panic(err)
+			exit.Fatal("Exiting prompt:  %v\n", err)
 		}
 	}
 }
 
-func promptProjectName(projectName string, projectConfig *config.ZeroProjectConfig) {
+// global configs
+func promptPushRepoUpstream() string {
+	providerPrompt := promptui.Prompt{
+		Label:     "Should the created projects be checked into github automatically? (y/n)",
+		Default:   "y",
+		AllowEdit: false,
+	}
+	providerResult, err := providerPrompt.Run()
+	if err != nil {
+		exit.Fatal("Exiting prompt:  %v\n", err)
+	}
+	return providerResult
+}
+
+func promptGithubRootOrg() string {
+	providerPrompt := promptui.Prompt{
+		Label:     "What's the root of the github org to create repositories in?",
+		Default:   "github.com/",
+		AllowEdit: true,
+	}
+	result, err := providerPrompt.Run()
+	if err != nil {
+		exit.Fatal("Exiting prompt:  %v\n", err)
+	}
+	return result
+}
+
+func promptGithubPersonalToken(projectName string) string {
+	defaultToken := ""
+
+	project := config.GetUserCredentials(projectName)
+	if project.GithubResourceConfig.AccessToken != "" {
+		defaultToken = project.GithubResourceConfig.AccessToken
+	}
+
+	providerPrompt := promptui.Prompt{
+		Label:   "Github Personal Access Token with access to the above organization",
+		Default: defaultToken,
+	}
+	result, err := providerPrompt.Run()
+	if err != nil {
+		exit.Fatal("Prompt failed %v\n", err)
+	}
+
+	// If its different from saved token, update it
+	if project.GithubResourceConfig.AccessToken != result {
+		project.GithubResourceConfig.AccessToken = result
+		config.Save(project)
+	}
+	return result
+}
+
+func promptProjectName(projectName string) string {
 	providerPrompt := promptui.Prompt{
 		Label:     "Project Name",
 		Default:   projectName,
 		AllowEdit: false,
 	}
-	providerPrompt.Run()
+	result, err := providerPrompt.Run()
+	if err != nil {
+		exit.Fatal("Prompt failed %v\n", err)
+	}
+	return result
 }
 
 func chooseCloudProvider(projectConfig *config.ZeroProjectConfig) {
@@ -79,8 +137,7 @@ func chooseCloudProvider(projectConfig *config.ZeroProjectConfig) {
 
 	_, providerResult, err := providerPrompt.Run()
 	if err != nil {
-		log.Fatalf("Prompt failed %v\n", err)
-		panic(err)
+		exit.Fatal("Prompt failed %v\n", err)
 	}
 
 	if providerResult != "Amazon AWS" {
@@ -88,8 +145,8 @@ func chooseCloudProvider(projectConfig *config.ZeroProjectConfig) {
 	}
 }
 
-func chooseStack(projectConfig *config.ZeroProjectConfig) {
-	items := map[string][]string{
+func getRegistry() Registry {
+	return Registry{
 		// TODO: better place to store these options as configuration file or any source
 		"EKS + Go + React": []string{
 			"github.com/commitdev/zero-aws-eks-stack",
@@ -98,24 +155,29 @@ func chooseStack(projectConfig *config.ZeroProjectConfig) {
 		},
 		"Custom": []string{},
 	}
+}
 
-	labels := make([]string, len(items))
+func (registry Registry) availableLabels() []string {
+	labels := make([]string, len(registry))
 	i := 0
-	for label := range items {
+	for label := range registry {
 		labels[i] = label
 		i++
 	}
+	return labels
+}
 
+func chooseStack(registry Registry) []string {
 	providerPrompt := promptui.Select{
 		Label: "Pick a stack you'd like to use",
-		Items: labels,
+		Items: registry.availableLabels(),
 	}
 	_, providerResult, err := providerPrompt.Run()
 	if err != nil {
-		log.Fatalf("Prompt failed %v\n", err)
-		panic(err)
+		exit.Fatal("Prompt failed %v\n", err)
 	}
-	projectConfig.Modules = items[providerResult]
+	return registry[providerResult]
+
 }
 
 func fillProviderDetails(projectConfig *config.ZeroProjectConfig, s project.Secrets) {

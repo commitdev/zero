@@ -78,9 +78,14 @@ func (m *TemplateModule) PromptParams(projectContext map[string]string) error {
 		if promptConfig.Label == "" {
 			label = promptConfig.Field
 		}
+
+		// deduplicate fields already prompted and received
+		if _, isAlreadySet := projectContext[promptConfig.Field]; isAlreadySet {
+			continue
+		}
+
 		var err error
 		var result string
-
 		if len(promptConfig.Options) > 0 {
 			prompt := promptui.Select{
 				Label: label,
