@@ -8,7 +8,7 @@ import (
 var applyConfigPath string
 
 func init() {
-	applyCmd.PersistentFlags().StringVarP(&applyConfigPath, "config", "c", configs.CommitYml, "config path")
+	applyCmd.PersistentFlags().StringVarP(&applyConfigPath, "config", "c", configs.ZeroProjectYml, "config path")
 
 	rootCmd.AddCommand(applyCmd)
 }

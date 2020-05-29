@@ -22,7 +22,7 @@ var amiLookup = map[string]string{
 }
 
 // GetOutputs captures the terraform output for the specific variables
-func GetOutputs(cfg *config.Commit0Config, pathPrefix string, outputs []string) map[string]string {
+func GetOutputs(cfg *config.ZeroProjectConfig, pathPrefix string, outputs []string) map[string]string {
 	outputsMap := make(map[string]string)
 	envars := credentials.MakeAwsEnvars(cfg, project.GetSecrets(util.GetCwd()))
 	pathPrefix = filepath.Join(pathPrefix, "environments/staging")
@@ -36,7 +36,7 @@ func GetOutputs(cfg *config.Commit0Config, pathPrefix string, outputs []string) 
 }
 
 // Init sets up anything required by Execute
-func Init(cfg *config.Commit0Config, pathPrefix string) {
+func Init(cfg *config.ZeroProjectConfig, pathPrefix string) {
 	if cfg.Infrastructure.AWS.AccountID != "" {
 		flog.Infof("Preparing aws environment...")
 
@@ -56,7 +56,7 @@ func Init(cfg *config.Commit0Config, pathPrefix string) {
 }
 
 // Execute terrafrom init & plan. May modify the config passed in
-func Execute(cfg *config.Commit0Config, pathPrefix string) {
+func Execute(cfg *config.ZeroProjectConfig, pathPrefix string) {
 	if cfg.Infrastructure.AWS.AccountID != "" {
 		log.Println("Preparing aws environment...")
 
