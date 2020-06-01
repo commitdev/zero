@@ -1,22 +1,17 @@
-package cmd
+package vcs
 
 import (
 	"context"
 	"fmt"
 	"github.com/machinebox/graphql"
-	"os"
 	"os/exec"
 )
 
 // this is being developed with the following assumptions:
-// 1. the initializeRepositories function and its deps will be moved into cmd/create.go eventually
-// 2. i didn't implement cobra.Command.  assuming this will get used by the Create command eventually
-// 3. create.go will handle parsing the repo names and github credentials and pass them into initializeRepostiories().
-// 4. configs are just hardcoded here for testing purposes
-// 5. if organizationName is set, create an org owned repo.  if not, create a personal repo.
+// 1. create.go will handle parsing the repo names and github credentials and pass them into initializeRepostiories().
+// 2. if organizationName is set, create an org owned repo.  if not, create a personal repo.
 
-// takes a list of directories containing modules to create a repos and and do initial commit for
-// can be converted to a private function if moved into create.go
+// takes a list of subdirectories containing modules to create a repository and do initial commit for
 func InitializeRepositories(moduleDirs []string, remoteRepository string, organizationName string, githubApiKey string) {
 
 	for _, moduleDir := range moduleDirs {
@@ -173,11 +168,6 @@ func doInitialCommit(moduleDir string, remoteRepository string) error {
 		},
 	}
 
-	// create README.md. may not need this.
-	if err := createReadme(moduleDir); err != nil {
-		return err
-	}
-
 	for _, command := range commands {
 		fmt.Printf(">> %s\n", command.description)
 
@@ -197,26 +187,6 @@ func doInitialCommit(moduleDir string, remoteRepository string) error {
 	}
 
 	fmt.Printf("Repository successfully initialized for module: %s\n", moduleDir)
-
-	return nil
-}
-
-func createReadme(moduleDir string) error {
-	fmt.Println(">> create readme file")
-
-	readmeFilename := fmt.Sprintf("./%s/README.md", moduleDir)
-	readmeFile, err := os.Create(readmeFilename)
-	if err != nil {
-		return err
-	}
-	defer readmeFile.Close()
-
-	readmeContent := "# repository created using zero"
-	cmd := exec.Command("echo", readmeContent)
-	cmd.Stdout = readmeFile
-	if err := cmd.Start(); err != nil {
-		return err
-	}
 
 	return nil
 }
