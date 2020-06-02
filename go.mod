@@ -24,7 +24,7 @@ require (
 	github.com/matryer/is v1.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/spf13/cobra v0.0.6
-	github.com/stretchr/testify v1.5.1 // indirect
+	github.com/stretchr/testify v1.4.0
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
 	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
