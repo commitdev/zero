@@ -3,8 +3,12 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os/exec"
+	"path/filepath"
+	"strings"
 
 	"github.com/commitdev/zero/internal/constants"
+	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -40,15 +44,18 @@ Only a single environment may be suitable for an initial test, but for a real sy
 		}
 
 		// @TODO : Pass environments to make commands
+
+		var config interface{}
+		makeAll(config, applyEnvironments)
 	},
 }
 
 // promptEnvironments Prompts the user for the environments to apply against and returns a slice of strings representing the environments
 func promptEnvironments() []string {
 	items := map[string][]string{
-		"Staging ":                    []string{"staging"},
-		"Production":                  []string{"production"},
-		"Both Staging and Production": []string{"staging", "production"},
+		"Staging ":                    {"staging"},
+		"Production":                  {"production"},
+		"Both Staging and Production": {"staging", "production"},
 	}
 
 	var labels []string
@@ -66,4 +73,24 @@ func promptEnvironments() []string {
 		panic(err)
 	}
 	return items[providerResult]
+}
+
+func makeAll(config interface{}, envars []string) error {
+	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(envars, ","))
+	projects := projectPaths(config)
+
+	for _, project := range projects {
+		absPath, err := filepath.Abs(project)
+		if err != nil {
+			return err
+		}
+		output := util.ExecuteCommandOutput(exec.Command("make", environmentArg), absPath, envars)
+		fmt.Println(output)
+	}
+	return nil
+}
+
+// @TODO extract project paths from some config/yaml
+func projectPaths(someConfig interface{}) []string {
+	return []string{"foo", "bar", "baz"}
 }

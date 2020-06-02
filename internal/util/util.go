@@ -10,6 +10,7 @@ import (
 	"path"
 	"strings"
 	"text/template"
+
 	"github.com/google/uuid"
 )
 
@@ -83,6 +84,8 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 	}
 }
 
+// ExecuteCommandOutput runs the command and returns its
+// combined standard output and standard error.
 func ExecuteCommandOutput(cmd *exec.Cmd, pathPrefix string, envars []string) string {
 	dir := GetCwd()
 
