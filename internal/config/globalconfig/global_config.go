@@ -1,4 +1,4 @@
-package config
+package globalconfig
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"os/user"
 	"path"
 
-	"github.com/commitdev/zero/configs"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/pkg/util/exit"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -69,9 +69,9 @@ func getCredentialsPath() string {
 		exit.Fatal("Failed to get user directory path: %v", err)
 	}
 
-	rootDir := path.Join(usr.HomeDir, configs.ZeroHomeDirectory)
+	rootDir := path.Join(usr.HomeDir, constants.ZeroHomeDirectory)
 	os.MkdirAll(rootDir, os.ModePerm)
-	filePath := path.Join(rootDir, configs.UserCredentials)
+	filePath := path.Join(rootDir, constants.UserCredentials)
 	return filePath
 }
 

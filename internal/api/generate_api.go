@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -15,13 +15,13 @@ func generateProject(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "POST":
 		decoder := json.NewDecoder(req.Body)
-		var projectConfig config.ZeroProjectConfig
-		err := decoder.Decode(&projectConfig)
+		var config projectconfig.ZeroProjectConfig
+		err := decoder.Decode(&config)
 		if err != nil {
 			panic(err)
 		}
-		log.Println(projectConfig.Name)
-		// createProject(projectConfig)
+		log.Println(config.Name)
+		// createProject(config)
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte(`{"message": "Post successful"}`))
 

@@ -1,4 +1,4 @@
-package configs
+package constants
 
 const (
 	TemplatesDir      = "tmp/templates"

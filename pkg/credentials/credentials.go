@@ -11,7 +11,7 @@ import (
 	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/manifoldco/promptui"
 	"gopkg.in/yaml.v2"
 )
@@ -28,7 +28,7 @@ type AWS struct {
 	SecretAccessKey string
 }
 
-func MakeAwsEnvars(cfg *config.ZeroProjectConfig, awsSecrets Secrets) []string {
+func MakeAwsEnvars(cfg *projectconfig.ZeroProjectConfig, awsSecrets Secrets) []string {
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", awsSecrets.AWS.AccessKeyID))
 	env = append(env, fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", awsSecrets.AWS.SecretAccessKey))

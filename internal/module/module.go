@@ -12,8 +12,9 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/commitdev/zero/configs"
 	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/config/moduleconfig"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/hashicorp/go-getter"
 	"github.com/manifoldco/promptui"
@@ -21,8 +22,8 @@ import (
 
 // TemplateModule merges a module instance params with the static configs
 type TemplateModule struct {
-	config.ModuleInstance
-	Config config.ModuleConfig
+	config.ModuleInstance // @TODO Move this
+	Config                moduleconfig.ModuleConfig
 }
 
 type ProgressTracking struct {
@@ -49,7 +50,7 @@ func NewTemplateModule(moduleCfg config.ModuleInstance) (*TemplateModule, error)
 	}
 
 	configPath := path.Join(sourcePath, "zero-module.yml")
-	moduleConfig := config.LoadModuleConfig(configPath)
+	moduleConfig := moduleconfig.LoadModuleConfig(configPath)
 	templateModule.Config = *moduleConfig
 
 	return &templateModule, nil
@@ -131,7 +132,7 @@ func GetSourceDir(source string) string {
 		h := md5.New()
 		io.WriteString(h, source)
 		source = base64.StdEncoding.EncodeToString(h.Sum(nil))
-		return path.Join(configs.TemplatesDir, source)
+		return path.Join(constants.TemplatesDir, source)
 	} else {
 		return source
 	}

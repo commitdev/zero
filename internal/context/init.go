@@ -10,6 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/config/globalconfig"
+	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/module"
 	project "github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
@@ -20,7 +22,7 @@ import (
 type Registry map[string][]string
 
 // Create cloud provider context
-func Init(projectName string, outDir string) *config.ZeroProjectConfig {
+func Init(projectName string, outDir string) *projectconfig.ZeroProjectConfig {
 	rootDir := path.Join(outDir, projectName)
 	flog.Infof(":tada: Creating project %s.", projectName)
 
@@ -51,7 +53,7 @@ func Init(projectName string, outDir string) *config.ZeroProjectConfig {
 	return &projectConfig
 }
 
-func promptAllModules(projectConfig *config.ZeroProjectConfig) {
+func promptAllModules(projectConfig *projectconfig.ZeroProjectConfig) {
 	// TODO: do we need to run through the modules and extract first
 	// or we need to run through twice, potentially still need to pre-process for global auths
 	for _, moduleSource := range projectConfig.Modules {
@@ -93,7 +95,7 @@ func promptGithubRootOrg() string {
 func promptGithubPersonalToken(projectName string) string {
 	defaultToken := ""
 
-	project := config.GetUserCredentials(projectName)
+	project := globalconfig.GetUserCredentials(projectName)
 	if project.GithubResourceConfig.AccessToken != "" {
 		defaultToken = project.GithubResourceConfig.AccessToken
 	}
@@ -110,7 +112,7 @@ func promptGithubPersonalToken(projectName string) string {
 	// If its different from saved token, update it
 	if project.GithubResourceConfig.AccessToken != result {
 		project.GithubResourceConfig.AccessToken = result
-		config.Save(project)
+		globalconfig.Save(project)
 	}
 	return result
 }
@@ -128,7 +130,7 @@ func promptProjectName(projectName string) string {
 	return result
 }
 
-func chooseCloudProvider(projectConfig *config.ZeroProjectConfig) {
+func chooseCloudProvider(projectConfig *projectconfig.ZeroProjectConfig) {
 	// @TODO move options into configs
 	providerPrompt := promptui.Select{
 		Label: "Select Cloud Provider",
@@ -180,7 +182,7 @@ func chooseStack(registry Registry) []string {
 
 }
 
-func fillProviderDetails(projectConfig *config.ZeroProjectConfig, s project.Secrets) {
+func fillProviderDetails(projectConfig *projectconfig.ZeroProjectConfig, s project.Secrets) {
 	if projectConfig.Infrastructure.AWS != nil {
 		sess, err := session.NewSession(&aws.Config{
 			Region:      aws.String(projectConfig.Infrastructure.AWS.Region),
@@ -208,10 +210,10 @@ func fillProviderDetails(projectConfig *config.ZeroProjectConfig, s project.Secr
 	}
 }
 
-func defaultProjConfig(projectName string) config.ZeroProjectConfig {
-	return config.ZeroProjectConfig{
+func defaultProjConfig(projectName string) projectconfig.ZeroProjectConfig {
+	return projectconfig.ZeroProjectConfig{
 		Name: projectName,
-		Infrastructure: config.Infrastructure{
+		Infrastructure: projectconfig.Infrastructure{
 			AWS: nil,
 		},
 		Context: map[string]string{},
