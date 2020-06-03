@@ -71,7 +71,7 @@ func getCredentialsPath() string {
 
 	rootDir := path.Join(usr.HomeDir, constants.ZeroHomeDirectory)
 	os.MkdirAll(rootDir, os.ModePerm)
-	filePath := path.Join(rootDir, constants.UserCredentials)
+	filePath := path.Join(rootDir, constants.UserCredentialsYml)
 	return filePath
 }
 

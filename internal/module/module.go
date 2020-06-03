@@ -49,7 +49,7 @@ func NewTemplateModule(moduleCfg config.ModuleInstance) (*TemplateModule, error)
 		}
 	}
 
-	configPath := path.Join(sourcePath, "zero-module.yml")
+	configPath := path.Join(sourcePath, constants.ZeroModuleYml)
 	moduleConfig := moduleconfig.LoadModuleConfig(configPath)
 	templateModule.Config = *moduleConfig
 
