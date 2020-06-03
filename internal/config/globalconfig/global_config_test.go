@@ -1,4 +1,4 @@
-package config_test
+package globalconfig_test
 
 import (
 	"fmt"
@@ -8,11 +8,11 @@ import (
 	"path"
 	"testing"
 
-	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/stretchr/testify/assert"
 )
 
-const baseTestFixturesDir = "../../tests/test_data/configs/"
+const baseTestFixturesDir = "../../../tests/test_data/configs/"
 
 var testCredentialFile = func() (func() string, func()) {
 	tmpConfigPath := getTmpConfig()
@@ -40,16 +40,16 @@ func copyFile(from string, to string) {
 	}
 }
 func TestReadOrCreateUserCredentialsFile(t *testing.T) {
-	config.GetCredentialsPath = func() string {
+	globalconfig.GetCredentialsPath = func() string {
 		return path.Join(baseTestFixturesDir, "does-not-exist.yml")
 	}
-	credPath := config.GetCredentialsPath()
+	credPath := globalconfig.GetCredentialsPath()
 
 	defer os.RemoveAll(credPath)
 	_, fileStateErr := os.Stat(credPath)
 	assert.True(t, os.IsNotExist(fileStateErr), "File should not exist")
 	// attempting to read the file should create the file
-	config.GetUserCredentials("any-project")
+	globalconfig.GetUserCredentials("any-project")
 
 	stats, err := os.Stat(credPath)
 	assert.False(t, os.IsNotExist(err), "File should be created")
@@ -58,12 +58,12 @@ func TestReadOrCreateUserCredentialsFile(t *testing.T) {
 
 func TestGetUserCredentials(t *testing.T) {
 	var teardownFn func()
-	config.GetCredentialsPath, teardownFn = testCredentialFile()
+	globalconfig.GetCredentialsPath, teardownFn = testCredentialFile()
 	defer teardownFn()
 
 	t.Run("Fixture file should have existing project with creds", func(t *testing.T) {
 		projectName := "my-project"
-		project := config.GetUserCredentials(projectName)
+		project := globalconfig.GetUserCredentials(projectName)
 
 		// Reading from fixtures: tests/test_data/configs/credentials.yml
 		assert.Equal(t, "AKIAABCD", project.AWSResourceConfig.AccessKeyId)
@@ -74,30 +74,30 @@ func TestGetUserCredentials(t *testing.T) {
 
 	t.Run("Fixture file should support multiple projects", func(t *testing.T) {
 		projectName := "another-project"
-		project := config.GetUserCredentials(projectName)
+		project := globalconfig.GetUserCredentials(projectName)
 		assert.Equal(t, "654", project.GithubResourceConfig.AccessToken)
 	})
 }
 
 func TestEditUserCredentials(t *testing.T) {
 	var teardownFn func()
-	config.GetCredentialsPath, teardownFn = testCredentialFile()
+	globalconfig.GetCredentialsPath, teardownFn = testCredentialFile()
 	defer teardownFn()
 
 	t.Run("Should create new project if not exist", func(t *testing.T) {
 		projectName := "test-project3"
-		project := config.GetUserCredentials(projectName)
+		project := globalconfig.GetUserCredentials(projectName)
 		project.AWSResourceConfig.AccessKeyId = "TEST_KEY_ID_1"
-		config.Save(project)
-		newKeyID := config.GetUserCredentials(projectName).AWSResourceConfig.AccessKeyId
+		globalconfig.Save(project)
+		newKeyID := globalconfig.GetUserCredentials(projectName).AWSResourceConfig.AccessKeyId
 		assert.Equal(t, "TEST_KEY_ID_1", newKeyID)
 	})
 	t.Run("Should edit old project if already exist", func(t *testing.T) {
 		projectName := "my-project"
-		project := config.GetUserCredentials(projectName)
+		project := globalconfig.GetUserCredentials(projectName)
 		project.AWSResourceConfig.AccessKeyId = "EDITED_ACCESS_KEY_ID"
-		config.Save(project)
-		newKeyID := config.GetUserCredentials(projectName).AWSResourceConfig.AccessKeyId
+		globalconfig.Save(project)
+		newKeyID := globalconfig.GetUserCredentials(projectName).AWSResourceConfig.AccessKeyId
 		assert.Equal(t, "EDITED_ACCESS_KEY_ID", newKeyID)
 	})
 }

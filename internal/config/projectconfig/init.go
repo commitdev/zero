@@ -1,11 +1,11 @@
-package config
+package projectconfig
 
 import (
 	"fmt"
 	"io/ioutil"
 	"path"
 
-	"github.com/commitdev/zero/configs"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/pkg/util/exit"
 )
 
@@ -36,8 +36,8 @@ func Init(dir string, projectName string, projectContext *ZeroProjectConfig) {
 	// TODO: template the zero-project.yml with projectContext
 	content := []byte(fmt.Sprintf(exampleConfig, projectName))
 
-	err := ioutil.WriteFile(path.Join(dir, projectName, configs.ZeroProjectYml), content, 0644)
+	err := ioutil.WriteFile(path.Join(dir, projectName, constants.ZeroProjectYml), content, 0644)
 	if err != nil {
-		exit.Fatal(fmt.Sprintf("Failed to create example %s", configs.ZeroProjectYml))
+		exit.Fatal(fmt.Sprintf("Failed to create example %s", constants.ZeroProjectYml))
 	}
 }

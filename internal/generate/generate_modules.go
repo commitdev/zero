@@ -10,13 +10,13 @@ import (
 	"text/template"
 
 	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/k0kubun/pp"
 
-	"github.com/commitdev/zero/configs"
 	"github.com/commitdev/zero/pkg/util/fs"
 )
 
@@ -92,15 +92,15 @@ func NewTemplates(moduleDir string, outputDir string, overwrite bool) []*Templat
 	}
 
 	for _, path := range paths {
-		ignoredPaths, _ := regexp.Compile(configs.IgnoredPaths)
+		ignoredPaths, _ := regexp.Compile(constants.IgnoredPaths)
 		if ignoredPaths.MatchString(path) {
 			continue
 		}
 
 		_, file := filepath.Split(path)
-		hasTmpltSuffix := strings.HasSuffix(file, configs.TemplateExtn)
+		hasTmpltSuffix := strings.HasSuffix(file, constants.TemplateExtn)
 		if hasTmpltSuffix {
-			file = strings.Replace(file, configs.TemplateExtn, "", -1)
+			file = strings.Replace(file, constants.TemplateExtn, "", -1)
 		}
 		outputPath := fs.ReplacePath(path, moduleDir, outputDir)
 

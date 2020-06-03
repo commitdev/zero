@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/context"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/spf13/cobra"
@@ -20,7 +20,7 @@ var initCmd = &cobra.Command{
 		}
 
 		projectName := args[0]
-		projectContext := context.Init(projectName, config.RootDir)
-		config.Init(config.RootDir, projectName, projectContext)
+		projectContext := context.Init(projectName, projectconfig.RootDir)
+		projectconfig.Init(projectconfig.RootDir, projectName, projectContext)
 	},
 }

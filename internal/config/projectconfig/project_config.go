@@ -1,4 +1,4 @@
-package config
+package projectconfig
 
 import (
 	"io/ioutil"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/commitdev/zero/configs"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -14,7 +14,7 @@ var applyConfigPath string
 var applyEnvironments []string
 
 func init() {
-	applyCmd.PersistentFlags().StringVarP(&applyConfigPath, "config", "c", configs.ZeroProjectYml, "config path")
+	applyCmd.PersistentFlags().StringVarP(&applyConfigPath, "config", "c", constants.ZeroProjectYml, "config path")
 	applyCmd.PersistentFlags().StringSliceVarP(&applyEnvironments, "env", "e", []string{}, "environments to set up (staging, production) - specify multiple times for multiple")
 
 	rootCmd.AddCommand(applyCmd)
