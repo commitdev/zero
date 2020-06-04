@@ -21,9 +21,9 @@ context:
 # - output: "github-actions"
 
 modules:
-	- source: "github.com/commitdev/zero-aws-eks-stack"
-	- source: "github.com/commitdev/zero-deployable-backend"
-	- source: "github.com/commitdev/zero-deployable-react-frontend"
+    - source: "github.com/commitdev/zero-aws-eks-stack"
+    - source: "github.com/commitdev/zero-deployable-backend"
+    - source: "github.com/commitdev/zero-deployable-react-frontend"
 `
 
 var RootDir = "./"
