@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
-	"sync"
 
 	"github.com/commitdev/zero/internal/config"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
@@ -26,34 +25,20 @@ type TemplateModule struct {
 	Config                moduleconfig.ModuleConfig
 }
 
-type ProgressTracking struct {
-	sync.Mutex
-	downloaded map[string]int
-}
-
-// Init downloads the remote template files and parses the module config yaml
-func NewTemplateModule(moduleCfg config.ModuleInstance) (*TemplateModule, error) {
-	var templateModule TemplateModule
-	templateModule.Source = moduleCfg.Source
-	templateModule.Params = moduleCfg.Params
-	templateModule.Overwrite = moduleCfg.Overwrite
-	templateModule.Output = moduleCfg.Output
-
-	p := &ProgressTracking{}
-	sourcePath := GetSourceDir(templateModule.Source)
-
-	if !IsLocal(templateModule.Source) {
-		err := getter.Get(sourcePath, templateModule.Source, getter.WithProgress(p))
+// FetchModule downloads the remote module source (or loads the local files) and parses the module config yaml
+func FetchModule(source string) (moduleconfig.ModuleConfig, error) {
+	config := moduleconfig.ModuleConfig{}
+	localPath := GetSourceDir(source)
+	if !isLocal(source) {
+		err := getter.Get(localPath, source)
 		if err != nil {
-			return nil, err
+			return config, err
 		}
 	}
 
-	configPath := path.Join(sourcePath, constants.ZeroModuleYml)
-	moduleConfig := moduleconfig.LoadModuleConfig(configPath)
-	templateModule.Config = *moduleConfig
-
-	return &templateModule, nil
+	configPath := path.Join(localPath, constants.ZeroModuleYml)
+	config, err := moduleconfig.LoadModuleConfig(configPath)
+	return config, err
 }
 
 func appendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []string {
@@ -69,6 +54,11 @@ func appendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []stri
 func sanitizePromptResult(str string) string {
 	re := regexp.MustCompile("\\n")
 	return re.ReplaceAllString(str, "")
+}
+
+// TODO : Use this function signature instead
+func PromptParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string) (map[string]string, error) {
+	return map[string]string{}, nil
 }
 
 // PromptParams renders series of prompt UI based on the config
@@ -128,7 +118,7 @@ func (m *TemplateModule) PromptParams(projectContext map[string]string) error {
 
 // GetSourcePath gets a unique local source directory name. For local modules, it use the local directory
 func GetSourceDir(source string) string {
-	if !IsLocal(source) {
+	if !isLocal(source) {
 		h := md5.New()
 		io.WriteString(h, source)
 		source = base64.StdEncoding.EncodeToString(h.Sum(nil))
@@ -139,7 +129,7 @@ func GetSourceDir(source string) string {
 }
 
 // IsLocal uses the go-getter FileDetector to check if source is a file
-func IsLocal(source string) bool {
+func isLocal(source string) bool {
 	pwd := util.GetCwd()
 
 	// ref: https://github.com/hashicorp/go-getter/blob/master/detect_test.go
@@ -158,17 +148,4 @@ func withPWD(pwd string) func(*getter.Client) error {
 		c.Pwd = pwd
 		return nil
 	}
-}
-
-func (p *ProgressTracking) TrackProgress(src string, currentSize, totalSize int64, stream io.ReadCloser) (body io.ReadCloser) {
-	p.Lock()
-	defer p.Unlock()
-
-	if p.downloaded == nil {
-		p.downloaded = map[string]int{}
-	}
-
-	v, _ := p.downloaded[src]
-	p.downloaded[src] = v + 1
-	return stream
 }

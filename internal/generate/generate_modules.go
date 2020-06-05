@@ -23,15 +23,17 @@ import (
 func GenerateModules(cfg *config.GeneratorConfig) {
 	var templateModules []*module.TemplateModule
 
-	// Initiate all the modules defined in the config
-	for _, moduleConfig := range cfg.Modules {
-		mod, err := module.NewTemplateModule(moduleConfig)
+	// TODO: Refactor this since the module struct is changing
 
-		if err != nil {
-			exit.Error("module failed to load: %s", err)
-		}
-		templateModules = append(templateModules, mod)
-	}
+	// Initiate all the modules defined in the config
+	// for _, moduleConfig := range cfg.Modules {
+	//mod, err := module.NewTemplateModule(moduleConfig)
+
+	// if err != nil {
+	// 	exit.Error("module failed to load: %s", err)
+	// }
+	// templateModules = append(templateModules, mod)
+	// }
 
 	// Prompt for module params and execute each of the generator modules
 	for _, mod := range templateModules {
