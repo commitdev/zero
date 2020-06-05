@@ -26,7 +26,7 @@ var applyCmd = &cobra.Command{
 
 		// @TODO where applyConfigPath comes from?
 		projectContext := context.Apply(applyEnvironments, applyConfigPath)
-		// @TODO rootdir or applyConfigPath?
+		// @TODO rootdir?
 		projectconfig.Apply(projectconfig.RootDir, projectContext, applyEnvironments)
 	},
 }

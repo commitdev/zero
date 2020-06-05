@@ -17,13 +17,26 @@ context:
 # module can be in any format the go-getter supports (path, github, url, etc.)
 # supports https://github.com/hashicorp/go-getter#url-format
 # Example:
-# - source: "../development/modules/ci"
-# - output: "github-actions"
-
+# - repo: "../development/modules/ci"
+# - dir: "github-actions"
 modules:
-    - source: "github.com/commitdev/zero-aws-eks-stack"
-    - source: "github.com/commitdev/zero-deployable-backend"
-    - source: "github.com/commitdev/zero-deployable-react-frontend"
+	aws-eks-stack:
+		parameters:
+			repoName: infrastructure
+			region: us-east-1
+			accountId: 12345
+			productionHost: something.com
+		files:
+			dir: infrastructure
+			repo: https://github.com/myorg/infrastructure
+	some-other-module:
+		parameters:
+			repoName: api
+		files:
+			dir: api
+			repo: https://github.com/myorg/api
+
+
 `
 
 var RootDir = "./"

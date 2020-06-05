@@ -3,6 +3,7 @@ package context
 import (
 	"fmt"
 	"log"
+	"path"
 
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/pkg/util/exit"
@@ -24,7 +25,8 @@ Only a single environment may be suitable for an initial test, but for a real sy
 		exit.Fatal("config path cannot be empty!")
 	}
 
-	projectConfig := projectconfig.LoadConfig(applyConfigPath)
+	configPath := path.Join(projectconfig.RootDir, applyConfigPath)
+	projectConfig := projectconfig.LoadConfig(configPath)
 	return projectConfig
 }
 

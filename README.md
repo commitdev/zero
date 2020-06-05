@@ -13,6 +13,15 @@ TBD
 $ git clone git@github.com:commitdev/zero.git
 $ cd zero && make
 ```
+#### Running the tool locally
+
+To install the CLI into your GOPATH and test it, run:
+```
+$ make install-go
+$ zero --help
+```
+
+
 
 ## Planning and Process
 

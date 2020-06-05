@@ -21,7 +21,7 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-type Registry map[string][]string
+type Registry map[string]projectconfig.Modules
 
 // Create cloud provider context
 func Init(outDir string) *projectconfig.ZeroProjectConfig {
@@ -85,7 +85,7 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 }
 
 // loadAllModules takes a list of module sources, downloads those modules, and parses their config
-func loadAllModules(moduleSources []string) map[string]moduleconfig.ModuleConfig {
+func loadAllModules(moduleSources projectconfig.Modules) map[string]moduleconfig.ModuleConfig {
 	modules := make(map[string]moduleconfig.ModuleConfig)
 
 	wg := sync.WaitGroup{}
@@ -200,12 +200,8 @@ func chooseCloudProvider(projectConfig *projectconfig.ZeroProjectConfig) {
 func getRegistry() Registry {
 	return Registry{
 		// TODO: better place to store these options as configuration file or any source
-		"EKS + Go + React": []string{
-			"github.com/commitdev/zero-aws-eks-stack",
-			"github.com/commitdev/zero-deployable-backend",
-			"github.com/commitdev/zero-deployable-react-frontend",
-		},
-		"Custom": []string{},
+		"EKS + Go + React": projectconfig.EKSGoReactSampleModules(),
+		"Custom":           projectconfig.Modules{},
 	}
 }
 
@@ -219,7 +215,7 @@ func (registry Registry) availableLabels() []string {
 	return labels
 }
 
-func chooseStack(registry Registry) []string {
+func chooseStack(registry Registry) projectconfig.Modules {
 	providerPrompt := promptui.Select{
 		Label: "Pick a stack you'd like to use",
 		Items: registry.availableLabels(),
@@ -267,6 +263,6 @@ func defaultProjConfig() projectconfig.ZeroProjectConfig {
 			AWS: nil,
 		},
 		Parameters: map[string]string{},
-		Modules:    []string{},
+		Modules:    projectconfig.Modules{},
 	}
 }
