@@ -7,6 +7,7 @@ import (
 
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/pkg/util/exit"
+	"gopkg.in/yaml.v2"
 )
 
 const exampleConfig = `name: %s
@@ -47,10 +48,14 @@ func SetRootDir(dir string) {
 
 func Init(dir string, projectName string, projectContext *ZeroProjectConfig) {
 	// TODO: template the zero-project.yml with projectContext
-	content := []byte(fmt.Sprintf(exampleConfig, projectName))
-
-	err := ioutil.WriteFile(path.Join(dir, projectName, constants.ZeroProjectYml), content, 0644)
+	// content := []byte(fmt.Sprintf(exampleConfig, projectName))
+	content, err := yaml.Marshal(projectContext)
 	if err != nil {
-		exit.Fatal(fmt.Sprintf("Failed to create example %s", constants.ZeroProjectYml))
+		exit.Fatal(fmt.Sprintf("Failed to serialize configuration file %s", constants.ZeroProjectYml))
+	}
+
+	writeErr := ioutil.WriteFile(path.Join(dir, projectName, constants.ZeroProjectYml), content, 0644)
+	if writeErr != nil {
+		exit.Fatal(fmt.Sprintf("Failed to create config file %s", constants.ZeroProjectYml))
 	}
 }

@@ -33,8 +33,8 @@ type terraform struct {
 type Modules map[string]Module
 
 type Module struct {
-	Parameters Parameters `yaml:"parameters"`
-	Files      Files      `yaml:"files"`
+	Parameters Parameters `yaml:"parameters,omitempty"`
+	Files      Files      `yaml:"files,omitempty"`
 }
 
 type Parameters map[string]string
@@ -66,9 +66,9 @@ func (c *ZeroProjectConfig) Print() {
 func EKSGoReactSampleModules() Modules {
 	parameters := Parameters{}
 	return Modules{
-		"zero-aws-eks-stack":             NewModule(parameters, "zero-aws-eks-stack", "github.com/commitdev/zero-aws-eks-stack"),
-		"zero-deployable-backend":        NewModule(parameters, "zero-deployable-backend", "github.com/commitdev/zero-deployable-backend"),
-		"zero-deployable-react-frontend": NewModule(parameters, "zero-deployable-react-frontend", "github.com/commitdev/zero-deployable-react-frontend"),
+		"aws-eks-stack":             NewModule(parameters, "zero-aws-eks-stack", "github.com/commitdev/zero-aws-eks-stack"),
+		"deployable-backend":        NewModule(parameters, "zero-deployable-backend", "github.com/commitdev/zero-deployable-backend"),
+		"deployable-react-frontend": NewModule(parameters, "zero-deployable-react-frontend", "github.com/commitdev/zero-deployable-react-frontend"),
 	}
 }
 
