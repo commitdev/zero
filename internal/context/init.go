@@ -51,7 +51,7 @@ func Init(projectName string, outDir string) *projectconfig.ZeroProjectConfig {
 	}
 
 	projectParameters := promptAllModules(moduleConfigs)
-	for k, v = range projectParameters {
+	for k, v := range projectParameters {
 		projectConfig.Context[k] = v
 		// TODO: Add parameters to module structs inside project
 	}
