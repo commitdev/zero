@@ -9,8 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/commitdev/zero/internal/config"
 	"github.com/commitdev/zero/internal/config/globalconfig"
+	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/module"
 	project "github.com/commitdev/zero/pkg/credentials"
@@ -38,31 +38,55 @@ func Init(projectName string, outDir string) *projectconfig.ZeroProjectConfig {
 	projectConfig.Context["ShouldPushRepoUpstream"] = promptPushRepoUpstream()
 	projectConfig.Context["GithubRootOrg"] = promptGithubRootOrg()
 	projectConfig.Context["githubPersonalToken"] = promptGithubPersonalToken(projectName)
-	projectConfig.Modules = chooseStack(getRegistry())
 
 	// chooseCloudProvider(&projectConfig)
 	// fmt.Println(&projectConfig)
 	// s := project.GetSecrets(rootDir)
 	// fillProviderDetails(&projectConfig, s)
 	// fmt.Println(&projectConfig)
+	moduleSources := chooseStack(getRegistry())
+	moduleConfigs := loadAllModules(moduleSources)
+	for _ = range moduleConfigs {
+		// TODO: initialize module structs inside project
+	}
 
-	promptAllModules(&projectConfig)
+	projectParameters := promptAllModules(moduleConfigs)
+	for k, v = range projectParameters {
+		projectConfig.Context[k] = v
+		// TODO: Add parameters to module structs inside project
+	}
+
 	// TODO: load ~/.zero/config.yml (or credentials)
 	// TODO: prompt global credentials
 
 	return &projectConfig
 }
 
-func promptAllModules(projectConfig *projectconfig.ZeroProjectConfig) {
-	// TODO: do we need to run through the modules and extract first
-	// or we need to run through twice, potentially still need to pre-process for global auths
-	for _, moduleSource := range projectConfig.Modules {
-		mod, _ := module.NewTemplateModule(config.ModuleInstance{Source: moduleSource})
-		err := mod.PromptParams(projectConfig.Context)
+// loadAllModules takes a list of module sources, downloads those modules, and parses their config
+func loadAllModules(moduleSources []string) map[string]moduleconfig.ModuleConfig {
+	modules := make(map[string]moduleconfig.ModuleConfig)
+
+	for _, moduleSource := range moduleSources {
+		mod, err := module.FetchModule(moduleSource)
+		if err != nil {
+			exit.Fatal("Unable to load module:  %v\n", err)
+		}
+		modules[mod.Name] = mod
+	}
+	return modules
+}
+
+// promptAllModules takes a map of all the modules and prompts the user for values for all the parameters
+func promptAllModules(modules map[string]moduleconfig.ModuleConfig) map[string]string {
+	parameterValues := make(map[string]string)
+	for _, config := range modules {
+		var err error
+		parameterValues, err = module.PromptParams(config, parameterValues)
 		if err != nil {
 			exit.Fatal("Exiting prompt:  %v\n", err)
 		}
 	}
+	return parameterValues
 }
 
 // global configs
