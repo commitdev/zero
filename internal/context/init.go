@@ -45,15 +45,14 @@ func Init(projectName string, outDir string) *projectconfig.ZeroProjectConfig {
 	// fillProviderDetails(&projectConfig, s)
 	// fmt.Println(&projectConfig)
 	moduleSources := chooseStack(getRegistry())
-	moduleConfig := loadAllModules(moduleSources)
-	for _ = range moduleConfig {
+	moduleConfigs := loadAllModules(moduleSources)
+	for _ = range moduleConfigs {
 		// TODO: initialize module structs inside project
 	}
 
-	projectParameters := promptAllModules(moduleConfig)
-
+	projectParameters := promptAllModules(moduleConfigs)
 	for k, v = range projectParameters {
-	  projectConfig.Context[k] = v
+		projectConfig.Context[k] = v
 		// TODO: Add parameters to module structs inside project
 	}
 
@@ -63,10 +62,8 @@ func Init(projectName string, outDir string) *projectconfig.ZeroProjectConfig {
 	return &projectConfig
 }
 
+// loadAllModules takes a list of module sources, downloads those modules, and parses their config
 func loadAllModules(moduleSources []string) map[string]moduleconfig.ModuleConfig {
-	// TODO: do we need to run through the modules and extract first
-	// or we need to run through twice, potentially still need to pre-process for global auths
-
 	modules := make(map[string]moduleconfig.ModuleConfig)
 
 	for _, moduleSource := range moduleSources {
@@ -79,6 +76,7 @@ func loadAllModules(moduleSources []string) map[string]moduleconfig.ModuleConfig
 	return modules
 }
 
+// promptAllModules takes a map of all the modules and prompts the user for values for all the parameters
 func promptAllModules(modules map[string]moduleconfig.ModuleConfig) map[string]string {
 	parameterValues := make(map[string]string)
 	for _, config := range modules {

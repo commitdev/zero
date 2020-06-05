@@ -57,6 +57,7 @@ func sanitizePromptResult(str string) string {
 }
 
 // TODO : Use this function signature instead
+// PromptParams renders series of prompt UI based on the config
 func PromptParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string) (map[string]string, error) {
 	return map[string]string{}, nil
 }
