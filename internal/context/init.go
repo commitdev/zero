@@ -24,7 +24,8 @@ type Registry map[string][]string
 // Create cloud provider context
 func Init(outDir string) *projectconfig.ZeroProjectConfig {
 	projectConfig := defaultProjConfig()
-	projectConfig.Name = promptProjectName()
+
+	projectConfig.Name = getProjectNamePrompt().GetParam(projectConfig.Parameters)
 
 	rootDir := path.Join(outDir, projectConfig.Name)
 	flog.Infof(":tada: Creating project")
@@ -36,15 +37,17 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 		exit.Fatal("Error creating root: %v ", err)
 	}
 
-	projectConfig.Context["ShouldPushRepoUpstream"] = promptPushRepoUpstream()
-	projectConfig.Context["GithubRootOrg"] = promptGithubRootOrg()
-	projectConfig.Context["githubPersonalToken"] = promptGithubPersonalToken(projectConfig.Name)
-
-	// chooseCloudProvider(&projectConfig)
-	// fmt.Println(&projectConfig)
-	// s := project.GetSecrets(rootDir)
-	// fillProviderDetails(&projectConfig, s)
-	// fmt.Println(&projectConfig)
+	prompts := getProjectPrompts(projectConfig.Name)
+	projectConfig.Parameters["ShouldPushRepoUpstream"] = prompts["ShouldPushRepoUpstream"].GetParam(projectConfig.Parameters)
+	// Prompting for push-up stream, then conditionally prompting for github
+	projectConfig.Parameters["GithubRootOrg"] = prompts["GithubRootOrg"].GetParam(projectConfig.Parameters)
+	personalToken := prompts["githubPersonalToken"].GetParam(projectConfig.Parameters)
+	if personalToken != "" && personalToken != globalconfig.GetUserCredentials(projectConfig.Name).AccessToken {
+		projectConfig.Parameters["githubPersonalToken"] = personalToken
+		projectCredential := globalconfig.GetUserCredentials(projectConfig.Name)
+		projectCredential.GithubResourceConfig.AccessToken = personalToken
+		globalconfig.Save(projectCredential)
+	}
 	moduleSources := chooseStack(getRegistry())
 	moduleConfigs := loadAllModules(moduleSources)
 	for _ = range moduleConfigs {
@@ -53,7 +56,7 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 
 	projectParameters := promptAllModules(moduleConfigs)
 	for k, v := range projectParameters {
-		projectConfig.Context[k] = v
+		projectConfig.Parameters[k] = v
 		// TODO: Add parameters to module structs inside project
 	}
 
@@ -82,7 +85,7 @@ func promptAllModules(modules map[string]moduleconfig.ModuleConfig) map[string]s
 	parameterValues := make(map[string]string)
 	for _, config := range modules {
 		var err error
-		parameterValues, err = module.PromptParams(config, parameterValues)
+		parameterValues, err = PromptModuleParams(config, parameterValues)
 		if err != nil {
 			exit.Fatal("Exiting prompt:  %v\n", err)
 		}
@@ -90,69 +93,46 @@ func promptAllModules(modules map[string]moduleconfig.ModuleConfig) map[string]s
 	return parameterValues
 }
 
-// global configs
-func promptPushRepoUpstream() string {
-	providerPrompt := promptui.Prompt{
-		Label:     "Should the created projects be checked into github automatically? (y/n)",
-		Default:   "y",
-		AllowEdit: false,
+// Project name is prompt individually because the rest of the prompts
+// requires the projectName to populate defaults
+func getProjectNamePrompt() PromptHandler {
+	return PromptHandler{
+		moduleconfig.Parameter{
+			Field:   "projectName",
+			Label:   "Project Name",
+			Default: "",
+		},
+		NoCondition,
 	}
-	providerResult, err := providerPrompt.Run()
-	if err != nil {
-		exit.Fatal("Exiting prompt:  %v\n", err)
-	}
-	return providerResult
 }
 
-func promptGithubRootOrg() string {
-	providerPrompt := promptui.Prompt{
-		Label:     "What's the root of the github org to create repositories in?",
-		Default:   "github.com/",
-		AllowEdit: true,
+func getProjectPrompts(projectName string) map[string]PromptHandler {
+	return map[string]PromptHandler{
+		"ShouldPushRepoUpstream": {
+			moduleconfig.Parameter{
+				Field:   "ShouldPushRepoUpstream",
+				Label:   "Should the created projects be checked into github automatically? (y/n)",
+				Default: "y",
+			},
+			NoCondition,
+		},
+		"GithubRootOrg": {
+			moduleconfig.Parameter{
+				Field:   "GithubRootOrg",
+				Label:   "What's the root of the github org to create repositories in?",
+				Default: "github.com/",
+			},
+			KeyMatchCondition("ShouldPushRepoUpstream", "y"),
+		},
+		"githubPersonalToken": {
+			moduleconfig.Parameter{
+				Field:   "githubPersonalToken",
+				Label:   "Github Personal Access Token with access to the above organization",
+				Default: globalconfig.GetUserCredentials(projectName).AccessToken,
+			},
+			KeyMatchCondition("ShouldPushRepoUpstream", "y"),
+		},
 	}
-	result, err := providerPrompt.Run()
-	if err != nil {
-		exit.Fatal("Exiting prompt:  %v\n", err)
-	}
-	return result
-}
-
-func promptGithubPersonalToken(projectName string) string {
-	defaultToken := ""
-
-	project := globalconfig.GetUserCredentials(projectName)
-	if project.GithubResourceConfig.AccessToken != "" {
-		defaultToken = project.GithubResourceConfig.AccessToken
-	}
-
-	providerPrompt := promptui.Prompt{
-		Label:   "Github Personal Access Token with access to the above organization",
-		Default: defaultToken,
-	}
-	result, err := providerPrompt.Run()
-	if err != nil {
-		exit.Fatal("Prompt failed %v\n", err)
-	}
-
-	// If its different from saved token, update it
-	if project.GithubResourceConfig.AccessToken != result {
-		project.GithubResourceConfig.AccessToken = result
-		globalconfig.Save(project)
-	}
-	return result
-}
-
-func promptProjectName() string {
-	providerPrompt := promptui.Prompt{
-		Label:     "Project Name",
-		Default:   "",
-		AllowEdit: false,
-	}
-	result, err := providerPrompt.Run()
-	if err != nil {
-		exit.Fatal("Prompt failed %v\n", err)
-	}
-	return result
 }
 
 func chooseCloudProvider(projectConfig *projectconfig.ZeroProjectConfig) {
@@ -241,7 +221,7 @@ func defaultProjConfig() projectconfig.ZeroProjectConfig {
 		Infrastructure: projectconfig.Infrastructure{
 			AWS: nil,
 		},
-		Context: map[string]string{},
-		Modules: []string{},
+		Parameters: map[string]string{},
+		Modules:    []string{},
 	}
 }

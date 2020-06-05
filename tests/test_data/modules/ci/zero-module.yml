@@ -18,7 +18,7 @@ template:
 #   - cognitoClientID
 
 # parameters required from user to populate the template params
-prompts: 
+parameters: 
   - field: platform
     label: CI Platform
     # default: github

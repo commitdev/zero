@@ -74,7 +74,7 @@ func Execute(cfg *projectconfig.ZeroProjectConfig, pathPrefix string) {
 			"cognito_client_id",
 		}
 		outputValues := GetOutputs(cfg, pathPrefix, outputs)
-		cfg.Context["cognito_pool_id"] = outputValues["cognito_pool_id"]
-		cfg.Context["cognito_client_id"] = outputValues["cognito_client_id"]
+		cfg.Parameters["cognito_pool_id"] = outputValues["cognito_pool_id"]
+		cfg.Parameters["cognito_client_id"] = outputValues["cognito_client_id"]
 	}
 }
