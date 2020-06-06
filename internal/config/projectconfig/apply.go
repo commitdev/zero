@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/commitdev/zero/internal/util"
@@ -33,10 +32,7 @@ func makeAll(dir string, projectContext *ZeroProjectConfig, applyEnvironments []
 	for _, module := range projectContext.Modules {
 		// TODO what's the root dir for these modules?
 		// what's the real path to these modules? It's probably not the module name...
-		modulePath, err := filepath.Abs(path.Join(dir, projectContext.Name, module.Files.Directory))
-		if err != nil {
-			return err
-		}
+		modulePath := path.Join(dir, projectContext.Name, module.Files.Directory)
 
 		// @TODO mock exec?
 		output := util.ExecuteCommandOutput(exec.Command("make", environmentArg), modulePath, envars)
