@@ -11,7 +11,7 @@ import (
 )
 
 // Apply will bootstrap the runtime environment for the project
-func Apply(dir string, projectContext *ZeroProjectConfig, applyEnvironments []string) {
+func Apply(dir string, projectContext *ZeroProjectConfig, applyEnvironments []string) []string {
 	flog.Infof(":tada: Bootstrapping project %s. Please use the zero.[hcl, yaml] file to modify the project as needed. %s.", projectContext.Name)
 
 	flog.Infof("Cloud provider: %s", "AWS") // will this come from the config?
@@ -22,21 +22,22 @@ func Apply(dir string, projectContext *ZeroProjectConfig, applyEnvironments []st
 
 	// other details...
 
-	makeAll(dir, projectContext, applyEnvironments)
+	return makeAll(dir, projectContext, applyEnvironments)
 }
 
-func makeAll(dir string, projectContext *ZeroProjectConfig, applyEnvironments []string) error {
+func makeAll(dir string, projectContext *ZeroProjectConfig, applyEnvironments []string) []string {
 	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ","))
 	envars := []string{environmentArg}
 
-	for _, module := range projectContext.Modules {
-		// TODO what's the root dir for these modules?
-		// what's the real path to these modules? It's probably not the module name...
-		modulePath := path.Join(dir, projectContext.Name, module.Files.Directory)
+	outputs := []string{}
 
-		// @TODO mock exec?
+	for _, module := range projectContext.Modules {
+		// @TODO what's the root dir for these modules?
+		modulePath := path.Join(dir, projectContext.Name, module.Files.Directory)
 		output := util.ExecuteCommandOutput(exec.Command("make", environmentArg), modulePath, envars)
-		fmt.Println(output)
+		flog.Infof("%s", output)
+
+		outputs = append(outputs, output)
 	}
-	return nil
+	return outputs
 }

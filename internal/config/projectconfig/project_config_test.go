@@ -18,42 +18,27 @@ func TestLoadConfig(t *testing.T) {
 	}
 	defer os.Remove(file.Name())
 	file.Write([]byte(validConfigContent()))
+	filePath := file.Name()
 
-	type args struct {
-		filePath string
-	}
+	modules := projectconfig.InfrastructureSampleModules()
+	sampleModules := projectconfig.EKSGoReactSampleModules()
 
-	modules := projectconfig.EKSGoReactSampleModules()
-	infrastructureModules := projectconfig.InfrastructureSampleModules()
-
-	for k, v := range infrastructureModules {
+	for k, v := range sampleModules {
 		modules[k] = v
 	}
 
-	expected := &projectconfig.ZeroProjectConfig{
+	want := &projectconfig.ZeroProjectConfig{
 		Name:    "abc",
 		Modules: modules,
 	}
 
-	tests := []struct {
-		name string
-		args args
-		want *projectconfig.ZeroProjectConfig
-	}{
-		{
-			"Working config",
-			args{filePath: file.Name()},
-			expected,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// @TODO handle nil/empty map unmarshall case?
-			if got := projectconfig.LoadConfig(tt.args.filePath); !cmp.Equal(got, tt.want, cmpopts.EquateEmpty()) {
-				t.Errorf(cmp.Diff(got, tt.want))
-			}
-		})
-	}
+	t.Run("Should load and unmarshall config correctly", func(t *testing.T) {
+		got := projectconfig.LoadConfig(filePath)
+		if !cmp.Equal(want, got, cmpopts.EquateEmpty()) {
+			t.Errorf("projectconfig.ZeroProjectConfig.Unmarshal mismatch (-want +got):\n%s", cmp.Diff(want, got))
+		}
+	})
+
 }
 
 func validConfigContent() string {
@@ -72,15 +57,15 @@ modules:
         files:
             dir: infrastructure
             repo: https://github.com/myorg/infrastructure
-    zero-aws-eks-stack:
+    aws-eks-stack:
         files:
             dir: zero-aws-eks-stack
             repo: github.com/commitdev/zero-aws-eks-stack
-    zero-deployable-backend:
+    deployable-backend:
         files:
             dir: zero-deployable-backend
             repo: github.com/commitdev/zero-deployable-backend
-    zero-deployable-react-frontend:
+    deployable-react-frontend:
         files:
             dir: zero-deployable-react-frontend
             repo: github.com/commitdev/zero-deployable-react-frontend
