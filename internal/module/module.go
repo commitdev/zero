@@ -64,7 +64,7 @@ func PromptParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]
 
 // PromptParams renders series of prompt UI based on the config
 func (m *TemplateModule) PromptParams(projectContext map[string]string) error {
-	for _, promptConfig := range m.Config.Prompts {
+	for _, promptConfig := range m.Config.Parameters {
 
 		label := promptConfig.Label
 		if promptConfig.Label == "" {

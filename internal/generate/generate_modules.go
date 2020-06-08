@@ -58,12 +58,12 @@ type TemplateParams struct {
 }
 
 func Generate(mod *module.TemplateModule, generatorCfg *config.GeneratorConfig) error {
-	moduleDir := module.GetSourceDir(mod.Source)
-	delimiters := mod.Config.Template.Delimiters
+	moduleDir := path.Join(module.GetSourceDir(mod.Source), mod.Config.TemplateConfig.InputDir)
+	delimiters := mod.Config.TemplateConfig.Delimiters
 	overwrite := mod.Overwrite
 	outputDir := mod.Output
 	if outputDir == "" {
-		outputDir = mod.Config.Template.Output
+		outputDir = mod.Config.TemplateConfig.OutputDir
 	}
 
 	templateData := TemplateParams{}

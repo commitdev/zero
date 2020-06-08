@@ -8,27 +8,28 @@ import (
 )
 
 type ModuleConfig struct {
-	Name        string
-	Description string
-	Author      string
-	Icon        string
-	Thumbnail   string
-	Template    TemplateConfig
-	Credentials []string `yaml:"requiredCredentials"`
-	Prompts     []Prompt `yaml:"parameters"`
+	Name                string
+	Description         string
+	Author              string
+	TemplateConfig      `yaml:"template"`
+	RequiredCredentials []string
+	Parameters          []Parameter
 }
 
-type Prompt struct {
-	Field   string `yaml:"field,omitempty"`
-	Label   string
+type Parameter struct {
+	Field   string
+	Label   string   `yaml:"value,omitempty"`
 	Options []string `yaml:"options,omitempty"`
 	Execute string   `yaml:"execute,omitempty"`
+	Value   string   `yaml:"value,omitempty"`
+	Default string   `yaml:"default,omitempty"`
 }
 
 type TemplateConfig struct {
 	StrictMode bool
 	Delimiters []string
-	Output     string
+	InputDir   string
+	OutputDir  string
 }
 
 func LoadModuleConfig(filePath string) (ModuleConfig, error) {
