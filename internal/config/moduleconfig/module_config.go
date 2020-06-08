@@ -18,7 +18,7 @@ type ModuleConfig struct {
 
 type Parameter struct {
 	Field   string
-	Label   string   `yaml:"value,omitempty"`
+	Label   string   `yaml:"label,omitempty"`
 	Options []string `yaml:"options,omitempty"`
 	Execute string   `yaml:"execute,omitempty"`
 	Value   string   `yaml:"value,omitempty"`
