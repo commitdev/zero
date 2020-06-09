@@ -22,22 +22,23 @@ import (
 type Registry map[string][]string
 
 // Create cloud provider context
-func Init(projectName string, outDir string) *projectconfig.ZeroProjectConfig {
-	rootDir := path.Join(outDir, projectName)
-	flog.Infof(":tada: Creating project %s.", projectName)
+func Init(outDir string) *projectconfig.ZeroProjectConfig {
+	projectConfig := defaultProjConfig()
+	projectConfig.Name = promptProjectName()
+
+	rootDir := path.Join(outDir, projectConfig.Name)
+	flog.Infof(":tada: Creating project")
 
 	err := os.MkdirAll(rootDir, os.ModePerm)
 	if os.IsExist(err) {
-		exit.Fatal("Directory %v already exists! Error: %v", projectName, err)
+		exit.Fatal("Directory %v already exists! Error: %v", projectConfig.Name, err)
 	} else if err != nil {
 		exit.Fatal("Error creating root: %v ", err)
 	}
 
-	projectConfig := defaultProjConfig(projectName)
-	projectConfig.Name = promptProjectName(projectName)
 	projectConfig.Context["ShouldPushRepoUpstream"] = promptPushRepoUpstream()
 	projectConfig.Context["GithubRootOrg"] = promptGithubRootOrg()
-	projectConfig.Context["githubPersonalToken"] = promptGithubPersonalToken(projectName)
+	projectConfig.Context["githubPersonalToken"] = promptGithubPersonalToken(projectConfig.Name)
 
 	// chooseCloudProvider(&projectConfig)
 	// fmt.Println(&projectConfig)
@@ -141,10 +142,10 @@ func promptGithubPersonalToken(projectName string) string {
 	return result
 }
 
-func promptProjectName(projectName string) string {
+func promptProjectName() string {
 	providerPrompt := promptui.Prompt{
 		Label:     "Project Name",
-		Default:   projectName,
+		Default:   "",
 		AllowEdit: false,
 	}
 	result, err := providerPrompt.Run()
@@ -234,9 +235,9 @@ func fillProviderDetails(projectConfig *projectconfig.ZeroProjectConfig, s proje
 	}
 }
 
-func defaultProjConfig(projectName string) projectconfig.ZeroProjectConfig {
+func defaultProjConfig() projectconfig.ZeroProjectConfig {
 	return projectconfig.ZeroProjectConfig{
-		Name: projectName,
+		Name: "",
 		Infrastructure: projectconfig.Infrastructure{
 			AWS: nil,
 		},
