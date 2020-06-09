@@ -128,6 +128,7 @@ func getProjectNamePrompt() PromptHandler {
 			Default: "",
 		},
 		NoCondition,
+		NoValidation,
 	}
 }
 
@@ -140,6 +141,7 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 				Default: "y",
 			},
 			NoCondition,
+			SpecificValueValidation("y", "n"),
 		},
 		"GithubRootOrg": {
 			moduleconfig.Parameter{
@@ -148,6 +150,7 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 				Default: "github.com/",
 			},
 			KeyMatchCondition("ShouldPushRepositories", "y"),
+			NoValidation,
 		},
 		"GithubPersonalToken": {
 			moduleconfig.Parameter{
@@ -156,6 +159,7 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 				Default: globalconfig.GetUserCredentials(projectName).AccessToken,
 			},
 			KeyMatchCondition("ShouldPushRepositories", "y"),
+			NoValidation,
 		},
 	}
 
@@ -169,6 +173,7 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 				Default: module.OutputDir,
 			},
 			NoCondition,
+			NoValidation,
 		}
 	}
 

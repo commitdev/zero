@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"strings"
 
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/pkg/util/exit"
@@ -15,14 +16,31 @@ import (
 type PromptHandler struct {
 	moduleconfig.Parameter
 	Condition func(map[string]string) bool
+	Validate  func(string) error
 }
 
 func NoCondition(map[string]string) bool {
 	return true
 }
+
 func KeyMatchCondition(key string, value string) func(map[string]string) bool {
 	return func(param map[string]string) bool {
 		return param[key] == value
+	}
+}
+
+func NoValidation(string) error {
+	return nil
+}
+
+func SpecificValueValidation(values ...string) func(string) error {
+	return func(checkValue string) error {
+		for _, allowedValue := range values {
+			if checkValue == allowedValue {
+				return nil
+			}
+		}
+		return fmt.Errorf("Please choose one of %s", strings.Join(values, "/"))
 	}
 }
 
@@ -40,7 +58,7 @@ func (p PromptHandler) GetParam(projectParams map[string]string) string {
 		} else if p.Parameter.Value != "" {
 			result = p.Parameter.Value
 		} else {
-			err, result = promptParameter(p.Parameter)
+			err, result = promptParameter(p)
 		}
 		if err != nil {
 			exit.Fatal("Exiting prompt:  %v\n", err)
@@ -51,7 +69,8 @@ func (p PromptHandler) GetParam(projectParams map[string]string) string {
 	return ""
 }
 
-func promptParameter(param moduleconfig.Parameter) (error, string) {
+func promptParameter(prompt PromptHandler) (error, string) {
+	param := prompt.Parameter
 	label := param.Label
 	if param.Label == "" {
 		label = param.Field
@@ -72,6 +91,7 @@ func promptParameter(param moduleconfig.Parameter) (error, string) {
 			Label:     label,
 			Default:   defaultValue,
 			AllowEdit: true,
+			Validate:  prompt.Validate,
 		}
 		result, err = prompt.Run()
 	}
@@ -119,6 +139,7 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 		promptHandler := PromptHandler{
 			promptConfig,
 			NoCondition,
+			NoValidation,
 		}
 		result := promptHandler.GetParam(parameters)
 
