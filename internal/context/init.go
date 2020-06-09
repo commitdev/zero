@@ -30,7 +30,7 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 	projectConfig.Name = getProjectNamePrompt().GetParam(projectConfig.Parameters)
 
 	rootDir := path.Join(outDir, projectConfig.Name)
-	flog.Infof(":tada: Creating project")
+	flog.Infof(":tada: Initializing project")
 
 	err := os.MkdirAll(rootDir, os.ModePerm)
 	if os.IsExist(err) {
@@ -47,14 +47,19 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 
 	prompts := getProjectPrompts(projectConfig.Name, moduleConfigs)
 
-	projectConfig.Parameters["ShouldPushRepoUpstream"] = prompts["ShouldPushRepoUpstream"].GetParam(projectConfig.Parameters)
+	initParams := make(map[string]string)
+	projectConfig.ShouldPushRepositories = true
+	initParams["ShouldPushRepositories"] = prompts["ShouldPushRepositories"].GetParam(initParams)
+	if initParams["ShouldPushRepositories"] == "n" {
+		projectConfig.ShouldPushRepositories = false
+	}
+
 	// Prompting for push-up stream, then conditionally prompting for github
-	projectConfig.Parameters["GithubRootOrg"] = prompts["GithubRootOrg"].GetParam(projectConfig.Parameters)
-	personalToken := prompts["githubPersonalToken"].GetParam(projectConfig.Parameters)
-	if personalToken != "" && personalToken != globalconfig.GetUserCredentials(projectConfig.Name).AccessToken {
-		projectConfig.Parameters["githubPersonalToken"] = personalToken
+	initParams["GithubRootOrg"] = prompts["GithubRootOrg"].GetParam(initParams)
+	initParams["GithubPersonalToken"] = prompts["GithubPersonalToken"].GetParam(initParams)
+	if initParams["GithubRootOrg"] != "" && initParams["GithubPersonalToken"] != globalconfig.GetUserCredentials(projectConfig.Name).AccessToken {
 		projectCredential := globalconfig.GetUserCredentials(projectConfig.Name)
-		projectCredential.GithubResourceConfig.AccessToken = personalToken
+		projectCredential.GithubResourceConfig.AccessToken = initParams["GithubPersonalToken"]
 		globalconfig.Save(projectCredential)
 	}
 
@@ -66,8 +71,11 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 
 	for moduleName, _ := range moduleConfigs {
 		// @TODO : Uncomment when this struct is implemented
-		//projectConfig.Modules[moduleName].Files.Directory = prompts[moduleName].GetParam(projectConfig.Parameters))
-		fmt.Println(prompts[moduleName].GetParam(projectConfig.Parameters))
+		repoName := prompts[moduleName].GetParam(initParams)
+		repoURL := fmt.Sprintf("%s/%s", initParams["GithubRootOrg"], repoName)
+		//projectConfig.Modules[moduleName].Files.Directory = prompts[moduleName].GetParam(initParams)
+		//projectConfig.Modules[moduleName].Files.Repository = repoURL
+		fmt.Println(repoURL)
 	}
 
 	// TODO: load ~/.zero/config.yml (or credentials)
@@ -125,9 +133,9 @@ func getProjectNamePrompt() PromptHandler {
 
 func getProjectPrompts(projectName string, modules map[string]moduleconfig.ModuleConfig) map[string]PromptHandler {
 	handlers := map[string]PromptHandler{
-		"ShouldPushRepoUpstream": {
+		"ShouldPushRepositories": {
 			moduleconfig.Parameter{
-				Field:   "ShouldPushRepoUpstream",
+				Field:   "ShouldPushRepositories",
 				Label:   "Should the created projects be checked into github automatically? (y/n)",
 				Default: "y",
 			},
@@ -139,15 +147,15 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 				Label:   "What's the root of the github org to create repositories in?",
 				Default: "github.com/",
 			},
-			KeyMatchCondition("ShouldPushRepoUpstream", "y"),
+			KeyMatchCondition("ShouldPushRepositories", "y"),
 		},
-		"githubPersonalToken": {
+		"GithubPersonalToken": {
 			moduleconfig.Parameter{
-				Field:   "githubPersonalToken",
+				Field:   "GithubPersonalToken",
 				Label:   "Github Personal Access Token with access to the above organization",
 				Default: globalconfig.GetUserCredentials(projectName).AccessToken,
 			},
-			KeyMatchCondition("ShouldPushRepoUpstream", "y"),
+			KeyMatchCondition("ShouldPushRepositories", "y"),
 		},
 	}
 

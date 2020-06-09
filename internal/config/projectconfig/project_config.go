@@ -9,10 +9,11 @@ import (
 )
 
 type ZeroProjectConfig struct {
-	Name           string
-	Infrastructure Infrastructure // TODO simplify and flatten / rename?
-	Parameters     map[string]string
-	Modules        []string
+	Name                   string
+	ShouldPushRepositories bool
+	Infrastructure         Infrastructure // TODO simplify and flatten / rename?
+	Parameters             map[string]string
+	Modules                []string
 }
 
 type Infrastructure struct {
