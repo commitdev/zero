@@ -1,8 +1,10 @@
 package context
 
 import (
+	"fmt"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -37,7 +39,14 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 		exit.Fatal("Error creating root: %v ", err)
 	}
 
-	prompts := getProjectPrompts(projectConfig.Name)
+	moduleSources := chooseStack(getRegistry())
+	moduleConfigs := loadAllModules(moduleSources)
+	for _ = range moduleConfigs {
+		// TODO: initialize module structs inside project
+	}
+
+	prompts := getProjectPrompts(projectConfig.Name, moduleConfigs)
+
 	projectConfig.Parameters["ShouldPushRepoUpstream"] = prompts["ShouldPushRepoUpstream"].GetParam(projectConfig.Parameters)
 	// Prompting for push-up stream, then conditionally prompting for github
 	projectConfig.Parameters["GithubRootOrg"] = prompts["GithubRootOrg"].GetParam(projectConfig.Parameters)
@@ -48,16 +57,17 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 		projectCredential.GithubResourceConfig.AccessToken = personalToken
 		globalconfig.Save(projectCredential)
 	}
-	moduleSources := chooseStack(getRegistry())
-	moduleConfigs := loadAllModules(moduleSources)
-	for _ = range moduleConfigs {
-		// TODO: initialize module structs inside project
-	}
 
 	projectParameters := promptAllModules(moduleConfigs)
 	for k, v := range projectParameters {
 		projectConfig.Parameters[k] = v
 		// TODO: Add parameters to module structs inside project
+	}
+
+	for moduleName, _ := range moduleConfigs {
+		// @TODO : Uncomment when this struct is implemented
+		//projectConfig.Modules[moduleName].Files.Directory = prompts[moduleName].GetParam(projectConfig.Parameters))
+		fmt.Println(prompts[moduleName].GetParam(projectConfig.Parameters))
 	}
 
 	// TODO: load ~/.zero/config.yml (or credentials)
@@ -70,8 +80,15 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 func loadAllModules(moduleSources []string) map[string]moduleconfig.ModuleConfig {
 	modules := make(map[string]moduleconfig.ModuleConfig)
 
+	wg := sync.WaitGroup{}
+	wg.Add(len(moduleSources))
 	for _, moduleSource := range moduleSources {
-		mod, err := module.FetchModule(moduleSource)
+		go module.FetchModule(moduleSource, &wg)
+	}
+	wg.Wait()
+
+	for _, moduleSource := range moduleSources {
+		mod, err := module.ParseModuleConfig(moduleSource)
 		if err != nil {
 			exit.Fatal("Unable to load module:  %v\n", err)
 		}
@@ -106,8 +123,8 @@ func getProjectNamePrompt() PromptHandler {
 	}
 }
 
-func getProjectPrompts(projectName string) map[string]PromptHandler {
-	return map[string]PromptHandler{
+func getProjectPrompts(projectName string, modules map[string]moduleconfig.ModuleConfig) map[string]PromptHandler {
+	handlers := map[string]PromptHandler{
 		"ShouldPushRepoUpstream": {
 			moduleconfig.Parameter{
 				Field:   "ShouldPushRepoUpstream",
@@ -133,6 +150,21 @@ func getProjectPrompts(projectName string) map[string]PromptHandler {
 			KeyMatchCondition("ShouldPushRepoUpstream", "y"),
 		},
 	}
+
+	for moduleName, module := range modules {
+		label := fmt.Sprintf("What do you want to call the %s project?", moduleName)
+
+		handlers[moduleName] = PromptHandler{
+			moduleconfig.Parameter{
+				Field:   moduleName,
+				Label:   label,
+				Default: module.OutputDir,
+			},
+			NoCondition,
+		}
+	}
+
+	return handlers
 }
 
 func chooseCloudProvider(projectConfig *projectconfig.ZeroProjectConfig) {

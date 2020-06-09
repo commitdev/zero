@@ -7,11 +7,13 @@ import (
 	"log"
 	"path"
 	"regexp"
+	"sync"
 
 	"github.com/commitdev/zero/internal/config"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
+	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/hashicorp/go-getter"
 )
 
@@ -21,17 +23,24 @@ type TemplateModule struct {
 	Config                moduleconfig.ModuleConfig
 }
 
-// FetchModule downloads the remote module source (or loads the local files) and parses the module config yaml
-func FetchModule(source string) (moduleconfig.ModuleConfig, error) {
-	config := moduleconfig.ModuleConfig{}
+// FetchModule downloads the remote module source if necessary. Meant to be run in a goroutine.
+func FetchModule(source string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	localPath := GetSourceDir(source)
 	if !isLocal(source) {
 		err := getter.Get(localPath, source)
 		if err != nil {
-			return config, err
+			exit.Fatal("Failed to fetch remote module from %s: %v\n", source, err)
 		}
 	}
+	return
+}
 
+// ParseModuleConfig loads the local config file for a module and parses the yaml
+func ParseModuleConfig(source string) (moduleconfig.ModuleConfig, error) {
+	localPath := GetSourceDir(source)
+	config := moduleconfig.ModuleConfig{}
 	configPath := path.Join(localPath, constants.ZeroModuleYml)
 	config, err := moduleconfig.LoadModuleConfig(configPath)
 	return config, err

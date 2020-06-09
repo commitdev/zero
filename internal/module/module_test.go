@@ -32,7 +32,7 @@ func TestNewTemplateModule(t *testing.T) {
 	var mod moduleconfig.ModuleConfig
 
 	t.Run("Loading module from source", func(t *testing.T) {
-		mod, _ = module.FetchModule(testModuleSource)
+		mod, _ = module.ParseModuleConfig(testModuleSource)
 
 		assert.Equal(t, "CI templates", mod.Name)
 	})
