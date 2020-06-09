@@ -3,11 +3,8 @@ package module
 import (
 	"crypto/md5"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"log"
-	"os"
-	"os/exec"
 	"path"
 	"regexp"
 
@@ -16,7 +13,6 @@ import (
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/hashicorp/go-getter"
-	"github.com/manifoldco/promptui"
 )
 
 // TemplateModule merges a module instance params with the static configs
@@ -39,82 +35,6 @@ func FetchModule(source string) (moduleconfig.ModuleConfig, error) {
 	configPath := path.Join(localPath, constants.ZeroModuleYml)
 	config, err := moduleconfig.LoadModuleConfig(configPath)
 	return config, err
-}
-
-func appendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []string {
-	for key, val := range envMap {
-		if val != "" {
-			envList = append(envList, fmt.Sprintf("%s=%s", key, val))
-		}
-	}
-	return envList
-}
-
-// aws cli prints output with linebreak in them
-func sanitizePromptResult(str string) string {
-	re := regexp.MustCompile("\\n")
-	return re.ReplaceAllString(str, "")
-}
-
-// TODO : Use this function signature instead
-// PromptParams renders series of prompt UI based on the config
-func PromptParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string) (map[string]string, error) {
-	return map[string]string{}, nil
-}
-
-// PromptParams renders series of prompt UI based on the config
-func (m *TemplateModule) PromptParams(projectContext map[string]string) error {
-	for _, promptConfig := range m.Config.Parameters {
-
-		label := promptConfig.Label
-		if promptConfig.Label == "" {
-			label = promptConfig.Field
-		}
-
-		// deduplicate fields already prompted and received
-		if _, isAlreadySet := projectContext[promptConfig.Field]; isAlreadySet {
-			continue
-		}
-
-		var err error
-		var result string
-		if len(promptConfig.Options) > 0 {
-			prompt := promptui.Select{
-				Label: label,
-				Items: promptConfig.Options,
-			}
-			_, result, err = prompt.Run()
-
-		} else if promptConfig.Execute != "" {
-			// TODO: this could perhaps be set as a default for part of regular prompt
-			cmd := exec.Command("bash", "-c", promptConfig.Execute)
-			cmd.Env = appendProjectEnvToCmdEnv(projectContext, os.Environ())
-			out, err := cmd.Output()
-
-			if err != nil {
-				log.Fatalf("Failed to execute  %v\n", err)
-				panic(err)
-			}
-			result = string(out)
-		} else {
-			prompt := promptui.Prompt{
-				Label: label,
-			}
-			result, err = prompt.Run()
-		}
-		if err != nil {
-			return err
-		}
-
-		result = sanitizePromptResult(result)
-		if m.Params == nil {
-			m.Params = make(map[string]string)
-		}
-		m.Params[promptConfig.Field] = result
-		projectContext[promptConfig.Field] = result
-	}
-
-	return nil
 }
 
 // GetSourcePath gets a unique local source directory name. For local modules, it use the local directory

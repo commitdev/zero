@@ -1,7 +1,11 @@
 package module_test
 
 import (
+	"errors"
 	"testing"
+
+	"github.com/commitdev/zero/internal/config/moduleconfig"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/commitdev/zero/internal/module"
 )
@@ -21,4 +25,34 @@ func TestGetSourceDir(t *testing.T) {
 	if dir == relativeSource {
 		t.Errorf("Error, remote sources should be converted to a local dir: %s", source)
 	}
+}
+
+func TestNewTemplateModule(t *testing.T) {
+	testModuleSource := "../../tests/test_data/modules/ci"
+	var mod moduleconfig.ModuleConfig
+
+	t.Run("Loading module from source", func(t *testing.T) {
+		mod, _ = module.FetchModule(testModuleSource)
+
+		assert.Equal(t, "CI templates", mod.Name)
+	})
+
+	t.Run("Parameters are loaded", func(t *testing.T) {
+		param, err := findParameter(mod.Parameters, "platform")
+		if err != nil {
+			panic(err)
+		}
+		assert.Equal(t, "platform", param.Field)
+		assert.Equal(t, "CI Platform", param.Label)
+	})
+
+}
+
+func findParameter(params []moduleconfig.Parameter, field string) (moduleconfig.Parameter, error) {
+	for _, v := range params {
+		if v.Field == field {
+			return v, nil
+		}
+	}
+	return moduleconfig.Parameter{}, errors.New("parameter not found")
 }
