@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/context"
-	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/spf13/cobra"
 )
 
@@ -15,12 +14,7 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Create new project with provided name and initialize configuration based on user input.",
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) < 1 {
-			exit.Fatal("Project name cannot be empty!")
-		}
-
-		projectName := args[0]
-		projectContext := context.Init(projectName, projectconfig.RootDir)
-		projectconfig.Init(projectconfig.RootDir, projectName, projectContext)
+		projectContext := context.Init(projectconfig.RootDir)
+		projectconfig.Init(projectconfig.RootDir, projectContext.Name, projectContext)
 	},
 }
