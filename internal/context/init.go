@@ -85,7 +85,7 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 }
 
 // loadAllModules takes a list of module sources, downloads those modules, and parses their config
-func loadAllModules(moduleSources projectconfig.Modules) map[string]moduleconfig.ModuleConfig {
+func loadAllModules(moduleSources []string) map[string]moduleconfig.ModuleConfig {
 	modules := make(map[string]moduleconfig.ModuleConfig)
 
 	wg := sync.WaitGroup{}
@@ -215,7 +215,7 @@ func (registry Registry) availableLabels() []string {
 	return labels
 }
 
-func chooseStack(registry Registry) projectconfig.Modules {
+func chooseStack(registry Registry) []string {
 	providerPrompt := promptui.Select{
 		Label: "Pick a stack you'd like to use",
 		Items: registry.availableLabels(),
@@ -224,8 +224,14 @@ func chooseStack(registry Registry) projectconfig.Modules {
 	if err != nil {
 		exit.Fatal("Prompt failed %v\n", err)
 	}
-	return registry[providerResult]
 
+	modules := registry[providerResult]
+	repositories := make([]string, len(modules))
+
+	for _, module := range modules {
+		repositories = append(repositories, module.Files.Repository)
+	}
+	return repositories
 }
 
 func fillProviderDetails(projectConfig *projectconfig.ZeroProjectConfig, s project.Secrets) {
