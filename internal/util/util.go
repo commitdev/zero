@@ -3,6 +3,7 @@ package util
 // @TODO split up and move into /pkg directory
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -100,4 +101,15 @@ func ExecuteCommandOutput(cmd *exec.Cmd, pathPrefix string, envars []string) str
 		log.Fatalf("Executing command failed: (%v) %s\n", err, out)
 	}
 	return string(out)
+}
+
+// AppendProjectEnvToCmdEnv will add all the keys and values from envMap
+// into envList as key-value pair strings (e.g.: "key=value")
+func AppendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []string {
+	for key, val := range envMap {
+		if val != "" {
+			envList = append(envList, fmt.Sprintf("%s=%s", key, val))
+		}
+	}
+	return envList
 }

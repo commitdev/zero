@@ -27,16 +27,14 @@ func Apply(dir string, projectContext *ZeroProjectConfig, applyEnvironments []st
 
 func makeAll(dir string, projectContext *ZeroProjectConfig, applyEnvironments []string) []string {
 	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ","))
-	envars := []string{environmentArg}
-
+	envList := []string{environmentArg}
 	outputs := []string{}
 
-	for _, module := range projectContext.Modules {
-		// @TODO what's the root dir for these modules?
-		modulePath := path.Join(dir, projectContext.Name, module.Files.Directory)
-		output := util.ExecuteCommandOutput(exec.Command("make", environmentArg), modulePath, envars)
-		flog.Infof("%s", output)
+	for _, mod := range projectContext.Modules {
+		modulePath := path.Join(dir, projectContext.Name, mod.Files.Directory)
+		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
 
+		output := util.ExecuteCommandOutput(exec.Command("make"), modulePath, envList)
 		outputs = append(outputs, output)
 	}
 	return outputs
