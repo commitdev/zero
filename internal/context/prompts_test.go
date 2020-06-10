@@ -20,6 +20,7 @@ func TestGetParam(t *testing.T) {
 		prompt := context.PromptHandler{
 			param,
 			context.NoCondition,
+			context.NoValidation,
 		}
 
 		result := prompt.GetParam(projectParams)
@@ -35,6 +36,7 @@ func TestGetParam(t *testing.T) {
 		prompt := context.PromptHandler{
 			param,
 			context.NoCondition,
+			context.NoValidation,
 		}
 
 		result := prompt.GetParam(map[string]string{
@@ -52,6 +54,7 @@ func TestGetParam(t *testing.T) {
 		prompt := context.PromptHandler{
 			param,
 			context.NoCondition,
+			context.NoValidation,
 		}
 
 		result := prompt.GetParam(projectParams)
