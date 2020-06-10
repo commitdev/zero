@@ -21,7 +21,7 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-type Registry map[string]projectconfig.Modules
+type Registry map[string][]string
 
 // Create cloud provider context
 func Init(outDir string) *projectconfig.ZeroProjectConfig {
@@ -200,8 +200,12 @@ func chooseCloudProvider(projectConfig *projectconfig.ZeroProjectConfig) {
 func getRegistry() Registry {
 	return Registry{
 		// TODO: better place to store these options as configuration file or any source
-		"EKS + Go + React": projectconfig.EKSGoReactSampleModules(),
-		"Custom":           projectconfig.Modules{},
+		"EKS + Go + React": []string{
+			"github.com/commitdev/zero-aws-eks-stack",
+			"github.com/commitdev/zero-deployable-backend",
+			"github.com/commitdev/zero-deployable-react-frontend",
+		},
+		"Custom": []string{},
 	}
 }
 
@@ -225,13 +229,7 @@ func chooseStack(registry Registry) []string {
 		exit.Fatal("Prompt failed %v\n", err)
 	}
 
-	modules := registry[providerResult]
-	repositories := make([]string, len(modules))
-
-	for _, module := range modules {
-		repositories = append(repositories, module.Files.Repository)
-	}
-	return repositories
+	return registry[providerResult]
 }
 
 func fillProviderDetails(projectConfig *projectconfig.ZeroProjectConfig, s project.Secrets) {
@@ -268,6 +266,7 @@ func defaultProjConfig() projectconfig.ZeroProjectConfig {
 		Infrastructure: projectconfig.Infrastructure{
 			AWS: nil,
 		},
+
 		Parameters: map[string]string{},
 		Modules:    projectconfig.Modules{},
 	}
