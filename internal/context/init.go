@@ -228,8 +228,8 @@ func chooseStack(registry Registry) []string {
 	if err != nil {
 		exit.Fatal("Prompt failed %v\n", err)
 	}
-	return registry[providerResult]
 
+	return registry[providerResult]
 }
 
 func fillProviderDetails(projectConfig *projectconfig.ZeroProjectConfig, s project.Secrets) {
@@ -266,7 +266,8 @@ func defaultProjConfig() projectconfig.ZeroProjectConfig {
 		Infrastructure: projectconfig.Infrastructure{
 			AWS: nil,
 		},
+
 		Parameters: map[string]string{},
-		Modules:    []string{},
+		Modules:    projectconfig.Modules{},
 	}
 }
