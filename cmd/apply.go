@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"github.com/commitdev/zero/internal/apply"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/constants"
-	"github.com/commitdev/zero/internal/context"
 	"github.com/spf13/cobra"
 )
 
@@ -21,12 +21,7 @@ var applyCmd = &cobra.Command{
 	Use:   "apply",
 	Short: "Execute modules to create projects, infrastructure, etc.",
 	Run: func(cmd *cobra.Command, args []string) {
-
-		// @TODO : Pass environments to make commands
-
-		// @TODO where applyConfigPath comes from?
-		projectContext := context.Apply(applyEnvironments, applyConfigPath)
 		// @TODO rootdir?
-		projectconfig.Apply(projectconfig.RootDir, projectContext, applyEnvironments)
+		apply.Apply(projectconfig.RootDir, applyConfigPath, applyEnvironments)
 	},
 }

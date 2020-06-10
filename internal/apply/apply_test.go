@@ -1,21 +1,17 @@
-package projectconfig_test
+package apply_test
 
 import (
 	"testing"
 
-	"github.com/commitdev/zero/internal/config/projectconfig"
+	"github.com/commitdev/zero/internal/apply"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestApply(t *testing.T) {
 	// @TODO is there a way to do this without relative paths?
-	// execCMD will use the current folder as target...
-	dir := "../../../tests/test_data/"
-	projectName := "sample_project"
-	projectContext := &projectconfig.ZeroProjectConfig{
-		Name:    projectName,
-		Modules: projectconfig.EKSGoReactSampleModules(),
-	}
+	dir := "../../tests/test_data/sample_project/"
+	applyConfigPath := constants.ZeroProjectYml
 	applyEnvironments := []string{"staging", "production"}
 
 	want := []string{
@@ -25,7 +21,7 @@ func TestApply(t *testing.T) {
 	}
 
 	t.Run("Should run apply and execute make on each folder module", func(t *testing.T) {
-		got := projectconfig.Apply(dir, projectContext, applyEnvironments)
-		assert.Equal(t, want, got)
+		got := apply.Apply(dir, applyConfigPath, applyEnvironments)
+		assert.ElementsMatch(t, want, got)
 	})
 }
