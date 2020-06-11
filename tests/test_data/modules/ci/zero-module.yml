@@ -10,7 +10,8 @@ template:
   delimiters:
     - "<%"
     - "%>"
-  output: "github/test"
+  inputDir: 'templates'
+  outputDir: ".circleci"
 
 # required context parameters: will throw a warning message at the end if any of the context parameters are not present
 # contextRequired: 

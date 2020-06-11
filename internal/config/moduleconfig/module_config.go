@@ -28,8 +28,8 @@ type Parameter struct {
 type TemplateConfig struct {
 	StrictMode bool
 	Delimiters []string
-	InputDir   string
-	OutputDir  string
+	InputDir   string `yaml:"inputDir"`
+	OutputDir  string `yaml:"outputDir"`
 }
 
 func LoadModuleConfig(filePath string) (ModuleConfig, error) {

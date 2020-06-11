@@ -27,7 +27,7 @@ func TestGetSourceDir(t *testing.T) {
 	}
 }
 
-func TestNewTemplateModule(t *testing.T) {
+func TestParseModuleConfig(t *testing.T) {
 	testModuleSource := "../../tests/test_data/modules/ci"
 	var mod moduleconfig.ModuleConfig
 
@@ -44,6 +44,13 @@ func TestNewTemplateModule(t *testing.T) {
 		}
 		assert.Equal(t, "platform", param.Field)
 		assert.Equal(t, "CI Platform", param.Label)
+	})
+
+	t.Run("TemplateConfig is unmarshaled", func(t *testing.T) {
+		mod, _ = module.ParseModuleConfig(testModuleSource)
+		assert.Equal(t, ".circleci", mod.TemplateConfig.OutputDir)
+		assert.Equal(t, "templates", mod.TemplateConfig.InputDir)
+		assert.Equal(t, []string{"<%", "%>"}, mod.TemplateConfig.Delimiters)
 	})
 
 }
