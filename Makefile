@@ -4,7 +4,7 @@ PKG ?=github.com/commitdev/zero
 BUILD_ARGS=-v -ldflags=all="-X ${PKG}/cmd.appVersion=${VERSION} -X ${PKG}/cmd.appBuild=${BUILD}"
 
 check:
-	go test ./...
+	go test -v $(go list -f '{{.Dir}}' ./... | grep -v /tmp/)
 
 fmt:
 	go fmt ./...

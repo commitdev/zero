@@ -1,0 +1,17 @@
+on:
+  push:
+    branches:
+      - 158-run-tests-github-actions
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  unit_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Go Tests 
+        uses: docker://golang:1.12
+        run: |
+          make check
