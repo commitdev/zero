@@ -5,34 +5,73 @@ import (
 	"fmt"
 	"github.com/machinebox/graphql"
 	"os/exec"
+	"strings"
 )
 
-// this is being developed with the following assumptions:
-// 1. create.go will handle parsing the repo names and github credentials and pass them into initializeRepostiories().
-// 2. if organizationName is set, create an org owned repo.  if not, create a personal repo.
+// InitializeRepository Creates and initializes a github repository for the given url
+// repositoryUrl is expected to be in the format "github.com/{ownerName}/{repositoryName}"
+func InitializeRepository(repositoryUrl string, githubApiKey string) {
 
-// takes a list of subdirectories containing modules to create a repository and do initial commit for
-func InitializeRepositories(moduleDirs []string, remoteRepository string, organizationName string, githubApiKey string) {
+	var err error
+	ownerName, repositoryName, err := parseRepositoryUrl(repositoryUrl)
+	if err != nil {
+		fmt.Printf("error creating repository: %s\n", err.Error())
+		return
+	}
 
-	for _, moduleDir := range moduleDirs {
-		// if organizationName is not set, create a personal github repo,  else create an org owned repo.
-		if organizationName == "" {
-			if err := createPersonalRepository(moduleDir, githubApiKey); err != nil {
-				fmt.Printf("error creating repository: %s\n", err.Error())
-				continue
-			}
-		} else {
-			if err := createOrganizationOwnedRepository(moduleDir, githubApiKey, organizationName); err != nil {
-				fmt.Printf("error creating repository: %s\n", err.Error())
-				continue
-			}
+	isOrgOwned, ownerId, err := isOrganizationOwned(ownerName, githubApiKey)
+	if err != nil {
+		fmt.Printf("error creating repository: %s\n", err.Error())
+		return
+	}
+
+	if isOrgOwned {
+		r := graphql.NewRequest(createOrganizationRepositoryMutation)
+		r.Var("repoName", repositoryName)
+		r.Var("repoDescription", fmt.Sprintf("Repository for %s", repositoryName))
+		r.Var("ownerId", ownerId)
+		r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", githubApiKey))
+
+		if err := createRepository(r); err != nil {
+			fmt.Printf("error creating repository: %s\n", err.Error())
+			return
 		}
+	} else {
+		r := graphql.NewRequest(createPersonalRepositoryMutation)
+		r.Var("repoName", repositoryName)
+		r.Var("repoDescription", fmt.Sprintf("Repository for %s", repositoryName))
+		r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", githubApiKey))
 
-		if err := doInitialCommit(moduleDir, remoteRepository); err != nil {
-			fmt.Printf("error initializing repository: %s\n", err.Error())
+		if err := createRepository(r); err != nil {
+			fmt.Printf("error creating repository: %s\n", err.Error())
+			return
 		}
 	}
 
+	if err := doInitialCommit(ownerName, repositoryName); err != nil {
+		fmt.Printf("error initializing repository: %s\n", err.Error())
+		return
+	}
+
+	fmt.Printf("Repository successfully created and initialized for module: %s\n", repositoryName)
+}
+
+// parseRepositoryUrl extracts the owner name and repository name from a repository url.
+// repositoryUrl is expected to be in the format "github.com/{ownerName}/{repositoryName}"
+func parseRepositoryUrl(repositoryUrl string) (string, string, error) {
+	if len(repositoryUrl) == 0 {
+		return "","", fmt.Errorf("invalid repository url.  expected format \"github.com/{ownerName}/{repositoryName}\"")
+	}
+
+	segments := strings.Split(repositoryUrl, "/")
+	if len(segments) != 3 {
+		return "","", fmt.Errorf("invalid repository url.  expected format \"github.com/{ownerName}/{repositoryName}\"")
+	}
+
+	ownerName := segments[1]
+	repositoryName := segments[2]
+
+	return ownerName, repositoryName, nil
 }
 
 const createPersonalRepositoryMutation = `mutation ($repoName: String!, $repoDescription: String!) {
@@ -47,30 +86,6 @@ const createPersonalRepositoryMutation = `mutation ($repoName: String!, $repoDes
 		}
 	}`
 
-func createPersonalRepository(moduleDir string, githubApiKey string) error {
-
-	fmt.Printf("Creating repository for module: %s\n", moduleDir)
-
-	// create client and mutation
-	client := graphql.NewClient("https://api.github.com/graphql")
-	req := graphql.NewRequest(createPersonalRepositoryMutation)
-	req.Var("repoName", moduleDir)
-	req.Var("repoDescription", fmt.Sprintf("Repository for %s", moduleDir))
-
-	// add auth token
-	var bearer = fmt.Sprintf("Bearer %s", githubApiKey)
-	req.Header.Add("Authorization", bearer)
-
-	ctx := context.Background()
-	if err := client.Run(ctx, req, nil); err != nil {
-		return err
-	}
-
-	fmt.Printf("Repository successfully created for module: %s\n", moduleDir)
-
-	return nil
-}
-
 const createOrganizationRepositoryMutation = `mutation ($repoName: String!, $repoDescription: String!, $ownerId: String!) {
 		createRepository(
 			input: {
@@ -84,8 +99,19 @@ const createOrganizationRepositoryMutation = `mutation ($repoName: String!, $rep
 		}
 	}`
 
-const getOrganizationQuery = `query ($organizationName: String!) {
-		organization(login: $organizationName) {
+// createRepository will create a new repository in github
+func createRepository(request *graphql.Request) error {
+	c := graphql.NewClient("https://api.github.com/graphql")
+	ctx := context.Background()
+	if err := c.Run(ctx, request, nil); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+const getOrganizationQuery = `query ($ownerName: String!) {
+		organization(login: $ownerName) {
 			id
 		}
 	}`
@@ -96,51 +122,39 @@ type organizationQueryResponse struct {
 	}
 }
 
-func createOrganizationOwnedRepository(moduleDir string, githubApiKey string, organizationName string) error {
+// isOrganizationOwned will determine if ownerName is an organization.
+// If ownerName is an organization it's id will be returned.
+func isOrganizationOwned(ownerName string, githubApiKey string) (bool, string, error) {
+	oRequest := graphql.NewRequest(getOrganizationQuery)
+	oRequest.Var("ownerName", ownerName)
+	oRequest.Header.Add("Authorization", fmt.Sprintf("Bearer %s", githubApiKey))
 
-	fmt.Printf("Creating org owned repository for module: %s\n", moduleDir)
-
-	// create client and organization query
-	var bearer = fmt.Sprintf("Bearer %s", githubApiKey)
-	client := graphql.NewClient("https://api.github.com/graphql")
-	orgIdReq := graphql.NewRequest(getOrganizationQuery)
-	orgIdReq.Var("organizationName", organizationName)
-	orgIdReq.Header.Add("Authorization", bearer)
-
-	var orgIdResp organizationQueryResponse
+	var oResponse organizationQueryResponse
+	c := graphql.NewClient("https://api.github.com/graphql")
 	ctx := context.Background()
-	if err := client.Run(ctx, orgIdReq, &orgIdResp); err != nil {
-		return err
+	if err := c.Run(ctx, oRequest, &oResponse); err != nil {
+
+		notAnOrgMessage := fmt.Sprintf("graphql: Could not resolve to an Organization with the login of '%s'.", ownerName)
+		if err.Error() == notAnOrgMessage {
+			return false, "", nil
+		}
+		return false, "", err
 	}
-	organizationId := orgIdResp.Organization.Id
+	organizationId := oResponse.Organization.Id
 
-	// create mutation and run it
-	req := graphql.NewRequest(createOrganizationRepositoryMutation)
-	req.Var("repoName", moduleDir)
-	req.Var("repoDescription", fmt.Sprintf("Repository for %s", moduleDir))
-	req.Var("ownerId", organizationId)
-	req.Header.Add("Authorization", bearer)
-	if err := client.Run(ctx, req, nil); err != nil {
-		return err
-	}
-
-	fmt.Printf("Repository successfully created for module: %s\n", moduleDir)
-
-	return nil
+	return true, organizationId, nil
 }
 
-type InitialCommands struct {
+type initialCommands struct {
 	description string
 	command     string
 	args        []string
 }
 
-// do initial commit to a repository
-func doInitialCommit(moduleDir string, remoteRepository string) error {
-	fmt.Printf("Initializing repository for module: %s\n", moduleDir)
-
-	remoteOrigin := fmt.Sprintf("%s/%s.git", remoteRepository, moduleDir)
-	commands := []InitialCommands{
+// doInitialCommit runs the git commands that initialize and do the first commit to a repository.
+func doInitialCommit(ownerName string, repositoryName string) error {
+	remoteOrigin := fmt.Sprintf("git@github.com:%s/%s.git", ownerName, repositoryName)
+	commands := []initialCommands{
 		{
 			description: "git init",
 			command:     "git",
@@ -172,7 +186,7 @@ func doInitialCommit(moduleDir string, remoteRepository string) error {
 		fmt.Printf(">> %s\n", command.description)
 
 		cmd := exec.Command(command.command, command.args...)
-		cmd.Dir = "./" + moduleDir
+		cmd.Dir = "./" + repositoryName
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			fmt.Printf("ERROR: failed to run %s: %s\n", command.description, err.Error())
@@ -185,8 +199,6 @@ func doInitialCommit(moduleDir string, remoteRepository string) error {
 			}
 		}
 	}
-
-	fmt.Printf("Repository successfully initialized for module: %s\n", moduleDir)
 
 	return nil
 }
