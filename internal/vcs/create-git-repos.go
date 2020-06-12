@@ -32,7 +32,7 @@ func InitializeRepository(repositoryUrl string, githubApiKey string) {
 		r.Var("ownerId", ownerId)
 		r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", githubApiKey))
 
-		if err := createRepository(r, repositoryName); err != nil {
+		if err := createRepository(r); err != nil {
 			fmt.Printf("error creating repository: %s\n", err.Error())
 			return
 		}
@@ -42,7 +42,7 @@ func InitializeRepository(repositoryUrl string, githubApiKey string) {
 		r.Var("repoDescription", fmt.Sprintf("Repository for %s", repositoryName))
 		r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", githubApiKey))
 
-		if err := createRepository(r, repositoryName); err != nil {
+		if err := createRepository(r); err != nil {
 			fmt.Printf("error creating repository: %s\n", err.Error())
 			return
 		}
@@ -50,7 +50,10 @@ func InitializeRepository(repositoryUrl string, githubApiKey string) {
 
 	if err := doInitialCommit(ownerName, repositoryName); err != nil {
 		fmt.Printf("error initializing repository: %s\n", err.Error())
+		return
 	}
+
+	fmt.Printf("Repository successfully created and initialized for module: %s\n", repositoryName)
 }
 
 // parseRepositoryUrl extracts the owner name and repository name from a repository url.
@@ -67,8 +70,6 @@ func parseRepositoryUrl(repositoryUrl string) (string, string, error) {
 
 	ownerName := segments[1]
 	repositoryName := segments[2]
-
-	fmt.Printf("found owner %s, repository %s\n", ownerName, repositoryName)
 
 	return ownerName, repositoryName, nil
 }
@@ -99,16 +100,12 @@ const createOrganizationRepositoryMutation = `mutation ($repoName: String!, $rep
 	}`
 
 // createRepository will create a new repository in github
-func createRepository(request *graphql.Request, repositoryName string) error {
-	fmt.Printf("Creating repository for module: %s\n", repositoryName)
-
+func createRepository(request *graphql.Request) error {
 	c := graphql.NewClient("https://api.github.com/graphql")
 	ctx := context.Background()
 	if err := c.Run(ctx, request, nil); err != nil {
 		return err
 	}
-
-	fmt.Printf("Repository successfully created for module: %s\n", repositoryName)
 
 	return nil
 }
@@ -156,10 +153,7 @@ type initialCommands struct {
 
 // doInitialCommit runs the git commands that initialize and do the first commit to a repository.
 func doInitialCommit(ownerName string, repositoryName string) error {
-	fmt.Printf("Initializing repository for module: %s\n", repositoryName)
-
 	remoteOrigin := fmt.Sprintf("git@github.com:%s/%s.git", ownerName, repositoryName)
-	fmt.Printf("remote origin: %s\n", remoteOrigin)
 	commands := []initialCommands{
 		{
 			description: "git init",
@@ -205,8 +199,6 @@ func doInitialCommit(ownerName string, repositoryName string) error {
 			}
 		}
 	}
-
-	fmt.Printf("Repository successfully initialized for module: %s\n", repositoryName)
 
 	return nil
 }
