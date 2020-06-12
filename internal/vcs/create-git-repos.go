@@ -12,15 +12,16 @@ import (
 // repositoryUrl is expected to be in the format "github.com/{ownerName}/{repositoryName}"
 func InitializeRepository(repositoryUrl string, githubApiKey string) {
 
-	ownerName, repositoryName, pErr := parseRepositoryUrl(repositoryUrl)
-	if pErr != nil {
-		fmt.Printf("error creating repository: %s\n", pErr.Error())
+	var err error
+	ownerName, repositoryName, err := parseRepositoryUrl(repositoryUrl)
+	if err != nil {
+		fmt.Printf("error creating repository: %s\n", err.Error())
 		return
 	}
 
-	isOrgOwned, ownerId, iErr := isOrganizationOwned(ownerName, githubApiKey)
-	if iErr != nil {
-		fmt.Printf("error creating repository: %s\n", iErr.Error())
+	isOrgOwned, ownerId, err := isOrganizationOwned(ownerName, githubApiKey)
+	if err != nil {
+		fmt.Printf("error creating repository: %s\n", err.Error())
 		return
 	}
 
