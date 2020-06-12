@@ -42,13 +42,6 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 
 	moduleSources := chooseStack(getRegistry())
 	moduleConfigs := loadAllModules(moduleSources)
-	// Initialize project structs for modules
-	// for moduleName := range moduleConfigs {
-	// 	projectConfig.Modules[moduleName] = Module{
-	// 		Parameters: projectconfig.Parameters{},
-	// 		Files:      projectconfig.Files{},
-	// 	}
-	// }
 
 	prompts := getProjectPrompts(projectConfig.Name, moduleConfigs)
 
@@ -69,8 +62,6 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 	}
 
 	projectParameters := promptAllModules(moduleConfigs)
-
-	// initialize stuff
 
 	// Map parameter values back to specific modules
 	for moduleName, module := range moduleConfigs {
