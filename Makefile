@@ -7,7 +7,7 @@ deps:
 	go mod download
 
 check:
-	go test -v $(go list -f '{{.Dir}}' ./... | grep -v /tmp/)
+	go list -f '{{.Dir}}' ./... | grep -v /tmp/ | xargs go test -v
 
 fmt:
 	go fmt ./...
