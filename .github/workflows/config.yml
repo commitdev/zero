@@ -1,6 +1,7 @@
-
-
 on:
+  push:
+    branches:
+      - 158-run-tests-github-actions
   pull_request:
     branches:
       - master
