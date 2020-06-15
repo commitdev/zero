@@ -46,6 +46,10 @@ func TestParseModuleConfig(t *testing.T) {
 		assert.Equal(t, "CI Platform", param.Label)
 	})
 
+	t.Run("requiredCredentials are loaded", func(t *testing.T) {
+		assert.Equal(t, []string{"aws", "circleci", "github"}, mod.RequiredCredentials)
+	})
+
 	t.Run("TemplateConfig is unmarshaled", func(t *testing.T) {
 		mod, _ = module.ParseModuleConfig(testModuleSource)
 		assert.Equal(t, ".circleci", mod.TemplateConfig.OutputDir)

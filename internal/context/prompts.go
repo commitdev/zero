@@ -8,9 +8,11 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/manifoldco/promptui"
+	"gopkg.in/yaml.v2"
 )
 
 type PromptHandler struct {
@@ -146,4 +148,42 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 		parameters[promptConfig.Field] = result
 	}
 	return parameters, nil
+}
+
+func promptCredentialsAndFillProjectCreds(credentialPrompts map[string][]PromptHandler, credentials globalconfig.ProjectCredential) globalconfig.ProjectCredential {
+	promptsValues := map[string]map[string]string{}
+
+	for vendor, prompts := range credentialPrompts {
+		vendorPromptValues := map[string]string{}
+
+		// vendors like AWS have multiple prompts (accessKeyId and secretAccessKey)
+		for _, prompt := range prompts {
+			vendorPromptValues[prompt.Field] = prompt.GetParam(map[string]string{})
+		}
+		promptsValues[vendor] = vendorPromptValues
+	}
+
+	// FIXME: what is a good way to dynamically modify partial data of a struct
+	// current just marashing to yaml, then unmarshaling into the base struct
+	yamlContent, _ := yaml.Marshal(promptsValues)
+	yaml.Unmarshal(yamlContent, &credentials)
+	return credentials
+}
+
+func appendToSet(set []string, toAppend []string) []string {
+	for _, appendee := range toAppend {
+		if !itemInSlice(set, appendee) {
+			set = append(set, appendee)
+		}
+	}
+	return set
+}
+
+func itemInSlice(slice []string, target string) bool {
+	for _, item := range slice {
+		if item == target {
+			return true
+		}
+	}
+	return false
 }

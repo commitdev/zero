@@ -4,6 +4,11 @@ author: ""
 icon: ""
 thumbnail: ""
 
+requiredCredentials:
+  - aws
+  - circleci
+  - github
+
 # Template variables to populate, these could be overwritten by the file spefic frontmatter variables
 template: 
   # strictMode: true # will only parse files that includes the .tmpl.* extension, otherwise it will copy file 

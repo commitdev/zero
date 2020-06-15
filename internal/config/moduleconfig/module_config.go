@@ -12,7 +12,7 @@ type ModuleConfig struct {
 	Description         string
 	Author              string
 	TemplateConfig      `yaml:"template"`
-	RequiredCredentials []string
+	RequiredCredentials []string `yaml:"requiredCredentials"`
 	Parameters          []Parameter
 }
 
