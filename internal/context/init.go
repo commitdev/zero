@@ -18,6 +18,7 @@ import (
 	project "github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
+	"github.com/k0kubun/pp"
 	"github.com/manifoldco/promptui"
 )
 
@@ -41,9 +42,6 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 
 	moduleSources := chooseStack(getRegistry())
 	moduleConfigs := loadAllModules(moduleSources)
-	for _ = range moduleConfigs {
-		// TODO: initialize module structs inside project
-	}
 
 	prompts := getProjectPrompts(projectConfig.Name, moduleConfigs)
 
@@ -64,19 +62,28 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 	}
 
 	projectParameters := promptAllModules(moduleConfigs)
-	for k, v := range projectParameters {
-		projectConfig.Parameters[k] = v
-		// TODO: Add parameters to module structs inside project
-	}
 
-	for moduleName, _ := range moduleConfigs {
-		// @TODO : Uncomment when this struct is implemented
+	// Map parameter values back to specific modules
+	for moduleName, module := range moduleConfigs {
 		repoName := prompts[moduleName].GetParam(initParams)
 		repoURL := fmt.Sprintf("%s/%s", initParams["GithubRootOrg"], repoName)
-		//projectConfig.Modules[moduleName].Files.Directory = prompts[moduleName].GetParam(initParams)
-		//projectConfig.Modules[moduleName].Files.Repository = repoURL
-		fmt.Println(repoURL)
+		projectModuleParams := make(projectconfig.Parameters)
+
+		// Loop through all the prompted values and find the ones relevant to this module
+		for parameterKey, parameterValue := range projectParameters {
+			for _, moduleParameter := range module.Parameters {
+				if moduleParameter.Field == parameterKey {
+					projectModuleParams[parameterKey] = parameterValue
+				}
+			}
+
+		}
+
+		projectConfig.Modules[moduleName] = projectconfig.NewModule(projectModuleParams, repoName, repoURL)
 	}
+
+	// TODO : Write the project config file. For now, print.
+	pp.Println(projectConfig)
 
 	// TODO: load ~/.zero/config.yml (or credentials)
 	// TODO: prompt global credentials
