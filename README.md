@@ -3,6 +3,10 @@
 This is a WIP version of our tool Zero which aims to make it quick and easy for developers to bootstrap a new environment and get to writing code.
 
 For the older, simple tool that just rendered templates, see [commitdev/zero-old][old]
+
+## Project Board
+https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?filterLogic=any&repos=203630543,247773730,257676371,258369081
+
 ## Getting Started
 
 TBD
