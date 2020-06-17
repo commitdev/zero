@@ -1,24 +1,45 @@
-package generate
+package generate_test
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
+
+	"github.com/commitdev/zero/internal/config/projectconfig"
+	"github.com/commitdev/zero/internal/generate"
+	"github.com/stretchr/testify/assert"
 )
 
-func setupTeardown(t *testing.T) func(t *testing.T) {
-	outputPath := "tmp/test"
-	os.RemoveAll(outputPath)
+const baseTestFixturesDir = "../../tests/test_data/generate/"
+
+func setupTeardown(t *testing.T) (func(t *testing.T), string) {
+	tmpDir := filepath.Join(os.TempDir(), "generate")
+	os.MkdirAll(tmpDir, 0755)
+	os.RemoveAll(tmpDir)
 	return func(t *testing.T) {
-		os.RemoveAll(outputPath)
-	}
+		os.RemoveAll(tmpDir)
+	}, tmpDir
 }
 
 func TestGenerateModules(t *testing.T) {
-	teardown := setupTeardown(t)
+	teardown, tmpDir := setupTeardown(t)
 	defer teardown(t)
 
-	// TODO organize test utils and write assertions
-	// generatorConfig := config.LoadGeneratorConfig("../../tests/test_data/configs/zero-basic.yml")
+	projectConfig := projectconfig.ZeroProjectConfig{
+		Name: "foo",
+		Modules: projectconfig.Modules{
+			"mod1": projectconfig.NewModule(map[string]string{"test": "bar"}, tmpDir, "n/a", baseTestFixturesDir),
+		},
+	}
 
-	// GenerateModules(generatorConfig)
+	generate.Generate(projectConfig)
+
+	content, err := ioutil.ReadFile(filepath.Join(tmpDir, "file_to_template.txt"))
+	assert.NoError(t, err)
+
+	expectedContent := `Name is foo
+Params.test is bar
+`
+	assert.Equal(t, string(content), expectedContent)
 }
