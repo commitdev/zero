@@ -31,7 +31,7 @@ func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
 	}
 	wg.Wait()
 
-	flog.Infof(":pencil: Rendering Modules")
+	flog.Infof(":memo: Rendering Modules")
 	for _, mod := range projectConfig.Modules {
 		// Load module configuration
 		moduleConfig, err := module.ParseModuleConfig(mod.Files.Source)
@@ -52,11 +52,15 @@ func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
 			mod.Parameters,
 		}
 
-		fileTemplates := NewTemplates(moduleDir, outputDir, false)
+		fileTemplates := newTemplates(moduleDir, outputDir, false)
 
-		ExecuteTemplates(fileTemplates, templateData, delimiters)
+		executeTemplates(fileTemplates, templateData, delimiters)
 	}
 
+	flog.Infof(":up_arrow: Done Rendering - committing repositories to version control")
+	// TODO : Integrate this work
+
+	flog.Infof(":check_mark_button: Done - run zero apply to create any required infrastructure or execute any other remote commands to prepare your environments.")
 	return nil
 }
 
@@ -66,11 +70,11 @@ type TemplateConfig struct {
 	isTemplate  bool
 }
 
-// NewTemplates walks the module directory to find all  to be templated
-func NewTemplates(moduleDir string, outputDir string, overwrite bool) []*TemplateConfig {
+// newTemplates walks the module directory to find all to be templated
+func newTemplates(moduleDir string, outputDir string, overwrite bool) []*TemplateConfig {
 	templates := []*TemplateConfig{}
 
-	paths, err := GetAllFilePathsInDirectory(moduleDir)
+	paths, err := getAllFilePathsInDirectory(moduleDir)
 	if err != nil {
 		panic(err)
 	}
@@ -104,8 +108,8 @@ func NewTemplates(moduleDir string, outputDir string, overwrite bool) []*Templat
 	return templates
 }
 
-// GetAllFilePathsInDirectory Recursively get all file paths in directory, including sub-directories.
-func GetAllFilePathsInDirectory(moduleDir string) ([]string, error) {
+// getAllFilePathsInDirectory Recursively get all file paths in directory, including sub-directories.
+func getAllFilePathsInDirectory(moduleDir string) ([]string, error) {
 	var paths []string
 	err := filepath.Walk(moduleDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -123,7 +127,7 @@ func GetAllFilePathsInDirectory(moduleDir string) ([]string, error) {
 	return paths, nil
 }
 
-func ExecuteTemplates(templates []*TemplateConfig, data interface{}, delimiters []string) {
+func executeTemplates(templates []*TemplateConfig, data interface{}, delimiters []string) {
 	var wg sync.WaitGroup
 	leftDelim := delimiters[0]
 	rightDelim := delimiters[1]

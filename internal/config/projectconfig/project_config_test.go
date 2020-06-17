@@ -25,7 +25,7 @@ func TestLoadConfig(t *testing.T) {
 		Modules: eksGoReactSampleModules(),
 	}
 
-	t.Run("Should load and unmarshall config correctly", func(t *testing.T) {
+	t.Run("Should load and unmarshal config correctly", func(t *testing.T) {
 		got := projectconfig.LoadConfig(filePath)
 		if !cmp.Equal(want, got, cmpopts.EquateEmpty()) {
 			t.Errorf("projectconfig.ZeroProjectConfig.Unmarshal mismatch (-want +got):\n%s", cmp.Diff(want, got))
