@@ -8,7 +8,6 @@ import (
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/generate"
 	"github.com/commitdev/zero/pkg/util/exit"
-	"github.com/k0kubun/pp"
 	"github.com/spf13/cobra"
 )
 
@@ -35,6 +34,5 @@ func Create(dir string, createConfigPath string) {
 	configFilePath := path.Join(dir, createConfigPath)
 	projectConfig := projectconfig.LoadConfig(configFilePath)
 
-	pp.Println(projectConfig)
 	generate.Generate(*projectConfig)
 }

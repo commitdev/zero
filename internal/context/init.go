@@ -79,10 +79,6 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 		projectConfig.Modules[moduleName] = projectconfig.NewModule(projectModuleParams, repoName, repoURL, mappedSources[moduleName])
 	}
 
-	// TODO : Write the project config file. For now, print.
-	pp.Println(projectConfig)
-	pp.Print(projectCredentials)
-
 	// TODO: load ~/.zero/config.yml (or credentials)
 	// TODO: prompt global credentials
 

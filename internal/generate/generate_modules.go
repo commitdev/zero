@@ -1,6 +1,7 @@
 package generate
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -11,67 +12,50 @@ import (
 
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/constants"
+	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/flog"
-	"github.com/k0kubun/pp"
 
 	"github.com/commitdev/zero/pkg/util/fs"
 )
 
-// func GenerateModules(cfg *config.GeneratorConfig) {
-// 	var templateModules []*module.TemplateModule
-
-// 	// TODO: Refactor this since the module struct is changing
-
-// 	// Initiate all the modules defined in the config
-// 	// for _, moduleConfig := range cfg.Modules {
-// 	//mod, err := module.NewTemplateModule(moduleConfig)
-
-// 	// if err != nil {
-// 	// 	exit.Error("module failed to load: %s", err)
-// 	// }
-// 	// templateModules = append(templateModules, mod)
-// 	// }
-
-// 	// Prompt for module params and execute each of the generator modules
-// 	for _, mod := range templateModules {
-// 		// TODO: read zero-project.yml instead
-
-// 		err := Generate(mod, cfg)
-// 		if err != nil {
-// 			exit.Error("module %s: %s", mod.Source, err)
-// 		}
-// 	}
-// }
-
-// type TemplateParams struct {
-// 	Name    string
-// 	Context map[string]string
-// 	Params  map[string]string
-// }
-
 // Generate accepts a projectconfig struct and renders the templates for all referenced modules
 func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
+	flog.Infof(":clock: Fetching Modules")
 
-	// for _, module := range projectConfig.Modules {
+	// Make sure module sources are on disk
+	wg := sync.WaitGroup{}
+	wg.Add(len(projectConfig.Modules))
+	for _, mod := range projectConfig.Modules {
+		go module.FetchModule(mod.Files.Source, &wg)
+	}
+	wg.Wait()
 
-	// 	moduleDir := path.Join(module.GetSourceDir(module..Source), mod.Config.TemplateConfig.InputDir)
-	// 	delimiters := mod.Config.TemplateConfig.Delimiters
-	// 	overwrite := mod.Overwrite
-	// 	outputDir := mod.Output
-	// 	if outputDir == "" {
-	// 		outputDir = mod.Config.TemplateConfig.OutputDir
-	// 	}
+	flog.Infof(":pencil: Rendering Modules")
+	for _, mod := range projectConfig.Modules {
+		// Load module configuration
+		moduleConfig, err := module.ParseModuleConfig(mod.Files.Source)
+		if err != nil {
+			return fmt.Errorf("unable to load module:  %v", err)
+		}
 
-	// 	templateData := TemplateParams{}
-	// 	templateData.Name = generatorCfg.Name
-	// 	templateData.Context = generatorCfg.Context
-	// 	templateData.Params = mod.Params
+		moduleDir := path.Join(module.GetSourceDir(mod.Files.Source), moduleConfig.InputDir)
+		delimiters := moduleConfig.Delimiters
+		outputDir := mod.Files.Directory
 
-	// 	fileTmplts := NewTemplates(moduleDir, outputDir, overwrite)
+		// Data that will be passed in to each template
+		templateData := struct {
+			Name   string
+			Params projectconfig.Parameters
+		}{
+			projectConfig.Name,
+			mod.Parameters,
+		}
 
-	// 	ExecuteTemplates(fileTmplts, templateData, delimiters)
-	// }
+		fileTemplates := NewTemplates(moduleDir, outputDir, false)
+
+		ExecuteTemplates(fileTemplates, templateData, delimiters)
+	}
 
 	return nil
 }
@@ -149,8 +133,8 @@ func ExecuteTemplates(templates []*TemplateConfig, data interface{}, delimiters 
 	if rightDelim == "" {
 		rightDelim = "}}"
 	}
-	flog.Infof("Templating params:")
-	pp.Println(data)
+	// flog.Infof("Templating params:")
+	// pp.Println(data)
 
 	for _, tmpltConfig := range templates {
 		source := tmpltConfig.source
