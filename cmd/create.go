@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"path"
+	"strings"
 
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/constants"
@@ -28,7 +29,7 @@ var createCmd = &cobra.Command{
 }
 
 func Create(dir string, createConfigPath string) {
-	if createConfigPath == "" {
+	if strings.Trim(createConfigPath, " ") == "" {
 		exit.Fatal("config path cannot be empty!")
 	}
 	configFilePath := path.Join(dir, createConfigPath)
