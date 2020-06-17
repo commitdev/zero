@@ -34,7 +34,7 @@ type Modules map[string]Module
 
 type Module struct {
 	Parameters Parameters `yaml:"parameters,omitempty"`
-	Files      Files      `yaml:"files,omitempty"`
+	Files      Files
 }
 
 type Parameters map[string]string
@@ -42,6 +42,7 @@ type Parameters map[string]string
 type Files struct {
 	Directory  string `yaml:"dir,omitempty"`
 	Repository string `yaml:"repo,omitempty"`
+	Source     string
 }
 
 func LoadConfig(filePath string) *ZeroProjectConfig {
@@ -62,35 +63,13 @@ func (c *ZeroProjectConfig) Print() {
 	pp.Println(c)
 }
 
-// @TODO only an example, needs refactoring
-func EKSGoReactSampleModules() Modules {
-	parameters := Parameters{}
-	return Modules{
-		"aws-eks-stack":             NewModule(parameters, "zero-aws-eks-stack", "github.com/commitdev/zero-aws-eks-stack"),
-		"deployable-backend":        NewModule(parameters, "zero-deployable-backend", "github.com/commitdev/zero-deployable-backend"),
-		"deployable-react-frontend": NewModule(parameters, "zero-deployable-react-frontend", "github.com/commitdev/zero-deployable-react-frontend"),
-	}
-}
-
-// @TODO only an example, needs refactoring
-func InfrastructureSampleModules() Modules {
-	parameters := Parameters{
-		"repoName":       "infrastructure",
-		"region":         "us-east-1",
-		"accountId":      "12345",
-		"productionHost": "something.com",
-	}
-	return Modules{
-		"infrastructure": NewModule(parameters, "infrastructure", "https://github.com/myorg/infrastructure"),
-	}
-}
-
-func NewModule(parameters Parameters, directory string, repository string) Module {
+func NewModule(parameters Parameters, directory string, repository string, source string) Module {
 	return Module{
 		Parameters: parameters,
 		Files: Files{
 			Directory:  directory,
 			Repository: repository,
+			Source:     source,
 		},
 	}
 }

@@ -11,6 +11,28 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
+// @TODO only an example, needs refactoring
+func eksGoReactSampleModules() Modules {
+	parameters := Parameters{}
+	return Modules{
+		"aws-eks-stack":             projectconfig.NewModule(parameters, "zero-aws-eks-stack", "github.com/something/repo1", "github.com/commitdev/zero-aws-eks-stack"),
+		"deployable-backend":        projectconfig.NewModule(parameters, "zero-deployable-backend", "github.com/something/repo2", "github.com/commitdev/zero-deployable-backend"),
+		"deployable-react-frontend": projectconfig.NewModule(parameters, "zero-deployable-react-frontend", "github.com/something/repo3", "github.com/commitdev/zero-deployable-react-frontend"),
+	}
+}
+
+// @TODO only an example, needs refactoring
+func sampleModules() Modules {
+	parameters := Parameters{
+		"repoName":       "infrastructure",
+		"region":         "us-east-1",
+		"accountId":      "12345",
+		"productionHost": "something.com",
+	}
+	return Modules{
+		"infrastructure": projectconfig.NewModule(parameters, "infrastructure", "https://github.com/myorg/infrastructure", "github.com/commitdev/zero-aws-eks-stack"),
+	}
+}
 func TestLoadConfig(t *testing.T) {
 	file, err := ioutil.TempFile(os.TempDir(), "config.yml")
 	if err != nil {
@@ -20,8 +42,8 @@ func TestLoadConfig(t *testing.T) {
 	file.Write([]byte(validConfigContent()))
 	filePath := file.Name()
 
-	modules := projectconfig.InfrastructureSampleModules()
-	sampleModules := projectconfig.EKSGoReactSampleModules()
+	modules := sampleModules()
+	sampleModules := eksGoReactSampleModules()
 
 	for k, v := range sampleModules {
 		modules[k] = v

@@ -9,66 +9,69 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/constants"
-	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/util"
-	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/k0kubun/pp"
 
 	"github.com/commitdev/zero/pkg/util/fs"
 )
 
-func GenerateModules(cfg *config.GeneratorConfig) {
-	var templateModules []*module.TemplateModule
+// func GenerateModules(cfg *config.GeneratorConfig) {
+// 	var templateModules []*module.TemplateModule
 
-	// TODO: Refactor this since the module struct is changing
+// 	// TODO: Refactor this since the module struct is changing
 
-	// Initiate all the modules defined in the config
-	// for _, moduleConfig := range cfg.Modules {
-	//mod, err := module.NewTemplateModule(moduleConfig)
+// 	// Initiate all the modules defined in the config
+// 	// for _, moduleConfig := range cfg.Modules {
+// 	//mod, err := module.NewTemplateModule(moduleConfig)
 
-	// if err != nil {
-	// 	exit.Error("module failed to load: %s", err)
+// 	// if err != nil {
+// 	// 	exit.Error("module failed to load: %s", err)
+// 	// }
+// 	// templateModules = append(templateModules, mod)
+// 	// }
+
+// 	// Prompt for module params and execute each of the generator modules
+// 	for _, mod := range templateModules {
+// 		// TODO: read zero-project.yml instead
+
+// 		err := Generate(mod, cfg)
+// 		if err != nil {
+// 			exit.Error("module %s: %s", mod.Source, err)
+// 		}
+// 	}
+// }
+
+// type TemplateParams struct {
+// 	Name    string
+// 	Context map[string]string
+// 	Params  map[string]string
+// }
+
+// Generate accepts a projectconfig struct and renders the templates for all referenced modules
+func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
+
+	// for _, module := range projectConfig.Modules {
+
+	// 	moduleDir := path.Join(module.GetSourceDir(module..Source), mod.Config.TemplateConfig.InputDir)
+	// 	delimiters := mod.Config.TemplateConfig.Delimiters
+	// 	overwrite := mod.Overwrite
+	// 	outputDir := mod.Output
+	// 	if outputDir == "" {
+	// 		outputDir = mod.Config.TemplateConfig.OutputDir
+	// 	}
+
+	// 	templateData := TemplateParams{}
+	// 	templateData.Name = generatorCfg.Name
+	// 	templateData.Context = generatorCfg.Context
+	// 	templateData.Params = mod.Params
+
+	// 	fileTmplts := NewTemplates(moduleDir, outputDir, overwrite)
+
+	// 	ExecuteTemplates(fileTmplts, templateData, delimiters)
 	// }
-	// templateModules = append(templateModules, mod)
-	// }
-
-	// Prompt for module params and execute each of the generator modules
-	for _, mod := range templateModules {
-		// TODO: read zero-project.yml instead
-
-		err := Generate(mod, cfg)
-		if err != nil {
-			exit.Error("module %s: %s", mod.Source, err)
-		}
-	}
-}
-
-type TemplateParams struct {
-	Name    string
-	Context map[string]string
-	Params  map[string]string
-}
-
-func Generate(mod *module.TemplateModule, generatorCfg *config.GeneratorConfig) error {
-	moduleDir := path.Join(module.GetSourceDir(mod.Source), mod.Config.TemplateConfig.InputDir)
-	delimiters := mod.Config.TemplateConfig.Delimiters
-	overwrite := mod.Overwrite
-	outputDir := mod.Output
-	if outputDir == "" {
-		outputDir = mod.Config.TemplateConfig.OutputDir
-	}
-
-	templateData := TemplateParams{}
-	templateData.Name = generatorCfg.Name
-	templateData.Context = generatorCfg.Context
-	templateData.Params = mod.Params
-
-	fileTmplts := NewTemplates(moduleDir, outputDir, overwrite)
-
-	ExecuteTemplates(fileTmplts, templateData, delimiters)
 
 	return nil
 }

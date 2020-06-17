@@ -41,7 +41,7 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 	}
 
 	moduleSources := chooseStack(getRegistry())
-	moduleConfigs := loadAllModules(moduleSources)
+	moduleConfigs, mappedSources := loadAllModules(moduleSources)
 
 	prompts := getProjectPrompts(projectConfig.Name, moduleConfigs)
 
@@ -75,8 +75,8 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 			}
 
 		}
-
-		projectConfig.Modules[moduleName] = projectconfig.NewModule(projectModuleParams, repoName, repoURL)
+		pp.Println(mappedSources)
+		projectConfig.Modules[moduleName] = projectconfig.NewModule(projectModuleParams, repoName, repoURL, mappedSources[moduleName])
 	}
 
 	// TODO : Write the project config file. For now, print.
@@ -90,8 +90,9 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 }
 
 // loadAllModules takes a list of module sources, downloads those modules, and parses their config
-func loadAllModules(moduleSources []string) map[string]moduleconfig.ModuleConfig {
+func loadAllModules(moduleSources []string) (map[string]moduleconfig.ModuleConfig, map[string]string) {
 	modules := make(map[string]moduleconfig.ModuleConfig)
+	mappedSources := make(map[string]string)
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(moduleSources))
@@ -106,8 +107,9 @@ func loadAllModules(moduleSources []string) map[string]moduleconfig.ModuleConfig
 			exit.Fatal("Unable to load module:  %v\n", err)
 		}
 		modules[mod.Name] = mod
+		mappedSources[mod.Name] = moduleSource
 	}
-	return modules
+	return modules, mappedSources
 }
 
 // promptAllModules takes a map of all the modules and prompts the user for values for all the parameters
