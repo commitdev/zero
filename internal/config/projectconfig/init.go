@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path"
 	"text/template"
 
@@ -14,8 +13,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// {{  .ShouldPushRepositories | printf "%q"}}
-const exampleConfig = `
+const zeroProjectConfigTemplate = `
 # Templated zero-project.yml file
 name: {{.Name}}
 
@@ -46,31 +44,30 @@ func Init(dir string, projectName string, projectContext *ZeroProjectConfig) {
 }
 
 func GetProjectFileContent(projectConfig ZeroProjectConfig) string {
-	var tpl bytes.Buffer
-	tmpl := template.New("sa")
-	tmpl, err := tmpl.Parse(exampleConfig)
+	var tplBuffer bytes.Buffer
+	tmpl, err := template.New("projectConfig").Parse(zeroProjectConfigTemplate)
 	if err != nil {
-		exit.Fatal(fmt.Sprintf("Failed to parse the sample Zero module config file %s", constants.ZeroProjectYml))
+		exit.Fatal(fmt.Sprintf("Failed to parse the config template %s", constants.ZeroProjectYml))
 	}
 
-	type tempProjectConfig struct {
+	pConfig, err := yaml.Marshal(projectConfig.Modules)
+	if err != nil {
+		exit.Fatal(fmt.Sprintf("Failed while serializing the modules %s", constants.ZeroProjectYml))
+	}
+
+	t := struct {
 		Name                   string
 		ShouldPushRepositories bool
 		Modules                string
-	}
-
-	foo, err := yaml.Marshal(projectConfig.Modules)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	t := tempProjectConfig{
+	}{
 		Name:                   projectConfig.Name,
 		ShouldPushRepositories: projectConfig.ShouldPushRepositories,
-		Modules:                util.IndentString(string(foo), 2),
+		Modules:                util.IndentString(string(pConfig), 2),
 	}
 
-	tmpl.Execute(os.Stdout, t)
-	result := tpl.String()
+	if err := tmpl.Execute(&tplBuffer, t); err != nil {
+		exit.Fatal(fmt.Sprintf("Failed while executing the template %s", constants.ZeroProjectYml))
+	}
+	result := tplBuffer.String()
 	return result
 }

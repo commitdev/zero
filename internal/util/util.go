@@ -3,12 +3,14 @@ package util
 // @TODO split up and move into /pkg directory
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -114,8 +116,12 @@ func AppendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []stri
 	return envList
 }
 
-// TODO: indent each line for the modules.
-func IndentString(content string, spaces int) string {
-	// TODO: implement me 
-	return "Testing indent string retrun"
+// IndentString will Add  x space char padding at the beginging of each line.
+func IndentString(content string, space int) string {
+	var result bytes.Buffer
+	subStr := strings.Split(content, "\n")
+	for _, s := range subStr {
+		result.WriteString(fmt.Sprintf("%"+strconv.Itoa(space)+"s%s \n", "", s))
+	}
+	return result.String()
 }
