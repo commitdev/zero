@@ -49,7 +49,7 @@ func TestReadOrCreateUserCredentialsFile(t *testing.T) {
 	_, fileStateErr := os.Stat(credPath)
 	assert.True(t, os.IsNotExist(fileStateErr), "File should not exist")
 	// attempting to read the file should create the file
-	globalconfig.GetUserCredentials("any-project")
+	globalconfig.GetProjectCredentials("any-project")
 
 	stats, err := os.Stat(credPath)
 	assert.False(t, os.IsNotExist(err), "File should be created")
@@ -63,7 +63,7 @@ func TestGetUserCredentials(t *testing.T) {
 
 	t.Run("Fixture file should have existing project with creds", func(t *testing.T) {
 		projectName := "my-project"
-		project := globalconfig.GetUserCredentials(projectName)
+		project := globalconfig.GetProjectCredentials(projectName)
 
 		// Reading from fixtures: tests/test_data/configs/credentials.yml
 		assert.Equal(t, "AKIAABCD", project.AWSResourceConfig.AccessKeyId)
@@ -74,7 +74,7 @@ func TestGetUserCredentials(t *testing.T) {
 
 	t.Run("Fixture file should support multiple projects", func(t *testing.T) {
 		projectName := "another-project"
-		project := globalconfig.GetUserCredentials(projectName)
+		project := globalconfig.GetProjectCredentials(projectName)
 		assert.Equal(t, "654", project.GithubResourceConfig.AccessToken)
 	})
 }
@@ -86,18 +86,18 @@ func TestEditUserCredentials(t *testing.T) {
 
 	t.Run("Should create new project if not exist", func(t *testing.T) {
 		projectName := "test-project3"
-		project := globalconfig.GetUserCredentials(projectName)
+		project := globalconfig.GetProjectCredentials(projectName)
 		project.AWSResourceConfig.AccessKeyId = "TEST_KEY_ID_1"
 		globalconfig.Save(project)
-		newKeyID := globalconfig.GetUserCredentials(projectName).AWSResourceConfig.AccessKeyId
+		newKeyID := globalconfig.GetProjectCredentials(projectName).AWSResourceConfig.AccessKeyId
 		assert.Equal(t, "TEST_KEY_ID_1", newKeyID)
 	})
 	t.Run("Should edit old project if already exist", func(t *testing.T) {
 		projectName := "my-project"
-		project := globalconfig.GetUserCredentials(projectName)
+		project := globalconfig.GetProjectCredentials(projectName)
 		project.AWSResourceConfig.AccessKeyId = "EDITED_ACCESS_KEY_ID"
 		globalconfig.Save(project)
-		newKeyID := globalconfig.GetUserCredentials(projectName).AWSResourceConfig.AccessKeyId
+		newKeyID := globalconfig.GetProjectCredentials(projectName).AWSResourceConfig.AccessKeyId
 		assert.Equal(t, "EDITED_ACCESS_KEY_ID", newKeyID)
 	})
 }

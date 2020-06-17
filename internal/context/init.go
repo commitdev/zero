@@ -54,13 +54,10 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 
 	// Prompting for push-up stream, then conditionally prompting for github
 	initParams["GithubRootOrg"] = prompts["GithubRootOrg"].GetParam(initParams)
-	initParams["GithubPersonalToken"] = prompts["GithubPersonalToken"].GetParam(initParams)
-	if initParams["GithubRootOrg"] != "" && initParams["GithubPersonalToken"] != globalconfig.GetUserCredentials(projectConfig.Name).AccessToken {
-		projectCredential := globalconfig.GetUserCredentials(projectConfig.Name)
-		projectCredential.GithubResourceConfig.AccessToken = initParams["GithubPersonalToken"]
-		globalconfig.Save(projectCredential)
-	}
-
+	projectCredentials := globalconfig.GetProjectCredentials(projectConfig.Name)
+	credentialPrompts := getCredentialPrompts(projectCredentials, moduleConfigs)
+	projectCredentials = promptCredentialsAndFillProjectCreds(credentialPrompts, projectCredentials)
+	globalconfig.Save(projectCredentials)
 	projectParameters := promptAllModules(moduleConfigs)
 
 	// Map parameter values back to specific modules
@@ -84,6 +81,7 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 
 	// TODO : Write the project config file. For now, print.
 	pp.Println(projectConfig)
+	pp.Print(projectCredentials)
 
 	// TODO: load ~/.zero/config.yml (or credentials)
 	// TODO: prompt global credentials
@@ -159,15 +157,6 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 			KeyMatchCondition("ShouldPushRepositories", "y"),
 			NoValidation,
 		},
-		"GithubPersonalToken": {
-			moduleconfig.Parameter{
-				Field:   "GithubPersonalToken",
-				Label:   "Github Personal Access Token with access to the above organization",
-				Default: globalconfig.GetUserCredentials(projectName).AccessToken,
-			},
-			KeyMatchCondition("ShouldPushRepositories", "y"),
-			NoValidation,
-		},
 	}
 
 	for moduleName, module := range modules {
@@ -185,6 +174,71 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 	}
 
 	return handlers
+}
+
+func getCredentialPrompts(projectCredentials globalconfig.ProjectCredential, moduleConfigs map[string]moduleconfig.ModuleConfig) map[string][]PromptHandler {
+	var uniqueVendors []string
+	for _, module := range moduleConfigs {
+		uniqueVendors = appendToSet(uniqueVendors, module.RequiredCredentials)
+	}
+	// map is to keep track of which vendor they belong to, to fill them back into the projectConfig
+	prompts := map[string][]PromptHandler{}
+	for _, vendor := range uniqueVendors {
+		prompts[vendor] = mapVendorToPrompts(projectCredentials, vendor)
+	}
+	return prompts
+}
+
+func mapVendorToPrompts(projectCred globalconfig.ProjectCredential, vendor string) []PromptHandler {
+	var prompts []PromptHandler
+
+	switch vendor {
+	case "aws":
+		awsPrompts := []PromptHandler{
+			{
+				moduleconfig.Parameter{
+					Field:   "accessKeyId",
+					Label:   "AWS Access Key ID",
+					Default: projectCred.AWSResourceConfig.AccessKeyId,
+				},
+				NoCondition,
+				NoValidation,
+			},
+			{
+				moduleconfig.Parameter{
+					Field:   "secretAccessKey",
+					Label:   "AWS Secret access key",
+					Default: projectCred.AWSResourceConfig.SecretAccessKey,
+				},
+				NoCondition,
+				NoValidation,
+			},
+		}
+		prompts = append(prompts, awsPrompts...)
+	case "github":
+		githubPrompt := PromptHandler{
+			moduleconfig.Parameter{
+				Field:   "accessToken",
+				Label:   "Github Personal Access Token with access to the above organization",
+				Default: projectCred.GithubResourceConfig.AccessToken,
+			},
+			NoCondition,
+			NoValidation,
+		}
+		prompts = append(prompts, githubPrompt)
+	case "circleci":
+		circleCiPrompt := PromptHandler{
+			moduleconfig.Parameter{
+				Field:   "apiKey",
+				Label:   "Circleci api key for CI/CD",
+				Default: projectCred.CircleCiResourceConfig.ApiKey,
+			},
+			NoCondition,
+			NoValidation,
+		}
+		prompts = append(prompts, circleCiPrompt)
+	}
+	return prompts
 }
 
 func chooseCloudProvider(projectConfig *projectconfig.ZeroProjectConfig) {

@@ -93,7 +93,7 @@ func readOrCreateUserCredentialsFile() []byte {
 	return data
 }
 
-func GetUserCredentials(targetProjectName string) ProjectCredential {
+func GetProjectCredentials(targetProjectName string) ProjectCredential {
 	projects := LoadUserCredentials()
 
 	if val, ok := projects[targetProjectName]; ok {
