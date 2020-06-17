@@ -113,3 +113,9 @@ func AppendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []stri
 	}
 	return envList
 }
+
+// TODO: indent each line for the modules.
+func IndentString(content string, spaces int) string {
+	// TODO: implement me 
+	return "Testing indent string retrun"
+}

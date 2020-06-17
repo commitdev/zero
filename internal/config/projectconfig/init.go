@@ -1,43 +1,28 @@
 package projectconfig
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path"
+	"text/template"
 
 	"github.com/commitdev/zero/internal/constants"
+	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"gopkg.in/yaml.v2"
 )
 
-const exampleConfig = `name: %s
+// {{  .ShouldPushRepositories | printf "%q"}}
+const exampleConfig = `
+# Templated zero-project.yml file
+name: {{.Name}}
 
-# Context is normally populated automatically but could be used to inject global params
-context:
+shouldPushRepositories: {{.ShouldPushRepositories | printf "%v"}}
 
-# module can be in any format the go-getter supports (path, github, url, etc.)
-# supports https://github.com/hashicorp/go-getter#url-format
-# Example:
-# - repo: "../development/modules/ci"
-# - dir: "github-actions"
 modules:
-	aws-eks-stack:
-		parameters:
-			repoName: infrastructure
-			region: us-east-1
-			accountId: 12345
-			productionHost: something.com
-		files:
-			dir: infrastructure
-			repo: https://github.com/myorg/infrastructure
-	some-other-module:
-		parameters:
-			repoName: api
-		files:
-			dir: api
-			repo: https://github.com/myorg/api
-
-
+{{.Modules}}
 `
 
 var RootDir = "./"
@@ -58,4 +43,34 @@ func Init(dir string, projectName string, projectContext *ZeroProjectConfig) {
 	if writeErr != nil {
 		exit.Fatal(fmt.Sprintf("Failed to create config file %s", constants.ZeroProjectYml))
 	}
+}
+
+func GetProjectFileContent(projectConfig ZeroProjectConfig) string {
+	var tpl bytes.Buffer
+	tmpl := template.New("sa")
+	tmpl, err := tmpl.Parse(exampleConfig)
+	if err != nil {
+		exit.Fatal(fmt.Sprintf("Failed to parse the sample Zero module config file %s", constants.ZeroProjectYml))
+	}
+
+	type tempProjectConfig struct {
+		Name                   string
+		ShouldPushRepositories bool
+		Modules                string
+	}
+
+	foo, err := yaml.Marshal(projectConfig.Modules)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	t := tempProjectConfig{
+		Name:                   projectConfig.Name,
+		ShouldPushRepositories: projectConfig.ShouldPushRepositories,
+		Modules:                util.IndentString(string(foo), 2),
+	}
+
+	tmpl.Execute(os.Stdout, t)
+	result := tpl.String()
+	return result
 }

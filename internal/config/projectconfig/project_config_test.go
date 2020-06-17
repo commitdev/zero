@@ -1,14 +1,18 @@
 package projectconfig_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v2"
 )
 
 func TestLoadConfig(t *testing.T) {
@@ -43,9 +47,64 @@ func eksGoReactSampleModules() projectconfig.Modules {
 	}
 }
 
+// TODO: Combinde TestMoudle and TestGetProjectFIleContent sample:global_config_test.go ln:42
+// TODO: remove test when you complete TestGetProjectFIleContent
+func TestProject(t *testing.T) {
+
+	module := projectconfig.NewModule(projectconfig.Parameters{
+		"repoName": "infrastructure",
+		"region":   "us-east-1",
+	}, "/infrastructure", "https://github.com/myorg/infrastructure")
+
+	modules := projectconfig.Modules{
+		"awk-eks-stack": module,
+	}
+
+	modulesContent, _ := yaml.Marshal(&modules)
+	expectedContents := `awk-eks-stack:
+  parameters:
+    region: us-east-1
+		repoName: infrastructure
+		accountId: 12345
+  files:
+    dir: /infrastructure
+    repo: https://github.com/myorg/infrastructure
+`
+	assert.Equal(t, strings.Trim(expectedContents, " "), strings.Trim(string(modulesContent), " "))
+}
+
+func TestGetProjectFileContent(t *testing.T) {
+
+	module := projectconfig.NewModule(projectconfig.Parameters{
+		"repoName": "infrastructure",
+		"region":   "us-east-1",
+	}, "/infrastructure", "https://github.com/myorg/infrastructure")
+
+	modules := projectconfig.Modules{
+		"awk-eks-stack": module,
+	}
+
+	config := projectconfig.ZeroProjectConfig{
+		Name:                   "abc",
+		ShouldPushRepositories: true,
+		Infrastructure: projectconfig.Infrastructure{
+			AWS: nil,
+		},
+
+		Parameters: map[string]string{},
+		Modules:    modules,
+	}
+	content := projectconfig.GetProjectFileContent(config)
+
+	// TODO: assert file output to make sure this works.
+	fmt.Println(content)
+}
+
 func validConfigContent() string {
 	return `
 name: abc
+
+shouldPushRepositories: true
 
 modules:
     aws-eks-stack:

@@ -33,8 +33,8 @@ type terraform struct {
 type Modules map[string]Module
 
 type Module struct {
-	Parameters Parameters `yaml:"parameters,omitempty"`
-	Files      Files
+	Parameters Parameters `yaml:"parameters,omitempty"` // map which parameter belongs to each module back from context/init.go
+	Files      Files      `yaml:"files,omitempty"`
 }
 
 type Parameters map[string]string
