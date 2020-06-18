@@ -3,7 +3,6 @@ package util
 // @TODO split up and move into /pkg directory
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -118,10 +117,10 @@ func AppendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []stri
 
 // IndentString will Add  x space char padding at the beginging of each line.
 func IndentString(content string, space int) string {
-	var result bytes.Buffer
+	var result string
 	subStr := strings.Split(content, "\n")
 	for _, s := range subStr {
-		result.WriteString(fmt.Sprintf("%"+strconv.Itoa(space)+"s%s \n", "", s))
+		result += fmt.Sprintf("%"+strconv.Itoa(space)+"s%s \n", "", s)
 	}
-	return result.String()
+	return result
 }
