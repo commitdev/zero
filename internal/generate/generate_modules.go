@@ -1,6 +1,7 @@
 package generate
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -9,67 +10,57 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/commitdev/zero/internal/config"
+	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/util"
-	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
-	"github.com/k0kubun/pp"
 
 	"github.com/commitdev/zero/pkg/util/fs"
 )
 
-func GenerateModules(cfg *config.GeneratorConfig) {
-	var templateModules []*module.TemplateModule
+// Generate accepts a projectconfig struct and renders the templates for all referenced modules
+func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
+	flog.Infof(":clock: Fetching Modules")
 
-	// TODO: Refactor this since the module struct is changing
+	// Make sure module sources are on disk
+	wg := sync.WaitGroup{}
+	wg.Add(len(projectConfig.Modules))
+	for _, mod := range projectConfig.Modules {
+		go module.FetchModule(mod.Files.Source, &wg)
+	}
+	wg.Wait()
 
-	// Initiate all the modules defined in the config
-	// for _, moduleConfig := range cfg.Modules {
-	//mod, err := module.NewTemplateModule(moduleConfig)
-
-	// if err != nil {
-	// 	exit.Error("module failed to load: %s", err)
-	// }
-	// templateModules = append(templateModules, mod)
-	// }
-
-	// Prompt for module params and execute each of the generator modules
-	for _, mod := range templateModules {
-		// TODO: read zero-project.yml instead
-
-		err := Generate(mod, cfg)
+	flog.Infof(":memo: Rendering Modules")
+	for _, mod := range projectConfig.Modules {
+		// Load module configuration
+		moduleConfig, err := module.ParseModuleConfig(mod.Files.Source)
 		if err != nil {
-			exit.Error("module %s: %s", mod.Source, err)
+			return fmt.Errorf("unable to load module:  %v", err)
 		}
+
+		moduleDir := path.Join(module.GetSourceDir(mod.Files.Source), moduleConfig.InputDir)
+		delimiters := moduleConfig.Delimiters
+		outputDir := mod.Files.Directory
+
+		// Data that will be passed in to each template
+		templateData := struct {
+			Name   string
+			Params projectconfig.Parameters
+		}{
+			projectConfig.Name,
+			mod.Parameters,
+		}
+
+		fileTemplates := newTemplates(moduleDir, outputDir, false)
+
+		executeTemplates(fileTemplates, templateData, delimiters)
 	}
-}
 
-type TemplateParams struct {
-	Name    string
-	Context map[string]string
-	Params  map[string]string
-}
+	flog.Infof(":up_arrow: Done Rendering - committing repositories to version control")
+	// TODO : Integrate this work
 
-func Generate(mod *module.TemplateModule, generatorCfg *config.GeneratorConfig) error {
-	moduleDir := path.Join(module.GetSourceDir(mod.Source), mod.Config.TemplateConfig.InputDir)
-	delimiters := mod.Config.TemplateConfig.Delimiters
-	overwrite := mod.Overwrite
-	outputDir := mod.Output
-	if outputDir == "" {
-		outputDir = mod.Config.TemplateConfig.OutputDir
-	}
-
-	templateData := TemplateParams{}
-	templateData.Name = generatorCfg.Name
-	templateData.Context = generatorCfg.Context
-	templateData.Params = mod.Params
-
-	fileTmplts := NewTemplates(moduleDir, outputDir, overwrite)
-
-	ExecuteTemplates(fileTmplts, templateData, delimiters)
-
+	flog.Infof(":check_mark_button: Done - run zero apply to create any required infrastructure or execute any other remote commands to prepare your environments.")
 	return nil
 }
 
@@ -79,11 +70,11 @@ type TemplateConfig struct {
 	isTemplate  bool
 }
 
-// NewTemplates walks the module directory to find all  to be templated
-func NewTemplates(moduleDir string, outputDir string, overwrite bool) []*TemplateConfig {
+// newTemplates walks the module directory to find all to be templated
+func newTemplates(moduleDir string, outputDir string, overwrite bool) []*TemplateConfig {
 	templates := []*TemplateConfig{}
 
-	paths, err := GetAllFilePathsInDirectory(moduleDir)
+	paths, err := getAllFilePathsInDirectory(moduleDir)
 	if err != nil {
 		panic(err)
 	}
@@ -117,8 +108,8 @@ func NewTemplates(moduleDir string, outputDir string, overwrite bool) []*Templat
 	return templates
 }
 
-// GetAllFilePathsInDirectory Recursively get all file paths in directory, including sub-directories.
-func GetAllFilePathsInDirectory(moduleDir string) ([]string, error) {
+// getAllFilePathsInDirectory Recursively get all file paths in directory, including sub-directories.
+func getAllFilePathsInDirectory(moduleDir string) ([]string, error) {
 	var paths []string
 	err := filepath.Walk(moduleDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -136,7 +127,7 @@ func GetAllFilePathsInDirectory(moduleDir string) ([]string, error) {
 	return paths, nil
 }
 
-func ExecuteTemplates(templates []*TemplateConfig, data interface{}, delimiters []string) {
+func executeTemplates(templates []*TemplateConfig, data interface{}, delimiters []string) {
 	var wg sync.WaitGroup
 	leftDelim := delimiters[0]
 	rightDelim := delimiters[1]
@@ -146,8 +137,8 @@ func ExecuteTemplates(templates []*TemplateConfig, data interface{}, delimiters 
 	if rightDelim == "" {
 		rightDelim = "}}"
 	}
-	flog.Infof("Templating params:")
-	pp.Println(data)
+	// flog.Infof("Templating params:")
+	// pp.Println(data)
 
 	for _, tmpltConfig := range templates {
 		source := tmpltConfig.source

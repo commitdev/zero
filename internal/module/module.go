@@ -9,19 +9,12 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/commitdev/zero/internal/config"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/hashicorp/go-getter"
 )
-
-// TemplateModule merges a module instance params with the static configs
-type TemplateModule struct {
-	config.ModuleInstance // @TODO Move this
-	Config                moduleconfig.ModuleConfig
-}
 
 // FetchModule downloads the remote module source if necessary. Meant to be run in a goroutine.
 func FetchModule(source string, wg *sync.WaitGroup) {

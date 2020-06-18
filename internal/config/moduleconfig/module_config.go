@@ -3,7 +3,6 @@ package moduleconfig
 import (
 	"io/ioutil"
 
-	"github.com/k0kubun/pp"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -42,6 +41,5 @@ func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 	if err != nil {
 		return config, err
 	}
-	pp.Println("Module Config:", config)
 	return config, nil
 }

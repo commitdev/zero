@@ -20,19 +20,12 @@ func TestLoadConfig(t *testing.T) {
 	file.Write([]byte(validConfigContent()))
 	filePath := file.Name()
 
-	modules := projectconfig.InfrastructureSampleModules()
-	sampleModules := projectconfig.EKSGoReactSampleModules()
-
-	for k, v := range sampleModules {
-		modules[k] = v
-	}
-
 	want := &projectconfig.ZeroProjectConfig{
 		Name:    "abc",
-		Modules: modules,
+		Modules: eksGoReactSampleModules(),
 	}
 
-	t.Run("Should load and unmarshall config correctly", func(t *testing.T) {
+	t.Run("Should load and unmarshal config correctly", func(t *testing.T) {
 		got := projectconfig.LoadConfig(filePath)
 		if !cmp.Equal(want, got, cmpopts.EquateEmpty()) {
 			t.Errorf("projectconfig.ZeroProjectConfig.Unmarshal mismatch (-want +got):\n%s", cmp.Diff(want, got))
@@ -41,33 +34,40 @@ func TestLoadConfig(t *testing.T) {
 
 }
 
+func eksGoReactSampleModules() projectconfig.Modules {
+	parameters := projectconfig.Parameters{"a": "b"}
+	return projectconfig.Modules{
+		"aws-eks-stack":             projectconfig.NewModule(parameters, "zero-aws-eks-stack", "github.com/something/repo1", "github.com/commitdev/zero-aws-eks-stack"),
+		"deployable-backend":        projectconfig.NewModule(parameters, "zero-deployable-backend", "github.com/something/repo2", "github.com/commitdev/zero-deployable-backend"),
+		"deployable-react-frontend": projectconfig.NewModule(parameters, "zero-deployable-react-frontend", "github.com/something/repo3", "github.com/commitdev/zero-deployable-react-frontend"),
+	}
+}
+
 func validConfigContent() string {
 	return `
 name: abc
 
-context:
-
 modules:
-    infrastructure:
-        parameters:
-            repoName: infrastructure
-            region: us-east-1
-            accountId: 12345
-            productionHost: something.com
-        files:
-            dir: infrastructure
-            repo: https://github.com/myorg/infrastructure
     aws-eks-stack:
+        parameters:
+            a: b
         files:
             dir: zero-aws-eks-stack
-            repo: github.com/commitdev/zero-aws-eks-stack
+            repo: github.com/something/repo1
+            source: github.com/commitdev/zero-aws-eks-stack
     deployable-backend:
+        parameters:
+            a: b
         files:
             dir: zero-deployable-backend
-            repo: github.com/commitdev/zero-deployable-backend
+            repo: github.com/something/repo2
+            source: github.com/commitdev/zero-deployable-backend
     deployable-react-frontend:
+        parameters:
+            a: b
         files:
             dir: zero-deployable-react-frontend
-            repo: github.com/commitdev/zero-deployable-react-frontend
+            repo: github.com/something/repo3
+            source: github.com/commitdev/zero-deployable-react-frontend
 `
 }

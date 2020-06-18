@@ -1,0 +1,15 @@
+name: test-generate
+description: 'generation test module'
+author: 'Commit'
+
+template:
+  strictMode: true
+  delimiters:
+    - '{{'
+    - '}}'
+  inputDir: '.'
+  outputDir: 'test'
+
+requiredCredentials:
+
+parameters:
