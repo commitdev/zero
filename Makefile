@@ -3,8 +3,11 @@ BUILD ?=$(shell git rev-parse --short HEAD)
 PKG ?=github.com/commitdev/zero
 BUILD_ARGS=-v -ldflags=all="-X ${PKG}/cmd.appVersion=${VERSION} -X ${PKG}/cmd.appBuild=${BUILD}"
 
+deps:
+	go mod download
+
 check:
-	go test ./...
+	go list -f '{{.Dir}}' ./... | grep -v /tmp/ | xargs go test -v
 
 fmt:
 	go fmt ./...
