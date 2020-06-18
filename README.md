@@ -4,6 +4,10 @@ This is a WIP version of our tool Zero which aims to make it quick and easy for 
 
 For the older, simple tool that just rendered templates, see [commitdev/zero-old][old]
 
+## Press Release
+Learn more about Zero's vision here:
+https://docs.google.com/document/d/1YNRNgCfCHCxmIpD5ZsLYG2xCBxJLFd6CBI0DS_NFqoY/edit
+
 ## Project Board
 https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?filterLogic=any&repos=203630543,247773730,257676371,258369081
 
