@@ -3,9 +3,11 @@ package vcs
 import (
 	"context"
 	"fmt"
-	"github.com/machinebox/graphql"
 	"os/exec"
 	"strings"
+
+	"github.com/commitdev/zero/pkg/util/flog"
+	"github.com/machinebox/graphql"
 )
 
 // InitializeRepository Creates and initializes a github repository for the given url
@@ -53,19 +55,19 @@ func InitializeRepository(repositoryUrl string, githubApiKey string) {
 		return
 	}
 
-	fmt.Printf("Repository successfully created and initialized for module: %s\n", repositoryName)
+	flog.Infof(":check_mark_button: Repository created: %s", repositoryUrl)
 }
 
 // parseRepositoryUrl extracts the owner name and repository name from a repository url.
 // repositoryUrl is expected to be in the format "github.com/{ownerName}/{repositoryName}"
 func parseRepositoryUrl(repositoryUrl string) (string, string, error) {
 	if len(repositoryUrl) == 0 {
-		return "","", fmt.Errorf("invalid repository url.  expected format \"github.com/{ownerName}/{repositoryName}\"")
+		return "", "", fmt.Errorf("invalid repository url.  expected format \"github.com/{ownerName}/{repositoryName}\"")
 	}
 
 	segments := strings.Split(repositoryUrl, "/")
 	if len(segments) != 3 {
-		return "","", fmt.Errorf("invalid repository url.  expected format \"github.com/{ownerName}/{repositoryName}\"")
+		return "", "", fmt.Errorf("invalid repository url.  expected format \"github.com/{ownerName}/{repositoryName}\"")
 	}
 
 	ownerName := segments[1]
@@ -77,10 +79,10 @@ func parseRepositoryUrl(repositoryUrl string) (string, string, error) {
 const createPersonalRepositoryMutation = `mutation ($repoName: String!, $repoDescription: String!) {
 		createRepository(
 			input: {
-				name:$repoName, 
-				visibility: PRIVATE, 
+				name:$repoName,
+				visibility: PRIVATE,
 				description: $repoDescription
-			}) 
+			})
 		{
 			clientMutationId
 		}
@@ -89,11 +91,11 @@ const createPersonalRepositoryMutation = `mutation ($repoName: String!, $repoDes
 const createOrganizationRepositoryMutation = `mutation ($repoName: String!, $repoDescription: String!, $ownerId: String!) {
 		createRepository(
 			input: {
-				name:$repoName, 
-				visibility: PRIVATE, 
+				name:$repoName,
+				visibility: PRIVATE,
 				description: $repoDescription
 				ownerId: $ownerId
-			}) 
+			})
 		{
 			clientMutationId
 		}
@@ -183,21 +185,23 @@ func doInitialCommit(ownerName string, repositoryName string) error {
 	}
 
 	for _, command := range commands {
-		fmt.Printf(">> %s\n", command.description)
+		// TODO: Debug-level logging?
+		// fmt.Printf(">> %s\n", command.description)
 
 		cmd := exec.Command(command.command, command.args...)
 		cmd.Dir = "./" + repositoryName
-		out, err := cmd.CombinedOutput()
+		_, err := cmd.CombinedOutput()
 		if err != nil {
 			fmt.Printf("ERROR: failed to run %s: %s\n", command.description, err.Error())
 			// this is a partial failure.  some commands may have exec'ed successfully.
 			break
-		} else {
-			response := string(out)
-			if len(response) > 0 {
-				fmt.Println(response)
-			}
-		}
+		} //else {
+		// TODO: Debug-level logging?
+		// response := string(out)
+		// 	if len(response) > 0 {
+		// 		fmt.Println(response)
+		// 	}
+		// }
 	}
 
 	return nil

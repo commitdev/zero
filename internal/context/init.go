@@ -19,7 +19,6 @@ import (
 	project "github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
-	"github.com/k0kubun/pp"
 	"github.com/manifoldco/promptui"
 )
 
@@ -74,7 +73,6 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 			}
 
 		}
-		pp.Println(mappedSources)
 		projectConfig.Modules[moduleName] = projectconfig.NewModule(projectModuleParams, repoName, repoURL, mappedSources[moduleName])
 	}
 
