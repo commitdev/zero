@@ -15,14 +15,13 @@ import (
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/module"
+	"github.com/commitdev/zero/internal/registry"
 	project "github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/k0kubun/pp"
 	"github.com/manifoldco/promptui"
 )
-
-type Registry map[string][]string
 
 // Create cloud provider context
 func Init(outDir string) *projectconfig.ZeroProjectConfig {
@@ -40,7 +39,7 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 		exit.Fatal("Error creating root: %v ", err)
 	}
 
-	moduleSources := chooseStack(getRegistry())
+	moduleSources := chooseStack(registry.GetRegistry())
 	moduleConfigs, mappedSources := loadAllModules(moduleSources)
 
 	prompts := getProjectPrompts(projectConfig.Name, moduleConfigs)
@@ -256,39 +255,17 @@ func chooseCloudProvider(projectConfig *projectconfig.ZeroProjectConfig) {
 	}
 }
 
-func getRegistry() Registry {
-	return Registry{
-		// TODO: better place to store these options as configuration file or any source
-		"EKS + Go + React": []string{
-			"github.com/commitdev/zero-aws-eks-stack",
-			"github.com/commitdev/zero-deployable-backend",
-			"github.com/commitdev/zero-deployable-react-frontend",
-		},
-		"Custom": []string{},
-	}
-}
-
-func (registry Registry) availableLabels() []string {
-	labels := make([]string, len(registry))
-	i := 0
-	for label := range registry {
-		labels[i] = label
-		i++
-	}
-	return labels
-}
-
-func chooseStack(registry Registry) []string {
+func chooseStack(reg registry.Registry) []string {
 	providerPrompt := promptui.Select{
 		Label: "Pick a stack you'd like to use",
-		Items: registry.availableLabels(),
+		Items: registry.AvailableLabels(reg),
 	}
 	_, providerResult, err := providerPrompt.Run()
 	if err != nil {
 		exit.Fatal("Prompt failed %v\n", err)
 	}
 
-	return registry[providerResult]
+	return registry.GetModulesByName(reg, providerResult)
 }
 
 func fillProviderDetails(projectConfig *projectconfig.ZeroProjectConfig, s project.Secrets) {
