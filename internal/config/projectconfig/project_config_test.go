@@ -1,18 +1,15 @@
 package projectconfig_test
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
 )
 
 func TestLoadConfig(t *testing.T) {
@@ -47,58 +44,32 @@ func eksGoReactSampleModules() projectconfig.Modules {
 	}
 }
 
-// TODO: Combinde TestMoudle and TestGetProjectFIleContent sample:global_config_test.go ln:42
-// TODO: remove test when you complete TestGetProjectFIleContent
-func TestProject(t *testing.T) {
-
-	module := projectconfig.NewModule(projectconfig.Parameters{
-		"repoName": "infrastructure",
-		"region":   "us-east-1",
-	}, "/infrastructure", "https://github.com/myorg/infrastructure")
-
-	modules := projectconfig.Modules{
-		"awk-eks-stack": module,
-	}
-
-	modulesContent, _ := yaml.Marshal(&modules)
-	expectedContents := `awk-eks-stack:
-  parameters:
-    region: us-east-1
-		repoName: infrastructure
-		accountId: 12345
-  files:
-    dir: /infrastructure
-    repo: https://github.com/myorg/infrastructure
-`
-	assert.Equal(t, strings.Trim(expectedContents, " "), strings.Trim(string(modulesContent), " "))
-}
-
 func TestGetProjectFileContent(t *testing.T) {
-
-	module := projectconfig.NewModule(projectconfig.Parameters{
-		"repoName": "infrastructure",
-		"region":   "us-east-1",
-	}, "/infrastructure", "https://github.com/myorg/infrastructure")
-
-	modules := projectconfig.Modules{
-		"awk-eks-stack": module,
-	}
-
-	config := projectconfig.ZeroProjectConfig{
+	projectConfig := projectconfig.ZeroProjectConfig{
 		Name:                   "abc",
-		ShouldPushRepositories: true,
-		Infrastructure: projectconfig.Infrastructure{
-			AWS: nil,
-		},
-
-		Parameters: map[string]string{},
-		Modules:    modules,
+		ShouldPushRepositories: false,
 	}
-	content := projectconfig.GetProjectFileContent(config)
 
-	// TODO: assert file output to make sure this works.
-	fmt.Println(content)
+	t.Run("Should fail if modules are missing from project config", func(t *testing.T) {
+		// Remove the modules
+		projectConfig.Modules = nil
+
+		result, err := projectconfig.GetProjectFileContent(projectConfig)
+
+		assert.Error(t, err)
+		assert.Equal(t, result, "")
+	})
+
+	t.Run("Should return a valid project config", func(t *testing.T) {
+		projectConfig.Modules = eksGoReactSampleModules()
+		result, err := projectconfig.GetProjectFileContent(projectConfig)
+
+		assert.NoError(t, err)
+		assert.NotEmpty(t, result)
+	})
 }
+
+// TODO: Write test init function to check file written to disk, use test_data/
 
 func validConfigContent() string {
 	return `

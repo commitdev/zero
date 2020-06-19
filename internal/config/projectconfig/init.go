@@ -30,29 +30,31 @@ func SetRootDir(dir string) {
 }
 
 func Init(dir string, projectName string, projectContext *ZeroProjectConfig) {
-	// TODO: template the zero-project.yml with projectContext
-	// content := []byte(fmt.Sprintf(exampleConfig, projectName))
-	content, err := yaml.Marshal(projectContext)
+	content, err := GetProjectFileContent(*projectContext)
 	if err != nil {
-		exit.Fatal(fmt.Sprintf("Failed to serialize configuration file %s", constants.ZeroProjectYml))
+		exit.Fatal(fmt.Sprintf("Failed extracting the file config content %s", constants.ZeroProjectYml))
 	}
 
-	writeErr := ioutil.WriteFile(path.Join(dir, projectName, constants.ZeroProjectYml), content, 0644)
+	writeErr := ioutil.WriteFile(path.Join(dir, projectName, constants.ZeroProjectYml), []byte(content), 0644)
 	if writeErr != nil {
 		exit.Fatal(fmt.Sprintf("Failed to create config file %s", constants.ZeroProjectYml))
 	}
 }
 
-func GetProjectFileContent(projectConfig ZeroProjectConfig) string {
+func GetProjectFileContent(projectConfig ZeroProjectConfig) (string, error) {
 	var tplBuffer bytes.Buffer
 	tmpl, err := template.New("projectConfig").Parse(zeroProjectConfigTemplate)
 	if err != nil {
-		exit.Fatal(fmt.Sprintf("Failed to parse the config template %s", constants.ZeroProjectYml))
+		return "", err
 	}
 
-	pConfig, err := yaml.Marshal(projectConfig.Modules)
+	if len(projectConfig.Modules) == 0 {
+		return "", fmt.Errorf("Invalid project config, expected config modules to be non-empty")
+	}
+
+	pConfigModule, err := yaml.Marshal(projectConfig.Modules)
 	if err != nil {
-		exit.Fatal(fmt.Sprintf("Failed while serializing the modules %s", constants.ZeroProjectYml))
+		return "", err
 	}
 
 	t := struct {
@@ -62,12 +64,11 @@ func GetProjectFileContent(projectConfig ZeroProjectConfig) string {
 	}{
 		Name:                   projectConfig.Name,
 		ShouldPushRepositories: projectConfig.ShouldPushRepositories,
-		Modules:                util.IndentString(string(pConfig), 2),
+		Modules:                util.IndentString(string(pConfigModule), 2),
 	}
 
 	if err := tmpl.Execute(&tplBuffer, t); err != nil {
-		exit.Fatal(fmt.Sprintf("Failed while executing the template %s", constants.ZeroProjectYml))
+		return "", err
 	}
-	result := tplBuffer.String()
-	return result
+	return tplBuffer.String(), nil
 }
