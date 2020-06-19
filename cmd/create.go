@@ -5,10 +5,13 @@ import (
 	"path"
 	"strings"
 
+	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/generate"
+	"github.com/commitdev/zero/internal/vcs"
 	"github.com/commitdev/zero/pkg/util/exit"
+	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/spf13/cobra"
 )
 
@@ -36,4 +39,17 @@ func Create(dir string, createConfigPath string) {
 	projectConfig := projectconfig.LoadConfig(configFilePath)
 
 	generate.Generate(*projectConfig)
+
+	if projectConfig.ShouldPushRepositories {
+		flog.Infof(":up_arrow: Done Rendering - committing repositories to version control.")
+
+		globalConfig := globalconfig.GetProjectCredentials(projectConfig.Name)
+		for _, module := range projectConfig.Modules {
+			vcs.InitializeRepository(module.Files.Repository, globalConfig.GithubResourceConfig.AccessToken)
+		}
+	} else {
+		flog.Infof(":up_arrow: Done Rendering - you will need to commit the created projects to version control.")
+	}
+
+	flog.Infof(":check_mark_button: Done - run zero apply to create any required infrastructure or execute any other remote commands to prepare your environments.")
 }

@@ -56,11 +56,6 @@ func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
 
 		executeTemplates(fileTemplates, templateData, delimiters)
 	}
-
-	flog.Infof(":up_arrow: Done Rendering - committing repositories to version control")
-	// TODO : Integrate this work
-
-	flog.Infof(":check_mark_button: Done - run zero apply to create any required infrastructure or execute any other remote commands to prepare your environments.")
 	return nil
 }
 
