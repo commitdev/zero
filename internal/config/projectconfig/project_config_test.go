@@ -10,6 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v2"
 )
 
 func TestLoadConfig(t *testing.T) {
@@ -45,33 +46,41 @@ func eksGoReactSampleModules() projectconfig.Modules {
 }
 
 func TestGetProjectFileContent(t *testing.T) {
-	projectConfig := projectconfig.ZeroProjectConfig{
+	defaultConfig := projectconfig.ZeroProjectConfig{
 		Name:                   "abc",
 		ShouldPushRepositories: false,
+		// Modules not set defaults to nil
 	}
 
 	t.Run("Should fail if modules are missing from project config", func(t *testing.T) {
-		// Remove the modules
-		projectConfig.Modules = nil
+		result, getProjectContentErr := projectconfig.GetProjectFileContent(defaultConfig)
 
-		result, err := projectconfig.GetProjectFileContent(projectConfig)
-
-		assert.Error(t, err)
+		// Expect error to throw error for missing modules
+		assert.Error(t, getProjectContentErr)
 		assert.Equal(t, result, "")
 	})
 
 	t.Run("Should return a valid project config", func(t *testing.T) {
-		projectConfig.Modules = eksGoReactSampleModules()
-		result, err := projectconfig.GetProjectFileContent(projectConfig)
+		resultConfig := &projectconfig.ZeroProjectConfig{}
+		expectedConfig := &projectconfig.ZeroProjectConfig{
+			Name:                   "abc",
+			ShouldPushRepositories: false,
+			Modules:                eksGoReactSampleModules(),
+		}
 
-		assert.NoError(t, err)
-		assert.NotEmpty(t, result)
-		// TODO: need to remove trailing new-line in util function for this to work
-		// assert.Equal(t, validConfigContent(), result)
+		defaultConfig.Modules = eksGoReactSampleModules() // re-insert project config modules
+		projectContentString, getProjectContentErr := projectconfig.GetProjectFileContent(defaultConfig)
+
+		assert.NoError(t, getProjectContentErr)
+
+		unmarshalErr := yaml.Unmarshal([]byte(projectContentString), &resultConfig)
+		assert.NoError(t, unmarshalErr)
+
+		if !cmp.Equal(expectedConfig, resultConfig, cmpopts.EquateEmpty()) {
+			t.Errorf("projectconfig.ZeroProjectConfig.Unmarshal mismatch (-expected +result):\n%s", cmp.Diff(expectedConfig, resultConfig))
+		}
 	})
 }
-
-// TODO: Write test init function to check file written to disk, use test_data/
 
 func validConfigContent() string {
 	return `
