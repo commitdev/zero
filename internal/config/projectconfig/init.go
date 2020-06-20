@@ -52,7 +52,7 @@ func GetProjectFileContent(projectConfig ZeroProjectConfig) (string, error) {
 		return "", fmt.Errorf("Invalid project config, expected config modules to be non-empty")
 	}
 
-	pConfigModule, err := yaml.Marshal(projectConfig.Modules)
+	pConfigModules, err := yaml.Marshal(projectConfig.Modules)
 	if err != nil {
 		return "", err
 	}
@@ -64,7 +64,7 @@ func GetProjectFileContent(projectConfig ZeroProjectConfig) (string, error) {
 	}{
 		Name:                   projectConfig.Name,
 		ShouldPushRepositories: projectConfig.ShouldPushRepositories,
-		Modules:                util.IndentString(string(pConfigModule), 2),
+		Modules:                util.IndentString(string(pConfigModules), 2),
 	}
 
 	if err := tmpl.Execute(&tplBuffer, t); err != nil {

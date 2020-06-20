@@ -66,6 +66,8 @@ func TestGetProjectFileContent(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, result)
+		// TODO: need to remove trailing new-line in util function for this to work
+		// assert.Equal(t, validConfigContent(), result)
 	})
 }
 
@@ -73,31 +75,32 @@ func TestGetProjectFileContent(t *testing.T) {
 
 func validConfigContent() string {
 	return `
+# Templated zero-project.yml file
 name: abc
 
-shouldPushRepositories: true
+shouldPushRepositories: false
 
 modules:
-    aws-eks-stack:
-        parameters:
-            a: b
-        files:
-            dir: zero-aws-eks-stack
-            repo: github.com/something/repo1
-            source: github.com/commitdev/zero-aws-eks-stack
-    deployable-backend:
-        parameters:
-            a: b
-        files:
-            dir: zero-deployable-backend
-            repo: github.com/something/repo2
-            source: github.com/commitdev/zero-deployable-backend
-    deployable-react-frontend:
-        parameters:
-            a: b
-        files:
-            dir: zero-deployable-react-frontend
-            repo: github.com/something/repo3
-            source: github.com/commitdev/zero-deployable-react-frontend
+  aws-eks-stack:
+    parameters:
+      a: b
+    files:
+      dir: zero-aws-eks-stack
+      repo: github.com/something/repo1
+      source: github.com/commitdev/zero-aws-eks-stack
+  deployable-backend:
+    parameters:
+      a: b
+    files:
+      dir: zero-deployable-backend
+      repo: github.com/something/repo2
+      source: github.com/commitdev/zero-deployable-backend
+  deployable-react-frontend:
+    parameters:
+      a: b
+    files:
+      dir: zero-deployable-react-frontend
+      repo: github.com/something/repo3
+      source: github.com/commitdev/zero-deployable-react-frontend
 `
 }

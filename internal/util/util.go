@@ -120,7 +120,7 @@ func IndentString(content string, space int) string {
 	var result string
 	subStr := strings.Split(content, "\n")
 	for _, s := range subStr {
-		result += fmt.Sprintf("%"+strconv.Itoa(space)+"s%s \n", "", s)
+		result += fmt.Sprintf("%"+strconv.Itoa(space)+"s%s\n", "", s)
 	}
 	return result
 }
