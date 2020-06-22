@@ -171,33 +171,78 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 	return handlers
 }
 
-func getCredentialPrompts(projectCredentials globalconfig.ProjectCredential, moduleConfigs map[string]moduleconfig.ModuleConfig) map[string][]PromptHandler {
+func getCredentialPrompts(projectCredentials globalconfig.ProjectCredential, moduleConfigs map[string]moduleconfig.ModuleConfig) []CredentialPrompts {
 	var uniqueVendors []string
 	for _, module := range moduleConfigs {
 		uniqueVendors = appendToSet(uniqueVendors, module.RequiredCredentials)
 	}
+
 	// map is to keep track of which vendor they belong to, to fill them back into the projectConfig
-	prompts := map[string][]PromptHandler{}
-	for _, vendor := range uniqueVendors {
-		prompts[vendor] = mapVendorToPrompts(projectCredentials, vendor)
+	prompts := []CredentialPrompts{}
+	for _, vendor := range AvailableVendorOrders {
+		if itemInSlice(uniqueVendors, vendor) {
+			vendorPrompts := CredentialPrompts{vendor, mapVendorToPrompts(projectCredentials, vendor)}
+			prompts = append(prompts, vendorPrompts)
+		}
 	}
 	return prompts
 }
 
 func mapVendorToPrompts(projectCred globalconfig.ProjectCredential, vendor string) []PromptHandler {
 	var prompts []PromptHandler
+	profiles, err := project.GetAWSProfiles()
+	if err != nil {
+		profiles = []string{}
+	}
+
+	// if no profiles available, dont prompt use to pick profile
+	customAwsPickProfileCondition := func(param map[string]string) bool {
+		if len(profiles) == 0 {
+			flog.Infof(":warning: No AWS profiles found, please manually input AWS credentials")
+			return false
+		} else {
+			return true
+		}
+	}
+
+	// condition for prompting manual AWS credentials input
+	customAwsMustInputCondition := func(param map[string]string) bool {
+		toPickProfile := awsPickProfile
+		if val, ok := param["use_aws_profile"]; ok && val != toPickProfile {
+			return true
+		}
+		return false
+	}
 
 	switch vendor {
 	case "aws":
 		awsPrompts := []PromptHandler{
 			{
 				moduleconfig.Parameter{
+					Field:   "use_aws_profile",
+					Label:   "Use credentials from existing AWS profiles?",
+					Options: []string{awsPickProfile, awsManualInputCredentials},
+				},
+				customAwsPickProfileCondition,
+				NoValidation,
+			},
+			{
+				moduleconfig.Parameter{
+					Field:   "aws_profile",
+					Label:   "Select AWS Profile",
+					Options: profiles,
+				},
+				KeyMatchCondition("use_aws_profile", awsPickProfile),
+				NoValidation,
+			},
+			{
+				moduleconfig.Parameter{
 					Field:   "accessKeyId",
 					Label:   "AWS Access Key ID",
 					Default: projectCred.AWSResourceConfig.AccessKeyId,
 				},
-				NoCondition,
-				NoValidation,
+				CustomCondition(customAwsMustInputCondition),
+				project.ValidateAKID,
 			},
 			{
 				moduleconfig.Parameter{
@@ -205,8 +250,8 @@ func mapVendorToPrompts(projectCred globalconfig.ProjectCredential, vendor strin
 					Label:   "AWS Secret access key",
 					Default: projectCred.AWSResourceConfig.SecretAccessKey,
 				},
-				NoCondition,
-				NoValidation,
+				CustomCondition(customAwsMustInputCondition),
+				project.ValidateSAK,
 			},
 		}
 		prompts = append(prompts, awsPrompts...)

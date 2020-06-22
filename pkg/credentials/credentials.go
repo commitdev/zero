@@ -11,6 +11,7 @@ import (
 	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/manifoldco/promptui"
 	"gopkg.in/yaml.v2"
@@ -35,6 +36,29 @@ func MakeAwsEnvars(cfg *projectconfig.ZeroProjectConfig, awsSecrets Secrets) []s
 	env = append(env, fmt.Sprintf("AWS_DEFAULT_REGION=%s", cfg.Infrastructure.AWS.Region))
 
 	return env
+}
+
+func AwsCredsPath() string {
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return filepath.Join(usr.HomeDir, ".aws/credentials")
+}
+
+func GetAWSProfileProjectCredentials(profileName string, creds globalconfig.ProjectCredential) globalconfig.ProjectCredential {
+	awsPath := AwsCredsPath()
+	return GetAWSProfileCredentials(awsPath, profileName, creds)
+}
+
+func GetAWSProfileCredentials(credsPath string, profileName string, creds globalconfig.ProjectCredential) globalconfig.ProjectCredential {
+	awsCreds, err := credentials.NewSharedCredentials(credsPath, profileName).Get()
+	if err != nil {
+		log.Fatal(err)
+	}
+	creds.AWSResourceConfig.AccessKeyId = awsCreds.AccessKeyID
+	creds.AWSResourceConfig.SecretAccessKey = awsCreds.SecretAccessKey
+	return creds
 }
 
 func GetSecrets(baseDir string) Secrets {
@@ -153,29 +177,28 @@ func writeSecrets(secretsFile string, s Secrets) {
 	}
 }
 
+func ValidateAKID(input string) error {
+	// 20 uppercase alphanumeric characters
+	var awsAccessKeyIDPat = regexp.MustCompile(`^[A-Z0-9]{20}$`)
+	if !awsAccessKeyIDPat.MatchString(input) {
+		return errors.New("Invalid aws_access_key_id")
+	}
+	return nil
+}
+
+func ValidateSAK(input string) error {
+	// 40 base64 characters
+	var awsSecretAccessKeyPat = regexp.MustCompile(`^[A-Za-z0-9/+=]{40}$`)
+	if !awsSecretAccessKeyPat.MatchString(input) {
+		return errors.New("Invalid aws_secret_access_key")
+	}
+	return nil
+}
+
 func promptAWSCredentials(secrets *Secrets) {
-
-	validateAKID := func(input string) error {
-		// 20 uppercase alphanumeric characters
-		var awsAccessKeyIDPat = regexp.MustCompile(`^[A-Z0-9]{20}$`)
-		if !awsAccessKeyIDPat.MatchString(input) {
-			return errors.New("Invalid aws_access_key_id")
-		}
-		return nil
-	}
-
-	validateSAK := func(input string) error {
-		// 40 base64 characters
-		var awsSecretAccessKeyPat = regexp.MustCompile(`^[A-Za-z0-9/+=]{40}$`)
-		if !awsSecretAccessKeyPat.MatchString(input) {
-			return errors.New("Invalid aws_secret_access_key")
-		}
-		return nil
-	}
-
 	accessKeyIDPrompt := promptui.Prompt{
 		Label:    "Aws Access Key ID ",
-		Validate: validateAKID,
+		Validate: ValidateAKID,
 	}
 
 	accessKeyIDResult, err := accessKeyIDPrompt.Run()
@@ -187,7 +210,7 @@ func promptAWSCredentials(secrets *Secrets) {
 
 	secretAccessKeyPrompt := promptui.Prompt{
 		Label:    "Aws Secret Access Key ",
-		Validate: validateSAK,
+		Validate: ValidateSAK,
 		Mask:     '*',
 	}
 

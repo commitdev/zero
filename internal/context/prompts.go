@@ -10,24 +10,45 @@ import (
 
 	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
+	"github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/manifoldco/promptui"
 	"gopkg.in/yaml.v2"
 )
 
+// Constant to maintain prompt orders so users can have the same flow,
+// modules get downloaded asynchronously therefore its easier to just hardcode an order
+var AvailableVendorOrders = []string{"aws", "github", "circleci"}
+
+const awsPickProfile = "Existing AWS Profiles"
+const awsManualInputCredentials = "Enter my own AWS credentials"
+
 type PromptHandler struct {
 	moduleconfig.Parameter
-	Condition func(map[string]string) bool
+	Condition CustomConditionSignature
 	Validate  func(string) error
 }
+
+type CredentialPrompts struct {
+	Vendor  string
+	Prompts []PromptHandler
+}
+
+type CustomConditionSignature func(map[string]string) bool
 
 func NoCondition(map[string]string) bool {
 	return true
 }
 
-func KeyMatchCondition(key string, value string) func(map[string]string) bool {
+func KeyMatchCondition(key string, value string) CustomConditionSignature {
 	return func(param map[string]string) bool {
 		return param[key] == value
+	}
+}
+
+func CustomCondition(fn CustomConditionSignature) CustomConditionSignature {
+	return func(param map[string]string) bool {
+		return fn(param)
 	}
 }
 
@@ -150,15 +171,16 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 	return parameters, nil
 }
 
-func promptCredentialsAndFillProjectCreds(credentialPrompts map[string][]PromptHandler, credentials globalconfig.ProjectCredential) globalconfig.ProjectCredential {
+func promptCredentialsAndFillProjectCreds(credentialPrompts []CredentialPrompts, creds globalconfig.ProjectCredential) globalconfig.ProjectCredential {
 	promptsValues := map[string]map[string]string{}
 
-	for vendor, prompts := range credentialPrompts {
+	for _, prompts := range credentialPrompts {
+		vendor := prompts.Vendor
 		vendorPromptValues := map[string]string{}
 
 		// vendors like AWS have multiple prompts (accessKeyId and secretAccessKey)
-		for _, prompt := range prompts {
-			vendorPromptValues[prompt.Field] = prompt.GetParam(map[string]string{})
+		for _, prompt := range prompts.Prompts {
+			vendorPromptValues[prompt.Field] = prompt.GetParam(vendorPromptValues)
 		}
 		promptsValues[vendor] = vendorPromptValues
 	}
@@ -166,8 +188,15 @@ func promptCredentialsAndFillProjectCreds(credentialPrompts map[string][]PromptH
 	// FIXME: what is a good way to dynamically modify partial data of a struct
 	// current just marashing to yaml, then unmarshaling into the base struct
 	yamlContent, _ := yaml.Marshal(promptsValues)
-	yaml.Unmarshal(yamlContent, &credentials)
-	return credentials
+	yaml.Unmarshal(yamlContent, &creds)
+
+	// Fill AWS credentials based on profile from ~/.aws/credentials
+	if val, ok := promptsValues["aws"]; ok {
+		if val["use_aws_profile"] == awsPickProfile {
+			creds = credentials.GetAWSProfileProjectCredentials(val["aws_profile"], creds)
+		}
+	}
+	return creds
 }
 
 func appendToSet(set []string, toAppend []string) []string {
