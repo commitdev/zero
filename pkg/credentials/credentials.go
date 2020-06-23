@@ -14,7 +14,6 @@ import (
 	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/manifoldco/promptui"
-	"gopkg.in/yaml.v2"
 )
 
 // Secrets - AWS prompted credentials
@@ -61,67 +60,6 @@ func GetAWSProfileCredentials(credsPath string, profileName string, creds global
 	return creds
 }
 
-func GetSecrets(baseDir string) Secrets {
-
-	secretsFile := filepath.Join(baseDir, "secrets.yaml")
-	if fileExists(secretsFile) {
-		log.Println("secrets.yaml exists ...")
-		return readSecrets(secretsFile)
-	} else {
-		// Get the user's home dir
-		usr, err := user.Current()
-		if err != nil {
-			log.Fatal(err)
-		}
-		credsFile := filepath.Join(usr.HomeDir, ".aws/credentials")
-
-		var secrets Secrets
-
-		// Load the credentials file to look for profiles
-		profiles, err := GetAWSProfiles()
-		if err == nil {
-			profilePrompt := promptui.Select{
-				Label: "Select AWS Profile",
-				Items: profiles,
-			}
-
-			_, profileResult, _ := profilePrompt.Run()
-
-			creds, err := credentials.NewSharedCredentials(credsFile, profileResult).Get()
-			if err == nil {
-				secrets = Secrets{
-					AWS: AWS{
-						AccessKeyID:     creds.AccessKeyID,
-						SecretAccessKey: creds.SecretAccessKey,
-					},
-				}
-			}
-		}
-
-		// We couldn't load the credentials file, get the user to just paste them
-		if secrets.AWS == (AWS{}) {
-			promptAWSCredentials(&secrets)
-		}
-
-		if secrets.CircleCIKey == "" || secrets.GithubToken == "" {
-			ciPrompt := promptui.Select{
-				Label: "Which Continuous integration provider do you want to use?",
-				Items: []string{"CircleCI", "GitHub Actions"},
-			}
-
-			_, ciResult, _ := ciPrompt.Run()
-
-			if ciResult == "CircleCI" {
-				promptCircleCICredentials(&secrets)
-			} else if ciResult == "GitHub Actions" {
-				promptGitHubCredentials(&secrets)
-			}
-		}
-
-		return secrets
-	}
-}
-
 // GetAWSProfiles returns a list of AWS forprofiles set up on the user's sytem
 func GetAWSProfiles() ([]string, error) {
 	usr, err := user.Current()
@@ -143,38 +81,6 @@ func GetAWSProfiles() ([]string, error) {
 		profiles[i] = p[1]
 	}
 	return profiles, nil
-}
-
-func readSecrets(secretsFile string) Secrets {
-	data, err := ioutil.ReadFile(secretsFile)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	awsSecrets := Secrets{}
-
-	err = yaml.Unmarshal(data, &awsSecrets)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	return awsSecrets
-}
-
-func writeSecrets(secretsFile string, s Secrets) {
-	secretsYaml, err := yaml.Marshal(&s)
-
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		panic(err)
-	}
-
-	err = ioutil.WriteFile(secretsFile, []byte(secretsYaml), 0644)
-
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		panic(err)
-	}
 }
 
 func ValidateAKID(input string) error {
