@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/commitdev/zero/internal/config/projectconfig"
-	"github.com/commitdev/zero/internal/context"
+	initPrompts "github.com/commitdev/zero/internal/init"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Create new project with provided name and initialize configuration based on user input.",
 	Run: func(cmd *cobra.Command, args []string) {
-		projectContext := context.Init(projectconfig.RootDir)
+		projectContext := initPrompts.Init(projectconfig.RootDir)
 		projectconfig.Init(projectconfig.RootDir, projectContext.Name, projectContext)
 	},
 }
