@@ -45,29 +45,32 @@ func eksGoReactSampleModules() projectconfig.Modules {
 
 func validConfigContent() string {
 	return `
+# Templated zero-project.yml file
 name: abc
 
+shouldPushRepositories: false
+
 modules:
-    aws-eks-stack:
-        parameters:
-            a: b
-        files:
-            dir: zero-aws-eks-stack
-            repo: github.com/something/repo1
-            source: github.com/commitdev/zero-aws-eks-stack
-    deployable-backend:
-        parameters:
-            a: b
-        files:
-            dir: zero-deployable-backend
-            repo: github.com/something/repo2
-            source: github.com/commitdev/zero-deployable-backend
-    deployable-react-frontend:
-        parameters:
-            a: b
-        files:
-            dir: zero-deployable-react-frontend
-            repo: github.com/something/repo3
-            source: github.com/commitdev/zero-deployable-react-frontend
+  aws-eks-stack:
+    parameters:
+      a: b
+    files:
+      dir: zero-aws-eks-stack
+      repo: github.com/something/repo1
+      source: github.com/commitdev/zero-aws-eks-stack
+  deployable-backend:
+    parameters:
+      a: b
+    files:
+      dir: zero-deployable-backend
+      repo: github.com/something/repo2
+      source: github.com/commitdev/zero-deployable-backend
+  deployable-react-frontend:
+    parameters:
+      a: b
+    files:
+      dir: zero-deployable-react-frontend
+      repo: github.com/something/repo3
+      source: github.com/commitdev/zero-deployable-react-frontend
 `
 }

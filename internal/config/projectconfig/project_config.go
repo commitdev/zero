@@ -34,7 +34,7 @@ type Modules map[string]Module
 
 type Module struct {
 	Parameters Parameters `yaml:"parameters,omitempty"`
-	Files      Files
+	Files      Files      `yaml:"files,omitempty"`
 }
 
 type Parameters map[string]string
