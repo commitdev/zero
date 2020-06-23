@@ -33,9 +33,7 @@ Only a single environment may be suitable for an initial test, but for a real sy
 		environments = promptEnvironments()
 	}
 
-	validateEnvironments(environments)
-
-	flog.Infof(":tada: Bootstrapping project %s. Please use the zero.yml file to modify the project as needed.", projectConfig.Name)
+	flog.Infof(":tada: Bootstrapping project %s. Please use the zero-project.yml file to modify the project as needed.", projectConfig.Name)
 
 	flog.Infof("Cloud provider: %s", "AWS") // will this come from the config?
 
