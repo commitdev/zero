@@ -1,6 +1,7 @@
 package init
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -66,6 +67,24 @@ func SpecificValueValidation(values ...string) func(string) error {
 		}
 		return fmt.Errorf("Please choose one of %s", strings.Join(values, "/"))
 	}
+}
+
+func ValidateAKID(input string) error {
+	// 20 uppercase alphanumeric characters
+	var awsAccessKeyIDPat = regexp.MustCompile(`^[A-Z0-9]{20}$`)
+	if !awsAccessKeyIDPat.MatchString(input) {
+		return errors.New("Invalid aws_access_key_id")
+	}
+	return nil
+}
+
+func ValidateSAK(input string) error {
+	// 40 base64 characters
+	var awsSecretAccessKeyPat = regexp.MustCompile(`^[A-Za-z0-9/+=]{40}$`)
+	if !awsSecretAccessKeyPat.MatchString(input) {
+		return errors.New("Invalid aws_secret_access_key")
+	}
+	return nil
 }
 
 // TODO: validation / allow prompt retry ...etc
