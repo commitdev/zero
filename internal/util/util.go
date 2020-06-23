@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -112,4 +113,14 @@ func AppendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []stri
 		}
 	}
 	return envList
+}
+
+// IndentString will Add x space char padding at the beginging of each line.
+func IndentString(content string, spaces int) string {
+	var result string
+	subStr := strings.Split(content, "\n")
+	for _, s := range subStr {
+		result += fmt.Sprintf("%"+strconv.Itoa(spaces)+"s%s\n", "", s)
+	}
+	return result
 }
