@@ -15,6 +15,6 @@ var initCmd = &cobra.Command{
 	Short: "Create new project with provided name and initialize configuration based on user input.",
 	Run: func(cmd *cobra.Command, args []string) {
 		projectContext := initPrompts.Init(projectconfig.RootDir)
-		projectconfig.Init(projectconfig.RootDir, projectContext.Name, projectContext)
+		projectconfig.CreateProjectConfigFile(projectconfig.RootDir, projectContext.Name, projectContext)
 	},
 }

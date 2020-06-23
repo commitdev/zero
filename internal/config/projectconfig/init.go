@@ -29,8 +29,8 @@ func SetRootDir(dir string) {
 	RootDir = dir
 }
 
-func Init(dir string, projectName string, projectContext *ZeroProjectConfig) {
-	content, err := GetProjectFileContent(*projectContext)
+func CreateProjectConfigFile(dir string, projectName string, projectContext *ZeroProjectConfig) {
+	content, err := getProjectFileContent(*projectContext)
 	if err != nil {
 		exit.Fatal(fmt.Sprintf("Failed extracting the file config content %s", constants.ZeroProjectYml))
 	}
@@ -41,7 +41,7 @@ func Init(dir string, projectName string, projectContext *ZeroProjectConfig) {
 	}
 }
 
-func GetProjectFileContent(projectConfig ZeroProjectConfig) (string, error) {
+func getProjectFileContent(projectConfig ZeroProjectConfig) (string, error) {
 	var tplBuffer bytes.Buffer
 	tmpl, err := template.New("projectConfig").Parse(zeroProjectConfigTemplate)
 	if err != nil {

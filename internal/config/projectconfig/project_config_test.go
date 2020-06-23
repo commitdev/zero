@@ -9,8 +9,6 @@ import (
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
 )
 
 func TestLoadConfig(t *testing.T) {
@@ -43,43 +41,6 @@ func eksGoReactSampleModules() projectconfig.Modules {
 		"deployable-backend":        projectconfig.NewModule(parameters, "zero-deployable-backend", "github.com/something/repo2", "github.com/commitdev/zero-deployable-backend"),
 		"deployable-react-frontend": projectconfig.NewModule(parameters, "zero-deployable-react-frontend", "github.com/something/repo3", "github.com/commitdev/zero-deployable-react-frontend"),
 	}
-}
-
-func TestGetProjectFileContent(t *testing.T) {
-	defaultConfig := projectconfig.ZeroProjectConfig{
-		Name:                   "abc",
-		ShouldPushRepositories: false,
-		// Modules not set defaults to nil
-	}
-
-	t.Run("Should fail if modules are missing from project config", func(t *testing.T) {
-		result, getProjectContentErr := projectconfig.GetProjectFileContent(defaultConfig)
-
-		// Expect error to throw error for missing modules
-		assert.Error(t, getProjectContentErr)
-		assert.Equal(t, result, "")
-	})
-
-	t.Run("Should return a valid project config", func(t *testing.T) {
-		resultConfig := &projectconfig.ZeroProjectConfig{}
-		expectedConfig := &projectconfig.ZeroProjectConfig{
-			Name:                   "abc",
-			ShouldPushRepositories: false,
-			Modules:                eksGoReactSampleModules(),
-		}
-
-		defaultConfig.Modules = eksGoReactSampleModules() // re-insert project config modules
-		projectContentString, getProjectContentErr := projectconfig.GetProjectFileContent(defaultConfig)
-
-		assert.NoError(t, getProjectContentErr)
-
-		unmarshalErr := yaml.Unmarshal([]byte(projectContentString), &resultConfig)
-		assert.NoError(t, unmarshalErr)
-
-		if !cmp.Equal(expectedConfig, resultConfig, cmpopts.EquateEmpty()) {
-			t.Errorf("projectconfig.ZeroProjectConfig.Unmarshal mismatch (-expected +result):\n%s", cmp.Diff(expectedConfig, resultConfig))
-		}
-	})
 }
 
 func validConfigContent() string {
