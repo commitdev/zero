@@ -32,10 +32,10 @@ func TestApply(t *testing.T) {
 
 		content, err := ioutil.ReadFile(filepath.Join(tmpDir, "project1/project.out"))
 		assert.NoError(t, err)
-		assert.Equal(t, string(content), "foo: bar\n")
+		assert.Equal(t, "foo: bar\nrepo: github.com/commitdev/project1\n", string(content))
 
 		content, err = ioutil.ReadFile(filepath.Join(tmpDir, "project2/project.out"))
 		assert.NoError(t, err)
-		assert.Equal(t, string(content), "baz: qux\n")
+		assert.Equal(t, "baz: qux\n", string(content))
 	})
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/util"
 
+	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
@@ -52,8 +53,11 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ","))
 
 	for _, mod := range projectConfig.Modules {
-		dirArg := fmt.Sprintf("PROJECT_DIR=%s", path.Join(dir, mod.Files.Directory))
-		envList := []string{environmentArg, dirArg}
+		envList := []string{
+			environmentArg,
+			fmt.Sprintf("PROJECT_DIR=%s", path.Join(dir, mod.Files.Directory)),
+			fmt.Sprintf("REPOSITORY=%s", mod.Files.Repository),
+		}
 
 		modulePath := module.GetSourceDir(mod.Files.Source)
 		// Passed in `dir` will only be used to find the project path, not the module path,
@@ -62,7 +66,10 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 			modulePath = filepath.Join(dir, modulePath)
 		}
 
+		credentials := globalconfig.GetProjectCredentials(projectConfig.Name)
+
 		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
+		envList = util.AppendProjectEnvToCmdEnv(credentials.AsEnvVars(), envList)
 		util.ExecuteCommand(exec.Command("make"), modulePath, envList)
 	}
 }

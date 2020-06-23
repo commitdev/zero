@@ -239,7 +239,7 @@ func mapVendorToPrompts(projectCred globalconfig.ProjectCredential, vendor strin
 				moduleconfig.Parameter{
 					Field:   "accessKeyId",
 					Label:   "AWS Access Key ID",
-					Default: projectCred.AWSResourceConfig.AccessKeyId,
+					Default: projectCred.AWSResourceConfig.AccessKeyID,
 				},
 				CustomCondition(customAwsMustInputCondition),
 				project.ValidateAKID,
