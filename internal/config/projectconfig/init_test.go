@@ -9,6 +9,7 @@ import (
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateProjectConfigFile(t *testing.T) {
@@ -31,7 +32,7 @@ func TestCreateProjectConfigFile(t *testing.T) {
 		ShouldPushRepositories: false,
 		Modules:                eksGoReactSampleModules(),
 	}
-	projectconfig.CreateProjectConfigFile(projectconfig.RootDir, projectName, expectedConfig)
+	assert.NoError(t, projectconfig.CreateProjectConfigFile(projectconfig.RootDir, projectName, expectedConfig))
 
 	// make sure the file exists
 	if _, err := os.Stat(path.Join(testDirPath, constants.ZeroProjectYml)); err != nil {
@@ -39,7 +40,6 @@ func TestCreateProjectConfigFile(t *testing.T) {
 	}
 
 	t.Run("Should return a valid project config", func(t *testing.T) {
-
 		resultConfig := projectconfig.LoadConfig(path.Join(testDirPath, constants.ZeroProjectYml))
 
 		if !cmp.Equal(expectedConfig, resultConfig, cmpopts.EquateEmpty()) {
@@ -47,9 +47,9 @@ func TestCreateProjectConfigFile(t *testing.T) {
 		}
 	})
 
-	/* TODO: Test err is thrown when there is a failure?
 	t.Run("Should fail if modules are missing from project config", func(t *testing.T) {
-
+		expectedConfig.Modules = nil
+		assert.Error(t, projectconfig.CreateProjectConfigFile(projectconfig.RootDir, projectName, expectedConfig))
 	})
-	*/
+
 }

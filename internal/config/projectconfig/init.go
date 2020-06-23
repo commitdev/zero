@@ -9,7 +9,6 @@ import (
 
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
-	"github.com/commitdev/zero/pkg/util/exit"
 	"gopkg.in/yaml.v2"
 )
 
@@ -29,16 +28,19 @@ func SetRootDir(dir string) {
 	RootDir = dir
 }
 
-func CreateProjectConfigFile(dir string, projectName string, projectContext *ZeroProjectConfig) {
+// CreateProjectConfigFile extracts the required content for zero project config file then write to disk.
+func CreateProjectConfigFile(dir string, projectName string, projectContext *ZeroProjectConfig) error {
 	content, err := getProjectFileContent(*projectContext)
 	if err != nil {
-		exit.Fatal(fmt.Sprintf("Failed extracting the file config content %s", constants.ZeroProjectYml))
+		return err
 	}
 
 	writeErr := ioutil.WriteFile(path.Join(dir, projectName, constants.ZeroProjectYml), []byte(content), 0644)
 	if writeErr != nil {
-		exit.Fatal(fmt.Sprintf("Failed to create config file %s", constants.ZeroProjectYml))
+		return err
 	}
+
+	return nil
 }
 
 func getProjectFileContent(projectConfig ZeroProjectConfig) (string, error) {
