@@ -55,7 +55,7 @@ func GetAWSProfileCredentials(credsPath string, profileName string, creds global
 	if err != nil {
 		log.Fatal(err)
 	}
-	creds.AWSResourceConfig.AccessKeyId = awsCreds.AccessKeyID
+	creds.AWSResourceConfig.AccessKeyID = awsCreds.AccessKeyID
 	creds.AWSResourceConfig.SecretAccessKey = awsCreds.SecretAccessKey
 	return creds
 }
