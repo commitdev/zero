@@ -52,7 +52,9 @@ Only a single environment may be suitable for an initial test, but for a real sy
 func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
 	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ","))
 
+	// Go through each of the modules and run `make`
 	for _, mod := range projectConfig.Modules {
+		// Add env vars for the makefile
 		envList := []string{
 			environmentArg,
 			fmt.Sprintf("PROJECT_DIR=%s", path.Join(dir, mod.Files.Directory)),
@@ -66,6 +68,7 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 			modulePath = filepath.Join(dir, modulePath)
 		}
 
+		// Get project credentials for the makefile
 		credentials := globalconfig.GetProjectCredentials(projectConfig.Name)
 
 		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)

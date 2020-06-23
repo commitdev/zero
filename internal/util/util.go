@@ -59,6 +59,7 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 
 	var errStdout, errStderr error
 
+	cmd.Env = os.Environ()
 	if envars != nil {
 		cmd.Env = append(os.Environ(), envars...)
 	}
@@ -99,6 +100,7 @@ func ExecuteCommandOutput(cmd *exec.Cmd, pathPrefix string, envars []string) str
 		cmd.Dir = path.Join(dir, pathPrefix)
 	}
 
+	cmd.Env = os.Environ()
 	if envars != nil {
 		cmd.Env = append(os.Environ(), envars...)
 	}
