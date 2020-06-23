@@ -21,7 +21,7 @@ func FetchModule(source string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	localPath := GetSourceDir(source)
-	if !isLocal(source) {
+	if !IsLocal(source) {
 		err := getter.Get(localPath, source)
 		if err != nil {
 			exit.Fatal("Failed to fetch remote module from %s: %v\n", source, err)
@@ -41,7 +41,7 @@ func ParseModuleConfig(source string) (moduleconfig.ModuleConfig, error) {
 
 // GetSourcePath gets a unique local source directory name. For local modules, it use the local directory
 func GetSourceDir(source string) string {
-	if !isLocal(source) {
+	if !IsLocal(source) {
 		h := md5.New()
 		io.WriteString(h, source)
 		source = base64.StdEncoding.EncodeToString(h.Sum(nil))
@@ -52,7 +52,7 @@ func GetSourceDir(source string) string {
 }
 
 // IsLocal uses the go-getter FileDetector to check if source is a file
-func isLocal(source string) bool {
+func IsLocal(source string) bool {
 	pwd := util.GetCwd()
 
 	// ref: https://github.com/hashicorp/go-getter/blob/master/detect_test.go

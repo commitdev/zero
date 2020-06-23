@@ -1,6 +1,6 @@
 module github.com/commitdev/zero
 
-go 1.12
+go 1.13
 
 require (
 	github.com/aws/aws-sdk-go v1.25.33
@@ -24,6 +24,7 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/spf13/cobra v0.0.6
 	github.com/stretchr/testify v1.4.0
+	github.com/termie/go-shutil v0.0.0-20140729215957-bcacb06fecae
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
 	golang.org/x/sys v0.0.0-20200602225109-6fdc65e7d980 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect

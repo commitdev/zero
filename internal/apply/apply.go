@@ -2,25 +2,39 @@ package apply
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"log"
 	"os/exec"
 	"path"
 	"strings"
 
+	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/util"
-	"github.com/commitdev/zero/pkg/util/flog"
 
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/pkg/util/exit"
+	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/manifoldco/promptui"
 )
 
-// Apply will bootstrap the runtime environment for the project
-func Apply(dir string, applyConfigPath string, applyEnvironments []string) []string {
-	context := loadContext(dir, applyConfigPath, applyEnvironments)
+func Apply(rootDir string, configPath string, environments []string) {
+	if strings.Trim(configPath, " ") == "" {
+		exit.Fatal("config path cannot be empty!")
+	}
+	configFilePath := path.Join(rootDir, configPath)
+	projectConfig := projectconfig.LoadConfig(configFilePath)
 
-	flog.Infof(":tada: Bootstrapping project %s. Please use the zero.[hcl, yaml] file to modify the project as needed. %s.", context.Name)
+	if len(environments) == 0 {
+		fmt.Println(`Choose the environments to apply. This will create infrastructure, CI pipelines, etc.
+At this point, real things will be generated that may cost money!
+Only a single environment may be suitable for an initial test, but for a real system we suggest setting up both staging and production environments.`)
+		environments = promptEnvironments()
+	}
+
+	validateEnvironments(environments)
+
+	flog.Infof(":tada: Bootstrapping project %s. Please use the zero.yml file to modify the project as needed.", projectConfig.Name)
 
 	flog.Infof("Cloud provider: %s", "AWS") // will this come from the config?
 
@@ -28,28 +42,29 @@ func Apply(dir string, applyConfigPath string, applyEnvironments []string) []str
 
 	flog.Infof("Infrastructure executor: %s", "Terraform")
 
-	// other details...
+	applyAll(rootDir, *projectConfig, environments)
 
-	return makeAll(dir, context, applyEnvironments)
+	// TODO Summary
+	flog.Infof(":check_mark_button: Done - Summary goes here.")
 }
 
-// loadContext will load the context/configuration to be used by the apply command
-func loadContext(dir string, applyConfigPath string, applyEnvironments []string) *projectconfig.ZeroProjectConfig {
-	if len(applyEnvironments) == 0 {
-		fmt.Println(`Choose the environments to apply. This will create infrastructure, CI pipelines, etc.
-At this point, real things will be generated that may cost money!
-Only a single environment may be suitable for an initial test, but for a real system we suggest setting up both staging and production environments.`)
-		applyEnvironments = promptEnvironments()
-	}
+func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
+	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ","))
 
-	validateEnvironments(applyEnvironments)
+	for _, mod := range projectConfig.Modules {
+		dirArg := fmt.Sprintf("PROJECT_DIR=%s", path.Join(dir, mod.Files.Directory))
+		envList := []string{environmentArg, dirArg}
 
-	if applyConfigPath == "" {
-		exit.Fatal("config path cannot be empty!")
+		modulePath := module.GetSourceDir(mod.Files.Source)
+		// Passed in `dir` will only be used to find the project path, not the module path,
+		// unless the module path is relative
+		if module.IsLocal(mod.Files.Source) && !filepath.IsAbs(modulePath) {
+			modulePath = filepath.Join(dir, modulePath)
+		}
+
+		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
+		util.ExecuteCommand(exec.Command("make"), modulePath, envList)
 	}
-	configPath := path.Join(dir, applyConfigPath)
-	projectConfig := projectconfig.LoadConfig(configPath)
-	return projectConfig
 }
 
 // promptEnvironments Prompts the user for the environments to apply against and returns a slice of strings representing the environments
@@ -84,19 +99,4 @@ func validateEnvironments(applyEnvironments []string) {
 			exit.Fatal("The currently supported environments are \"staging\" and \"production\"")
 		}
 	}
-}
-
-func makeAll(dir string, projectContext *projectconfig.ZeroProjectConfig, applyEnvironments []string) []string {
-	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ","))
-	envList := []string{environmentArg}
-	outputs := []string{}
-
-	for _, mod := range projectContext.Modules {
-		modulePath := path.Join(dir, mod.Files.Directory)
-		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
-
-		output := util.ExecuteCommandOutput(exec.Command("make"), modulePath, envList)
-		outputs = append(outputs, output)
-	}
-	return outputs
 }
