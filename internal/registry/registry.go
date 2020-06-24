@@ -13,7 +13,7 @@ func GetRegistry() Registry {
 			"EKS + Go + React",
 			[]string{
 				"github.com/commitdev/zero-aws-eks-stack",
-				"github.com/commitdev/zero-deployable-backend",
+				"/Volumes/Work/Commit/commitdev/zero-deployable-backend",
 				"github.com/commitdev/zero-deployable-react-frontend",
 			},
 		},

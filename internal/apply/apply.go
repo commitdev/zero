@@ -11,6 +11,7 @@ import (
 
 	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/util"
+	"github.com/hashicorp/terraform/dag"
 
 	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
@@ -50,8 +51,18 @@ Only a single environment may be suitable for an initial test, but for a real sy
 func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
 	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ","))
 
-	// Go through each of the modules and run `make`
-	for _, mod := range projectConfig.Modules {
+	graph := projectConfig.GetDAG()
+
+	// Walk the graph of modules and run `make`
+	root := []dag.Vertex{projectconfig.GraphRootName}
+	graph.DepthFirstWalk(root, func(v dag.Vertex, depth int) error {
+		// Don't process the root
+		if depth == 0 {
+			return nil
+		}
+
+		name := v.(string)
+		mod := projectConfig.Modules[name]
 		// Add env vars for the makefile
 		envList := []string{
 			environmentArg,
@@ -72,7 +83,8 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
 		envList = util.AppendProjectEnvToCmdEnv(credentials.AsEnvVars(), envList)
 		util.ExecuteCommand(exec.Command("make"), modulePath, envList)
-	}
+		return nil
+	})
 }
 
 // promptEnvironments Prompts the user for the environments to apply against and returns a slice of strings representing the environments

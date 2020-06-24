@@ -10,6 +10,7 @@ type ModuleConfig struct {
 	Name                string
 	Description         string
 	Author              string
+	DependsOn           []string `yaml:"dependsOn,omitempty"`
 	TemplateConfig      `yaml:"template"`
 	RequiredCredentials []string `yaml:"requiredCredentials"`
 	Parameters          []Parameter
