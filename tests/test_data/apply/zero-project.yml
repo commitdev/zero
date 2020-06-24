@@ -1,7 +1,5 @@
 name: sample_project
 
-context:
-
 modules:
     project1:
         parameters:
