@@ -1,6 +1,7 @@
 package init
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
+	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/manifoldco/promptui"
@@ -65,6 +67,24 @@ func SpecificValueValidation(values ...string) func(string) error {
 		}
 		return fmt.Errorf("Please choose one of %s", strings.Join(values, "/"))
 	}
+}
+
+func ValidateAKID(input string) error {
+	// 20 uppercase alphanumeric characters
+	var awsAccessKeyIDPat = regexp.MustCompile(`^[A-Z0-9]{20}$`)
+	if !awsAccessKeyIDPat.MatchString(input) {
+		return errors.New("Invalid aws_access_key_id")
+	}
+	return nil
+}
+
+func ValidateSAK(input string) error {
+	// 40 base64 characters
+	var awsSecretAccessKeyPat = regexp.MustCompile(`^[A-Za-z0-9/+=]{40}$`)
+	if !awsSecretAccessKeyPat.MatchString(input) {
+		return errors.New("Invalid aws_secret_access_key")
+	}
+	return nil
 }
 
 // TODO: validation / allow prompt retry ...etc
@@ -127,7 +147,7 @@ func promptParameter(prompt PromptHandler) (error, string) {
 
 func executeCmd(command string, envVars map[string]string) string {
 	cmd := exec.Command("bash", "-c", command)
-	cmd.Env = appendProjectEnvToCmdEnv(envVars, os.Environ())
+	cmd.Env = util.AppendProjectEnvToCmdEnv(envVars, os.Environ())
 	out, err := cmd.Output()
 
 	if err != nil {
@@ -140,15 +160,6 @@ func executeCmd(command string, envVars map[string]string) string {
 func sanitizeParameterValue(str string) string {
 	re := regexp.MustCompile("\\n")
 	return re.ReplaceAllString(str, "")
-}
-
-func appendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []string {
-	for key, val := range envMap {
-		if val != "" {
-			envList = append(envList, fmt.Sprintf("%s=%s", key, val))
-		}
-	}
-	return envList
 }
 
 // PromptParams renders series of prompt UI based on the config

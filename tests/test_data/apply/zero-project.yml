@@ -1,0 +1,17 @@
+name: sample_project
+
+modules:
+    project1:
+        parameters:
+            foo: bar
+        files:
+            dir: project1
+            repo: github.com/commitdev/project1
+            source: project1
+    project2:
+        parameters:
+            baz: qux
+        files:
+            dir: project2
+            repo: github.com/commitdev/project2
+            source: project2

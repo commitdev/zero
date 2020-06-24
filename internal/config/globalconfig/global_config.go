@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"reflect"
 
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/pkg/util/exit"
@@ -25,14 +26,14 @@ type ProjectCredential struct {
 }
 
 type AWSResourceConfig struct {
-	AccessKeyId     string `yaml:"accessKeyId,omitempty"`
-	SecretAccessKey string `yaml:"secretAccessKey,omitempty"`
+	AccessKeyID     string `yaml:"accessKeyId,omitempty" env:"AWS_ACCESS_KEY_ID"`
+	SecretAccessKey string `yaml:"secretAccessKey,omitempty" env:"AWS_SECRET_ACCESS_KEY"`
 }
 type GithubResourceConfig struct {
-	AccessToken string `yaml:"accessToken,omitempty"`
+	AccessToken string `yaml:"accessToken,omitempty" env:"GITHUB_ACCESS_TOKEN"`
 }
 type CircleCiResourceConfig struct {
-	ApiKey string `yaml:"apiKey,omitempty"`
+	ApiKey string `yaml:"apiKey,omitempty" env:"CIRCLECI_API_KEY"`
 }
 
 func (p ProjectCredentials) Unmarshal(data []byte) error {
@@ -48,6 +49,35 @@ func (p ProjectCredentials) Unmarshal(data []byte) error {
 		p[k] = v
 	}
 	return nil
+}
+
+// AsEnvVars marshals ProjectCredential as a map of key/value strings suitable for environment variables
+func (p ProjectCredential) AsEnvVars() map[string]string {
+	t := reflect.ValueOf(p)
+
+	list := make(map[string]string)
+	list = gatherFieldTags(t, list)
+
+	return list
+}
+
+func gatherFieldTags(t reflect.Value, list map[string]string) map[string]string {
+	reflectType := t.Type()
+
+	for i := 0; i < t.NumField(); i++ {
+		fieldValue := t.Field(i)
+		fieldType := reflectType.Field(i)
+
+		if fieldType.Type.Kind() == reflect.Struct {
+			list = gatherFieldTags(fieldValue, list)
+			continue
+		}
+
+		if env := fieldType.Tag.Get("env"); env != "" {
+			list[env] = fieldValue.String()
+		}
+	}
+	return list
 }
 
 func LoadUserCredentials() ProjectCredentials {

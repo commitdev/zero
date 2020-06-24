@@ -6,11 +6,6 @@ import (
 	"path"
 	"sync"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
@@ -239,10 +234,10 @@ func mapVendorToPrompts(projectCred globalconfig.ProjectCredential, vendor strin
 				moduleconfig.Parameter{
 					Field:   "accessKeyId",
 					Label:   "AWS Access Key ID",
-					Default: projectCred.AWSResourceConfig.AccessKeyId,
+					Default: projectCred.AWSResourceConfig.AccessKeyID,
 				},
 				CustomCondition(customAwsMustInputCondition),
-				project.ValidateAKID,
+				ValidateAKID,
 			},
 			{
 				moduleconfig.Parameter{
@@ -251,7 +246,7 @@ func mapVendorToPrompts(projectCred globalconfig.ProjectCredential, vendor strin
 					Default: projectCred.AWSResourceConfig.SecretAccessKey,
 				},
 				CustomCondition(customAwsMustInputCondition),
-				project.ValidateSAK,
+				ValidateSAK,
 			},
 		}
 		prompts = append(prompts, awsPrompts...)
@@ -309,34 +304,6 @@ func chooseStack(reg registry.Registry) []string {
 	}
 
 	return registry.GetModulesByName(reg, providerResult)
-}
-
-func fillProviderDetails(projectConfig *projectconfig.ZeroProjectConfig, s project.Secrets) {
-	if projectConfig.Infrastructure.AWS != nil {
-		sess, err := session.NewSession(&aws.Config{
-			Region:      aws.String(projectConfig.Infrastructure.AWS.Region),
-			Credentials: credentials.NewStaticCredentials(s.AWS.AccessKeyID, s.AWS.SecretAccessKey, ""),
-		})
-
-		svc := sts.New(sess)
-		input := &sts.GetCallerIdentityInput{}
-
-		awsCaller, err := svc.GetCallerIdentity(input)
-		if err != nil {
-			if aerr, ok := err.(awserr.Error); ok {
-				switch aerr.Code() {
-				default:
-					exit.Error(aerr.Error())
-				}
-			} else {
-				exit.Error(err.Error())
-			}
-		}
-
-		if awsCaller != nil && awsCaller.Account != nil {
-			projectConfig.Infrastructure.AWS.AccountID = *awsCaller.Account
-		}
-	}
 }
 
 func defaultProjConfig() projectconfig.ZeroProjectConfig {

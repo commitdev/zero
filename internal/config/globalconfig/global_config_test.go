@@ -66,7 +66,7 @@ func TestGetUserCredentials(t *testing.T) {
 		project := globalconfig.GetProjectCredentials(projectName)
 
 		// Reading from fixtures: tests/test_data/configs/credentials.yml
-		assert.Equal(t, "AKIAABCD", project.AWSResourceConfig.AccessKeyId)
+		assert.Equal(t, "AKIAABCD", project.AWSResourceConfig.AccessKeyID)
 		assert.Equal(t, "ZXCV", project.AWSResourceConfig.SecretAccessKey)
 		assert.Equal(t, "0987", project.GithubResourceConfig.AccessToken)
 		assert.Equal(t, "SOME_API_KEY", project.CircleCiResourceConfig.ApiKey)
@@ -87,17 +87,36 @@ func TestEditUserCredentials(t *testing.T) {
 	t.Run("Should create new project if not exist", func(t *testing.T) {
 		projectName := "test-project3"
 		project := globalconfig.GetProjectCredentials(projectName)
-		project.AWSResourceConfig.AccessKeyId = "TEST_KEY_ID_1"
+		project.AWSResourceConfig.AccessKeyID = "TEST_KEY_ID_1"
 		globalconfig.Save(project)
-		newKeyID := globalconfig.GetProjectCredentials(projectName).AWSResourceConfig.AccessKeyId
+		newKeyID := globalconfig.GetProjectCredentials(projectName).AWSResourceConfig.AccessKeyID
 		assert.Equal(t, "TEST_KEY_ID_1", newKeyID)
 	})
 	t.Run("Should edit old project if already exist", func(t *testing.T) {
 		projectName := "my-project"
 		project := globalconfig.GetProjectCredentials(projectName)
-		project.AWSResourceConfig.AccessKeyId = "EDITED_ACCESS_KEY_ID"
+		project.AWSResourceConfig.AccessKeyID = "EDITED_ACCESS_KEY_ID"
 		globalconfig.Save(project)
-		newKeyID := globalconfig.GetProjectCredentials(projectName).AWSResourceConfig.AccessKeyId
+		newKeyID := globalconfig.GetProjectCredentials(projectName).AWSResourceConfig.AccessKeyID
 		assert.Equal(t, "EDITED_ACCESS_KEY_ID", newKeyID)
+	})
+}
+
+func TestMarshalProjectCredentialAsEnvVars(t *testing.T) {
+	t.Run("Should be able to marshal a ProjectCredential into env vars", func(t *testing.T) {
+		pc := globalconfig.ProjectCredential{
+			AWSResourceConfig: globalconfig.AWSResourceConfig{
+				AccessKeyID:     "AKID",
+				SecretAccessKey: "SAK",
+			},
+			CircleCiResourceConfig: globalconfig.CircleCiResourceConfig{
+				ApiKey: "APIKEY",
+			},
+		}
+
+		envVars := pc.AsEnvVars()
+		assert.Equal(t, "AKID", envVars["AWS_ACCESS_KEY_ID"])
+		assert.Equal(t, "SAK", envVars["AWS_SECRET_ACCESS_KEY"])
+		assert.Equal(t, "APIKEY", envVars["CIRCLECI_API_KEY"])
 	})
 }

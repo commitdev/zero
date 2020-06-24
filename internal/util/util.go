@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -47,17 +48,21 @@ func GetCwd() string {
 }
 
 func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
-	dir := GetCwd()
 
-	cmd.Dir = path.Join(dir, pathPrefix)
+	cmd.Dir = pathPrefix
+	if !filepath.IsAbs(pathPrefix) {
+		dir := GetCwd()
+		cmd.Dir = path.Join(dir, pathPrefix)
+	}
 
 	stdoutPipe, _ := cmd.StdoutPipe()
 	stderrPipe, _ := cmd.StderrPipe()
 
 	var errStdout, errStderr error
 
+	cmd.Env = os.Environ()
 	if envars != nil {
-		cmd.Env = envars
+		cmd.Env = append(os.Environ(), envars...)
 	}
 
 	err := cmd.Start()
@@ -89,17 +94,21 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 // ExecuteCommandOutput runs the command and returns its
 // combined standard output and standard error.
 func ExecuteCommandOutput(cmd *exec.Cmd, pathPrefix string, envars []string) string {
-	dir := GetCwd()
 
-	cmd.Dir = path.Join(dir, pathPrefix)
+	cmd.Dir = pathPrefix
+	if !filepath.IsAbs(pathPrefix) {
+		dir := GetCwd()
+		cmd.Dir = path.Join(dir, pathPrefix)
+	}
 
+	cmd.Env = os.Environ()
 	if envars != nil {
-		cmd.Env = envars
+		cmd.Env = append(os.Environ(), envars...)
 	}
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("Executing command failed: (%v) %s\n", err, out)
+		log.Fatalf("Executing command with output failed: (%v) %s\n", err, out)
 	}
 	return string(out)
 }
