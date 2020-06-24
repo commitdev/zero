@@ -68,7 +68,7 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 			}
 
 		}
-		projectConfig.Modules[moduleName] = projectconfig.NewModule(projectModuleParams, repoName, repoURL, mappedSources[moduleName])
+		projectConfig.Modules[moduleName] = projectconfig.NewModule(projectModuleParams, repoName, repoURL, mappedSources[moduleName], module.DependsOn)
 	}
 
 	// TODO: load ~/.zero/config.yml (or credentials)
@@ -308,11 +308,7 @@ func chooseStack(reg registry.Registry) []string {
 
 func defaultProjConfig() projectconfig.ZeroProjectConfig {
 	return projectconfig.ZeroProjectConfig{
-		Name: "",
-		Infrastructure: projectconfig.Infrastructure{
-			AWS: nil,
-		},
-
+		Name:       "",
 		Parameters: map[string]string{},
 		Modules:    projectconfig.Modules{},
 	}

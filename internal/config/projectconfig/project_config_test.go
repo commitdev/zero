@@ -4,11 +4,14 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/commitdev/zero/internal/config/projectconfig"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLoadConfig(t *testing.T) {
@@ -37,9 +40,9 @@ func TestLoadConfig(t *testing.T) {
 func eksGoReactSampleModules() projectconfig.Modules {
 	parameters := projectconfig.Parameters{"a": "b"}
 	return projectconfig.Modules{
-		"aws-eks-stack":             projectconfig.NewModule(parameters, "zero-aws-eks-stack", "github.com/something/repo1", "github.com/commitdev/zero-aws-eks-stack"),
-		"deployable-backend":        projectconfig.NewModule(parameters, "zero-deployable-backend", "github.com/something/repo2", "github.com/commitdev/zero-deployable-backend"),
-		"deployable-react-frontend": projectconfig.NewModule(parameters, "zero-deployable-react-frontend", "github.com/something/repo3", "github.com/commitdev/zero-deployable-react-frontend"),
+		"aws-eks-stack":             projectconfig.NewModule(parameters, "zero-aws-eks-stack", "github.com/something/repo1", "github.com/commitdev/zero-aws-eks-stack", []string{}),
+		"deployable-backend":        projectconfig.NewModule(parameters, "zero-deployable-backend", "github.com/something/repo2", "github.com/commitdev/zero-deployable-backend", []string{}),
+		"deployable-react-frontend": projectconfig.NewModule(parameters, "zero-deployable-react-frontend", "github.com/something/repo3", "github.com/commitdev/zero-deployable-react-frontend", []string{}),
 	}
 }
 
@@ -73,4 +76,38 @@ modules:
       repo: github.com/something/repo3
       source: github.com/commitdev/zero-deployable-react-frontend
 `
+}
+
+func TestProjectConfigModuleGraph(t *testing.T) {
+	configPath := filepath.Join("../../../tests/test_data/projectconfig/", constants.ZeroProjectYml)
+
+	t.Run("Should generate a valid, correct graph based on the project config", func(t *testing.T) {
+		pc := projectconfig.LoadConfig(configPath)
+		graph := pc.GetDAG()
+
+		// Validate the graph
+		assert.NoError(t, graph.Validate())
+
+		// Check the structure of the graph
+		root, err := graph.Root()
+		assert.NoError(t, err)
+		assert.Equal(t, "graphRoot", root)
+
+		want := `graphRoot
+  project1
+project1
+  project2
+  project3
+project2
+  project4
+project3
+  project4
+  project5
+project4
+project5
+`
+		assert.Equal(t, want, graph.String())
+
+	})
+
 }

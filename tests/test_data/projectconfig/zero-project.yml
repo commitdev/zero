@@ -1,0 +1,34 @@
+# Graph shape:
+#    2
+#  /  \
+# 1    4
+#  \  /
+#   3 - 5
+
+name: graph_test
+
+modules:
+    project1:
+        parameters:
+            foo: bar
+    project2:
+        dependsOn:
+        - project1
+        parameters:
+            baz: qux
+    project3:
+        dependsOn:
+        - project1
+        parameters:
+            baz: qux
+    project4:
+        dependsOn:
+        - project2
+        - project3
+        parameters:
+            baz: qux
+    project5:
+        dependsOn:
+        - project3
+        parameters:
+            baz: qux

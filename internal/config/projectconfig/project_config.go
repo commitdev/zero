@@ -4,37 +4,27 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/hashicorp/terraform/dag"
 	"github.com/k0kubun/pp"
 	yaml "gopkg.in/yaml.v2"
 )
 
+// GraphRootName represents the root of the graph of modules in a project
+const GraphRootName = "graphRoot"
+
 type ZeroProjectConfig struct {
 	Name                   string `yaml:"name"`
 	ShouldPushRepositories bool
-	Infrastructure         Infrastructure // TODO simplify and flatten / rename?
 	Parameters             map[string]string
 	Modules                Modules `yaml:"modules"`
-}
-
-type Infrastructure struct {
-	AWS *AWS
-}
-
-type AWS struct {
-	AccountID string `yaml:"accountId"`
-	Region    string
-	Terraform terraform // TODO simplify and flatten?
-}
-
-type terraform struct {
-	RemoteState bool
 }
 
 type Modules map[string]Module
 
 type Module struct {
+	DependsOn  []string   `yaml:"dependsOn,omitempty"`
 	Parameters Parameters `yaml:"parameters,omitempty"`
-	Files      Files      `yaml:"files,omitempty"`
+	Files      Files
 }
 
 type Parameters map[string]string
@@ -63,9 +53,33 @@ func (c *ZeroProjectConfig) Print() {
 	pp.Println(c)
 }
 
-func NewModule(parameters Parameters, directory string, repository string, source string) Module {
+// GetDAG returns a graph of the module names used in this project config
+func (c *ZeroProjectConfig) GetDAG() dag.AcyclicGraph {
+	var g dag.AcyclicGraph
+
+	// Add vertices to graph
+	g.Add(GraphRootName)
+	for name := range c.Modules {
+		g.Add(name)
+	}
+
+	// Connect modules in graph
+	for name, m := range c.Modules {
+		if len(m.DependsOn) == 0 {
+			g.Connect(dag.BasicEdge(GraphRootName, name))
+		} else {
+			for _, dependencyName := range m.DependsOn {
+				g.Connect(dag.BasicEdge(dependencyName, name))
+			}
+		}
+	}
+	return g
+}
+
+func NewModule(parameters Parameters, directory string, repository string, source string, dependsOn []string) Module {
 	return Module{
 		Parameters: parameters,
+		DependsOn:  dependsOn,
 		Files: Files{
 			Directory:  directory,
 			Repository: repository,
