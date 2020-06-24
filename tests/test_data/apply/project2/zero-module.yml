@@ -1,0 +1,19 @@
+name: project2
+description: 'project2'
+author: 'Commit'
+
+template:
+  strictMode: true
+  delimiters:
+    - "<%"
+    - "%>"
+  inputDir: '.'
+  outputDir: 'test'
+
+requiredCredentials:
+  - aws
+  - github
+
+parameters:
+  - field: baz
+    label: baz

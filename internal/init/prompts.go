@@ -163,19 +163,27 @@ func sanitizeParameterValue(str string) string {
 }
 
 // PromptParams renders series of prompt UI based on the config
-func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string) (map[string]string, error) {
+func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string, projectCredentials globalconfig.ProjectCredential) (map[string]string, error) {
 
+	credentialEnvs := projectCredentials.SelectedVendorsCredentialsAsEnv(moduleConfig.RequiredCredentials)
 	for _, promptConfig := range moduleConfig.Parameters {
 		// deduplicate fields already prompted and received
 		if _, isAlreadySet := parameters[promptConfig.Field]; isAlreadySet {
 			continue
 		}
+
 		promptHandler := PromptHandler{
 			promptConfig,
 			NoCondition,
 			NoValidation,
 		}
-		result := promptHandler.GetParam(parameters)
+		// merging the context of param and credentals
+		// this treats credentialEnvs as throwaway, parameters is shared between modules
+		// so credentials should not be in parameters as it gets returned to parent
+		for k, v := range parameters {
+			credentialEnvs[k] = v
+		}
+		result := promptHandler.GetParam(credentialEnvs)
 
 		parameters[promptConfig.Field] = result
 	}
@@ -212,18 +220,9 @@ func promptCredentialsAndFillProjectCreds(credentialPrompts []CredentialPrompts,
 
 func appendToSet(set []string, toAppend []string) []string {
 	for _, appendee := range toAppend {
-		if !itemInSlice(set, appendee) {
+		if !util.ItemInSlice(set, appendee) {
 			set = append(set, appendee)
 		}
 	}
 	return set
-}
-
-func itemInSlice(slice []string, target string) bool {
-	for _, item := range slice {
-		if item == target {
-			return true
-		}
-	}
-	return false
 }

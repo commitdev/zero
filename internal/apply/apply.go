@@ -77,11 +77,18 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 			modulePath = filepath.Join(dir, modulePath)
 		}
 
+		// TODO: in the case user lost the `/tmp` (module source dir), this will fail
+		// and we should redownload the module for the user
+		modConfig, err := module.ParseModuleConfig(modulePath)
+		if err != nil {
+			exit.Fatal("Failed to load module config, credentials cannot be injected properly")
+		}
+
 		// Get project credentials for the makefile
 		credentials := globalconfig.GetProjectCredentials(projectConfig.Name)
-
+		credentialEnvs := credentials.SelectedVendorsCredentialsAsEnv(modConfig.RequiredCredentials)
 		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
-		envList = util.AppendProjectEnvToCmdEnv(credentials.AsEnvVars(), envList)
+		envList = util.AppendProjectEnvToCmdEnv(credentialEnvs, envList)
 		util.ExecuteCommand(exec.Command("make"), modulePath, envList)
 		return nil
 	})
