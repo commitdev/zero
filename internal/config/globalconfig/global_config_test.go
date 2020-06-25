@@ -119,4 +119,51 @@ func TestMarshalProjectCredentialAsEnvVars(t *testing.T) {
 		assert.Equal(t, "SAK", envVars["AWS_SECRET_ACCESS_KEY"])
 		assert.Equal(t, "APIKEY", envVars["CIRCLECI_API_KEY"])
 	})
+
+	t.Run("should honor omitempty and left out empty values", func(t *testing.T) {
+		pc := globalconfig.ProjectCredential{}
+
+		envVars := pc.AsEnvVars()
+		assert.Equal(t, 0, len(envVars))
+	})
+}
+
+func TestMarshalSelectedVendorsCredentialsAsEnv(t *testing.T) {
+	pc := globalconfig.ProjectCredential{
+		AWSResourceConfig: globalconfig.AWSResourceConfig{
+			AccessKeyID:     "AKID",
+			SecretAccessKey: "SAK",
+		},
+		GithubResourceConfig: globalconfig.GithubResourceConfig{
+			AccessToken: "FOOBAR",
+		},
+		CircleCiResourceConfig: globalconfig.CircleCiResourceConfig{
+			ApiKey: "APIKEY",
+		},
+	}
+
+	t.Run("cherry pick credentials by vendor", func(t *testing.T) {
+		envs := pc.SelectedVendorsCredentialsAsEnv([]string{"aws", "github"})
+		assert.Equal(t, "AKID", envs["AWS_ACCESS_KEY_ID"])
+		assert.Equal(t, "SAK", envs["AWS_SECRET_ACCESS_KEY"])
+		assert.Equal(t, "FOOBAR", envs["GITHUB_ACCESS_TOKEN"])
+	})
+
+	t.Run("omits vendors not selected", func(t *testing.T) {
+		envs := pc.SelectedVendorsCredentialsAsEnv([]string{"github"})
+		assert.Equal(t, "FOOBAR", envs["GITHUB_ACCESS_TOKEN"])
+
+		_, hasAWSKeyID := envs["AWS_ACCESS_KEY_ID"]
+		assert.Equal(t, false, hasAWSKeyID)
+		_, hasAWSSecretAccessKey := envs["AWS_SECRET_ACCESS_KEY"]
+		assert.Equal(t, false, hasAWSSecretAccessKey)
+		_, hasCircleCIKey := envs["CIRCLECI_API_KEY"]
+		assert.Equal(t, false, hasCircleCIKey)
+	})
+
+	t.Run("omits vendors not selected", func(t *testing.T) {
+		envs := pc.SelectedVendorsCredentialsAsEnv([]string{})
+		assert.Equal(t, 0, len(envs))
+	})
+
 }

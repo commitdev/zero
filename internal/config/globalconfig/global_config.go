@@ -8,8 +8,10 @@ import (
 	"os/user"
 	"path"
 	"reflect"
+	"strings"
 
 	"github.com/commitdev/zero/internal/constants"
+	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/exit"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -20,20 +22,20 @@ type ProjectCredentials map[string]ProjectCredential
 
 type ProjectCredential struct {
 	ProjectName            string `yaml:"-"`
-	AWSResourceConfig      `yaml:"aws,omitempty"`
-	GithubResourceConfig   `yaml:"github,omitempty"`
-	CircleCiResourceConfig `yaml:"circleci,omitempty"`
+	AWSResourceConfig      `yaml:"aws,omitempty" vendor:"aws"`
+	GithubResourceConfig   `yaml:"github,omitempty" vendor:"github"`
+	CircleCiResourceConfig `yaml:"circleci,omitempty" vendor:"circleci"`
 }
 
 type AWSResourceConfig struct {
-	AccessKeyID     string `yaml:"accessKeyId,omitempty" env:"AWS_ACCESS_KEY_ID"`
-	SecretAccessKey string `yaml:"secretAccessKey,omitempty" env:"AWS_SECRET_ACCESS_KEY"`
+	AccessKeyID     string `yaml:"accessKeyId,omitempty" env:"AWS_ACCESS_KEY_ID,omitempty"`
+	SecretAccessKey string `yaml:"secretAccessKey,omitempty" env:"AWS_SECRET_ACCESS_KEY,omitempty"`
 }
 type GithubResourceConfig struct {
-	AccessToken string `yaml:"accessToken,omitempty" env:"GITHUB_ACCESS_TOKEN"`
+	AccessToken string `yaml:"accessToken,omitempty" env:"GITHUB_ACCESS_TOKEN,omitempty"`
 }
 type CircleCiResourceConfig struct {
-	ApiKey string `yaml:"apiKey,omitempty" env:"CIRCLECI_API_KEY"`
+	ApiKey string `yaml:"apiKey,omitempty" env:"CIRCLECI_API_KEY,omitempty"`
 }
 
 func (p ProjectCredentials) Unmarshal(data []byte) error {
@@ -74,10 +76,34 @@ func gatherFieldTags(t reflect.Value, list map[string]string) map[string]string 
 		}
 
 		if env := fieldType.Tag.Get("env"); env != "" {
-			list[env] = fieldValue.String()
+			name, opts := parseTag(env)
+			if idx := strings.Index(opts, "omitempty"); idx != -1 && fieldValue.String() == "" {
+				continue
+			}
+			list[name] = fieldValue.String()
 		}
 	}
 	return list
+}
+
+func (p ProjectCredential) SelectedVendorsCredentialsAsEnv(vendors []string) map[string]string {
+	t := reflect.ValueOf(p)
+	envs := map[string]string{}
+	for i := 0; i < t.NumField(); i++ {
+		childStruct := t.Type().Field(i)
+		childValue := t.Field(i)
+		if tag := childStruct.Tag.Get("vendor"); tag != "" && util.ItemInSlice(vendors, tag) {
+			envs = gatherFieldTags(childValue, envs)
+		}
+	}
+	return envs
+}
+
+func parseTag(tag string) (string, string) {
+	if idx := strings.Index(tag, ","); idx != -1 {
+		return tag[:idx], tag[idx+1:]
+	}
+	return tag, ""
 }
 
 func LoadUserCredentials() ProjectCredentials {

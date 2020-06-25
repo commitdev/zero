@@ -133,3 +133,12 @@ func IndentString(content string, spaces int) string {
 	}
 	return result
 }
+
+func ItemInSlice(slice []string, target string) bool {
+	for _, item := range slice {
+		if item == target {
+			return true
+		}
+	}
+	return false
+}

@@ -11,6 +11,7 @@ import (
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/registry"
+	"github.com/commitdev/zero/internal/util"
 	project "github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
@@ -51,7 +52,7 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 	credentialPrompts := getCredentialPrompts(projectCredentials, moduleConfigs)
 	projectCredentials = promptCredentialsAndFillProjectCreds(credentialPrompts, projectCredentials)
 	globalconfig.Save(projectCredentials)
-	projectParameters := promptAllModules(moduleConfigs)
+	projectParameters := promptAllModules(moduleConfigs, projectCredentials)
 
 	// Map parameter values back to specific modules
 	for moduleName, module := range moduleConfigs {
@@ -101,11 +102,12 @@ func loadAllModules(moduleSources []string) (map[string]moduleconfig.ModuleConfi
 }
 
 // promptAllModules takes a map of all the modules and prompts the user for values for all the parameters
-func promptAllModules(modules map[string]moduleconfig.ModuleConfig) map[string]string {
+func promptAllModules(modules map[string]moduleconfig.ModuleConfig, projectCredentials globalconfig.ProjectCredential) map[string]string {
 	parameterValues := make(map[string]string)
 	for _, config := range modules {
 		var err error
-		parameterValues, err = PromptModuleParams(config, parameterValues)
+
+		parameterValues, err = PromptModuleParams(config, parameterValues, projectCredentials)
 		if err != nil {
 			exit.Fatal("Exiting prompt:  %v\n", err)
 		}
@@ -175,7 +177,7 @@ func getCredentialPrompts(projectCredentials globalconfig.ProjectCredential, mod
 	// map is to keep track of which vendor they belong to, to fill them back into the projectConfig
 	prompts := []CredentialPrompts{}
 	for _, vendor := range AvailableVendorOrders {
-		if itemInSlice(uniqueVendors, vendor) {
+		if util.ItemInSlice(uniqueVendors, vendor) {
 			vendorPrompts := CredentialPrompts{vendor, mapVendorToPrompts(projectCredentials, vendor)}
 			prompts = append(prompts, vendorPrompts)
 		}
