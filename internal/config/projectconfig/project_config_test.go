@@ -24,8 +24,9 @@ func TestLoadConfig(t *testing.T) {
 	filePath := file.Name()
 
 	want := &projectconfig.ZeroProjectConfig{
-		Name:    "abc",
-		Modules: eksGoReactSampleModules(),
+		Name:                   "abc",
+		ShouldPushRepositories: true,
+		Modules:                eksGoReactSampleModules(),
 	}
 
 	t.Run("Should load and unmarshal config correctly", func(t *testing.T) {
@@ -34,7 +35,6 @@ func TestLoadConfig(t *testing.T) {
 			t.Errorf("projectconfig.ZeroProjectConfig.Unmarshal mismatch (-want +got):\n%s", cmp.Diff(want, got))
 		}
 	})
-
 }
 
 func eksGoReactSampleModules() projectconfig.Modules {
@@ -51,7 +51,7 @@ func validConfigContent() string {
 # Templated zero-project.yml file
 name: abc
 
-shouldPushRepositories: false
+shouldPushRepositories: true
 
 modules:
   aws-eks-stack:
