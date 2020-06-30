@@ -46,7 +46,7 @@ Only a single environment may be suitable for an initial test, but for a real sy
 
 	flog.Infof(":check_mark_button: Done.")
 
-	summarizeAll(rootDir, *projectConfig)
+	summarizeAll(rootDir, *projectConfig, environments)
 }
 
 func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
@@ -129,7 +129,7 @@ func validateEnvironments(applyEnvironments []string) {
 	}
 }
 
-func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig) {
+func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
 	flog.Infof("Your projects and infrastructure have been successfully created.  Here are some useful links and commands to get you started:")
 
 	graph := projectConfig.GetDAG()
@@ -146,6 +146,7 @@ func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig) {
 		mod := projectConfig.Modules[name]
 		// Add env vars for the makefile
 		envList := []string{
+			fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ",")),
 			fmt.Sprintf("REPOSITORY=%s", mod.Files.Repository),
 		}
 
@@ -158,7 +159,6 @@ func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig) {
 
 		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
 		util.ExecuteCommand(exec.Command("make", "summary"), modulePath, envList)
-		fmt.Println()
 		return nil
 	})
 
