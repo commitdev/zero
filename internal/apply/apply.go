@@ -44,8 +44,9 @@ Only a single environment may be suitable for an initial test, but for a real sy
 
 	applyAll(rootDir, *projectConfig, environments)
 
-	// TODO Summary
-	flog.Infof(":check_mark_button: Done - Summary goes here.")
+	flog.Infof(":check_mark_button: Done.")
+
+	summarizeAll(rootDir, *projectConfig, environments)
 }
 
 func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
@@ -126,4 +127,40 @@ func validateEnvironments(applyEnvironments []string) {
 			exit.Fatal("The currently supported environments are \"staging\" and \"production\"")
 		}
 	}
+}
+
+func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
+	flog.Infof("Your projects and infrastructure have been successfully created.  Here are some useful links and commands to get you started:")
+
+	graph := projectConfig.GetDAG()
+
+	// Walk the graph of modules and run `make summary`
+	root := []dag.Vertex{projectconfig.GraphRootName}
+	graph.DepthFirstWalk(root, func(v dag.Vertex, depth int) error {
+		// Don't process the root
+		if depth == 0 {
+			return nil
+		}
+
+		name := v.(string)
+		mod := projectConfig.Modules[name]
+		// Add env vars for the makefile
+		envList := []string{
+			fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ",")),
+			fmt.Sprintf("REPOSITORY=%s", mod.Files.Repository),
+		}
+
+		modulePath := module.GetSourceDir(mod.Files.Source)
+		// Passed in `dir` will only be used to find the project path, not the module path,
+		// unless the module path is relative
+		if module.IsLocal(mod.Files.Source) && !filepath.IsAbs(modulePath) {
+			modulePath = filepath.Join(dir, modulePath)
+		}
+
+		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
+		util.ExecuteCommand(exec.Command("make", "summary"), modulePath, envList)
+		return nil
+	})
+
+	flog.Infof("Happy coding! :smile:")
 }
