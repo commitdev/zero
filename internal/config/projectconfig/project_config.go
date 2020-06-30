@@ -14,7 +14,7 @@ const GraphRootName = "graphRoot"
 
 type ZeroProjectConfig struct {
 	Name                   string `yaml:"name"`
-	ShouldPushRepositories bool
+	ShouldPushRepositories bool   `yaml:"shouldPushRepositories"`
 	Parameters             map[string]string
 	Modules                Modules `yaml:"modules"`
 }
