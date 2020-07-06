@@ -67,6 +67,7 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 		// Add env vars for the makefile
 		envList := []string{
 			environmentArg,
+			fmt.Sprintf("PROJECT_NAME=%s", projectConfig.Name),
 			fmt.Sprintf("PROJECT_DIR=%s", path.Join(dir, mod.Files.Directory)),
 			fmt.Sprintf("REPOSITORY=%s", mod.Files.Repository),
 		}
