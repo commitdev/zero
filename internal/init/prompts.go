@@ -14,6 +14,7 @@ import (
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
+	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/manifoldco/promptui"
 	"gopkg.in/yaml.v2"
 )
@@ -91,7 +92,11 @@ func ValidateSAK(input string) error {
 func (p PromptHandler) GetParam(projectParams map[string]string) string {
 	var err error
 	var result string
+
 	if p.Condition(projectParams) {
+		if p.Parameter.Info != "" {
+			flog.Guidef(p.Parameter.Info)
+		}
 		// TODO: figure out scope of projectParams per project
 		// potentially dangerous to have cross module env leaking
 		// so if community module has an `execute: twitter tweet $ENV`
@@ -173,9 +178,9 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 		}
 
 		promptHandler := PromptHandler{
-			promptConfig,
-			NoCondition,
-			NoValidation,
+			Parameter: promptConfig,
+			Condition: NoCondition,
+			Validate:  NoValidation,
 		}
 		// merging the context of param and credentals
 		// this treats credentialEnvs as throwaway, parameters is shared between modules

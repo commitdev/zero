@@ -1,6 +1,7 @@
 package flog
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/kyokomi/emoji"
@@ -10,6 +11,11 @@ import (
 // Warnf logs a formatted error message
 func Infof(format string, a ...interface{}) {
 	log.Println(aurora.Cyan(emoji.Sprintf(format, a...)))
+}
+
+// Infof prints out a timestamp as prefix, Guidef just prints the message
+func Guidef(format string, a ...interface{}) {
+	fmt.Println(aurora.Cyan(emoji.Sprintf(format, a...)))
 }
 
 // Successf logs a formatted success message
