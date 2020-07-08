@@ -119,35 +119,35 @@ func promptAllModules(modules map[string]moduleconfig.ModuleConfig, projectCrede
 // requires the projectName to populate defaults
 func getProjectNamePrompt() PromptHandler {
 	return PromptHandler{
-		moduleconfig.Parameter{
+		Parameter: moduleconfig.Parameter{
 			Field:   "projectName",
 			Label:   "Project Name",
 			Default: "",
 		},
-		NoCondition,
-		NoValidation,
+		Condition: NoCondition,
+		Validate:  NoValidation,
 	}
 }
 
 func getProjectPrompts(projectName string, modules map[string]moduleconfig.ModuleConfig) map[string]PromptHandler {
 	handlers := map[string]PromptHandler{
 		"ShouldPushRepositories": {
-			moduleconfig.Parameter{
+			Parameter: moduleconfig.Parameter{
 				Field:   "ShouldPushRepositories",
 				Label:   "Should the created projects be checked into github automatically? (y/n)",
 				Default: "y",
 			},
-			NoCondition,
-			SpecificValueValidation("y", "n"),
+			Condition: NoCondition,
+			Validate:  SpecificValueValidation("y", "n"),
 		},
 		"GithubRootOrg": {
-			moduleconfig.Parameter{
+			Parameter: moduleconfig.Parameter{
 				Field:   "GithubRootOrg",
 				Label:   "What's the root of the github org to create repositories in?",
 				Default: "github.com/",
 			},
-			KeyMatchCondition("ShouldPushRepositories", "y"),
-			NoValidation,
+			Condition: KeyMatchCondition("ShouldPushRepositories", "y"),
+			Validate:  NoValidation,
 		},
 	}
 
@@ -155,13 +155,13 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 		label := fmt.Sprintf("What do you want to call the %s project?", moduleName)
 
 		handlers[moduleName] = PromptHandler{
-			moduleconfig.Parameter{
+			Parameter: moduleconfig.Parameter{
 				Field:   moduleName,
 				Label:   label,
 				Default: module.OutputDir,
 			},
-			NoCondition,
-			NoValidation,
+			Condition: NoCondition,
+			Validate:  NoValidation,
 		}
 	}
 
@@ -215,63 +215,70 @@ func mapVendorToPrompts(projectCred globalconfig.ProjectCredential, vendor strin
 	case "aws":
 		awsPrompts := []PromptHandler{
 			{
-				moduleconfig.Parameter{
+				Parameter: moduleconfig.Parameter{
 					Field:   "use_aws_profile",
 					Label:   "Use credentials from existing AWS profiles?",
 					Options: []string{awsPickProfile, awsManualInputCredentials},
 				},
-				customAwsPickProfileCondition,
-				NoValidation,
+				Condition: customAwsPickProfileCondition,
+				Validate:  NoValidation,
 			},
 			{
-				moduleconfig.Parameter{
+				Parameter: moduleconfig.Parameter{
 					Field:   "aws_profile",
 					Label:   "Select AWS Profile",
 					Options: profiles,
 				},
-				KeyMatchCondition("use_aws_profile", awsPickProfile),
-				NoValidation,
+				Condition: KeyMatchCondition("use_aws_profile", awsPickProfile),
+				Validate:  NoValidation,
 			},
 			{
-				moduleconfig.Parameter{
+				Parameter: moduleconfig.Parameter{
 					Field:   "accessKeyId",
 					Label:   "AWS Access Key ID",
 					Default: projectCred.AWSResourceConfig.AccessKeyID,
+					Info: `AWS Access Key ID/Secret: used for provisioning infrastructure in AWS
+The token can be generated at https://console.aws.amazon.com/iam/home?#/security_credentials`,
 				},
-				CustomCondition(customAwsMustInputCondition),
-				ValidateAKID,
+				Condition: CustomCondition(customAwsMustInputCondition),
+				Validate:  ValidateAKID,
 			},
 			{
-				moduleconfig.Parameter{
+				Parameter: moduleconfig.Parameter{
 					Field:   "secretAccessKey",
 					Label:   "AWS Secret access key",
 					Default: projectCred.AWSResourceConfig.SecretAccessKey,
 				},
-				CustomCondition(customAwsMustInputCondition),
-				ValidateSAK,
+				Condition: CustomCondition(customAwsMustInputCondition),
+				Validate:  ValidateSAK,
 			},
 		}
 		prompts = append(prompts, awsPrompts...)
 	case "github":
 		githubPrompt := PromptHandler{
-			moduleconfig.Parameter{
+			Parameter: moduleconfig.Parameter{
 				Field:   "accessToken",
 				Label:   "Github Personal Access Token with access to the above organization",
 				Default: projectCred.GithubResourceConfig.AccessToken,
+				Info: `Github personal access token: used for creating repositories for your project
+Requires the following permissions: [repo::public_repo, admin::orgread:org]
+The token can be created at https://github.com/settings/tokens`,
 			},
-			NoCondition,
-			NoValidation,
+			Condition: NoCondition,
+			Validate:  NoValidation,
 		}
 		prompts = append(prompts, githubPrompt)
 	case "circleci":
 		circleCiPrompt := PromptHandler{
-			moduleconfig.Parameter{
+			Parameter: moduleconfig.Parameter{
 				Field:   "apiKey",
 				Label:   "Circleci api key for CI/CD",
 				Default: projectCred.CircleCiResourceConfig.ApiKey,
+				Info: `CircleCI api token: used for setting up CI/CD for your project
+The token can be created at https://app.circleci.com/settings/user/tokens`,
 			},
-			NoCondition,
-			NoValidation,
+			Condition: NoCondition,
+			Validate:  NoValidation,
 		}
 		prompts = append(prompts, circleCiPrompt)
 	}

@@ -23,6 +23,7 @@ type Parameter struct {
 	Execute string   `yaml:"execute,omitempty"`
 	Value   string   `yaml:"value,omitempty"`
 	Default string   `yaml:"default,omitempty"`
+	Info    string   `yaml:"info,omitempty"`
 }
 
 type TemplateConfig struct {

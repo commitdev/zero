@@ -11,6 +11,7 @@ import (
 )
 
 func TestGetParam(t *testing.T) {
+
 	projectParams := map[string]string{}
 	t.Run("Should execute params without prompt", func(t *testing.T) {
 		param := moduleconfig.Parameter{
