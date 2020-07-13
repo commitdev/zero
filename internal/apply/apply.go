@@ -149,7 +149,7 @@ func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig, app
 		envList := []string{
 			fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ",")),
 			fmt.Sprintf("REPOSITORY=%s", mod.Files.Repository),
-			fmt.Sprintf("NAME=%s", projectConfig.Name),
+			fmt.Sprintf("PROJECT_NAME=%s", projectConfig.Name),
 		}
 
 		modulePath := module.GetSourceDir(mod.Files.Source)
