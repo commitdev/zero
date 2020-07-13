@@ -13,7 +13,27 @@ https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?fil
 
 ## Getting Started
 
-TBD
+Before getting started with Zero on your local machine there are a few prerequisites tools required to get up and running.
+
+### Prerequisites
+- [git]
+- [kubectl]
+- [terraform]
+- [jq]
+- [aws-cli]
+
+### Zero and AWS
+
+Zero leverages Amazons’ Elastic Kubernetes Service. EKS is amazon managed Kubernetes service where you can build and deploy your applications / containers. EKS is deeply integrated with other AWS services such as:
+
+- [Amazon Virtual Private Cloud][vpc]
+- [AWS Identity and Access Management][iam]
+- [Amazon Cloud Watch][acw].
+- [Auto Scaling Groups][asg].
+- etc.
+
+<!-- Tight Integrating with  -->
+
 
 #### Building this tool
 
@@ -39,6 +59,15 @@ Documents should all be stored in the [Commit Zero Google Drive][drive]
 
 
 <!-- links -->
-[drive]: https://drive.google.com/drive/u/0/folders/1_b8qqy5iN5envfWvIYPW5SNR_ektt5kJ
-[ux]:    https://docs.google.com/document/d/1yQ4bZ5z0slL9PpmduItEiCXYKIor0nX-nnGT3J-JOFw
-[old]:   https://github.com/commitdev/zero-old
+[drive]:    https://drive.google.com/drive/u/0/folders/1_b8qqy5iN5envfWvIYPW5SNR_ektt5kJ
+[ux]:       https://docs.google.com/document/d/1yQ4bZ5z0slL9PpmduItEiCXYKIor0nX-nnGT3J-JOFw
+[old]:      https://github.com/commitdev/zero-old
+[git]:      https://git-scm.com
+[kubectl]:  https://kubernetes.io/docs/tasks/tools/install-kubectl/
+[terraform]:https://www.terraform.io/downloads.html
+[jq]:       https://github.com/stedolan/jq
+[aws-cli]:  https://aws.amazon.com/cli/
+[acw]:      https://aws.amazon.com/cloudwatch/
+[vpc]:      https://aws.amazon.com/vpc/
+[iam]:      https://aws.amazon.com/iam/
+[asg]:      https://aws.amazon.com/autoscaling/
