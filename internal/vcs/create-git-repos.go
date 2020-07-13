@@ -20,6 +20,7 @@ func InitializeRepository(repositoryUrl string, githubApiKey string) {
 		fmt.Printf("error creating repository: %s\n", err.Error())
 		return
 	}
+	flog.Debugf("Initialized repo: %s/%s", ownerName, repositoryName)
 
 	isOrgOwned, ownerId, err := isOrganizationOwned(ownerName, githubApiKey)
 	if err != nil {
@@ -190,6 +191,7 @@ func doInitialCommit(ownerName string, repositoryName string) error {
 
 		cmd := exec.Command(command.command, command.args...)
 		cmd.Dir = "./" + repositoryName
+		flog.Debugf("Running (%s) command in %s, %#v", command.command, cmd.Dir, command.args)
 		_, err := cmd.CombinedOutput()
 		if err != nil {
 			fmt.Printf("ERROR: failed to run %s: %s\n", command.description, err.Error())

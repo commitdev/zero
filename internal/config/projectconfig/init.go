@@ -9,6 +9,7 @@ import (
 
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
+	"github.com/commitdev/zero/pkg/util/flog"
 	"gopkg.in/yaml.v2"
 )
 
@@ -35,7 +36,9 @@ func CreateProjectConfigFile(dir string, projectName string, projectContext *Zer
 		return err
 	}
 
-	writeErr := ioutil.WriteFile(path.Join(dir, projectName, constants.ZeroProjectYml), []byte(content), 0644)
+	filePath := path.Join(dir, projectName, constants.ZeroProjectYml)
+	flog.Debugf("Project file path: %s", filePath)
+	writeErr := ioutil.WriteFile(filePath, []byte(content), 0644)
 	if writeErr != nil {
 		return err
 	}
