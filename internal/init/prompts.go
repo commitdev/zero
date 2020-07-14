@@ -154,10 +154,11 @@ func executeCmd(command string, envVars map[string]string) string {
 	cmd := exec.Command("bash", "-c", command)
 	cmd.Env = util.AppendProjectEnvToCmdEnv(envVars, os.Environ())
 	out, err := cmd.Output()
-
+	flog.Debugf("Running command: %s", command)
 	if err != nil {
 		log.Fatalf("Failed to execute  %v\n", err)
 	}
+	flog.Debugf("Command result: %s", string(out))
 	return string(out)
 }
 

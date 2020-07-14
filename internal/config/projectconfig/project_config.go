@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/hashicorp/terraform/dag"
 	"github.com/k0kubun/pp"
 	yaml "gopkg.in/yaml.v2"
@@ -45,7 +46,7 @@ func LoadConfig(filePath string) *ZeroProjectConfig {
 	if err != nil {
 		log.Panicf("failed to parse config: %v", err)
 	}
-
+	flog.Debugf("Loaded project config: %s from %s", config.Name, filePath)
 	return config
 }
 

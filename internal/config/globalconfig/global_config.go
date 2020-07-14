@@ -13,6 +13,7 @@ import (
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/exit"
+	"github.com/commitdev/zero/pkg/util/flog"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -140,12 +141,14 @@ func readOrCreateUserCredentialsFile() []byte {
 		if fileStateErr != nil {
 			exit.Fatal("Failed to create config file: %v", fileStateErr)
 		}
+		flog.Debugf("Created credentials file: %s", credPath)
 		defer file.Close()
 	}
 	data, err := ioutil.ReadFile(credPath)
 	if err != nil {
 		exit.Fatal("Failed to read credentials file: %v", err)
 	}
+	flog.Debugf("Loaded credentials file: %s", credPath)
 	return data
 }
 
@@ -166,6 +169,7 @@ func GetProjectCredentials(targetProjectName string) ProjectCredential {
 func Save(project ProjectCredential) {
 	projects := LoadUserCredentials()
 	projects[project.ProjectName] = project
+	flog.Debugf("Saved project credentials : %s", project.ProjectName)
 	writeCredentialsFile(projects)
 }
 

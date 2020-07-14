@@ -13,6 +13,7 @@ import (
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/exit"
+	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/hashicorp/go-getter"
 )
 
@@ -22,6 +23,7 @@ func FetchModule(source string, wg *sync.WaitGroup) {
 
 	localPath := GetSourceDir(source)
 	if !IsLocal(source) {
+		flog.Debugf("Downloading module: %s to %s", source, localPath)
 		err := getter.Get(localPath, source)
 		if err != nil {
 			exit.Fatal("Failed to fetch remote module from %s: %v\n", source, err)

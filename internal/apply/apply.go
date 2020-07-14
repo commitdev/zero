@@ -78,6 +78,7 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 		if module.IsLocal(mod.Files.Source) && !filepath.IsAbs(modulePath) {
 			modulePath = filepath.Join(dir, modulePath)
 		}
+		flog.Debugf("Loaded module: %s from %s", name, modulePath)
 
 		// TODO: in the case user lost the `/tmp` (module source dir), this will fail
 		// and we should redownload the module for the user
@@ -91,6 +92,7 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 		credentialEnvs := credentials.SelectedVendorsCredentialsAsEnv(modConfig.RequiredCredentials)
 		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
 		envList = util.AppendProjectEnvToCmdEnv(credentialEnvs, envList)
+		flog.Debugf("Env injected: %#v", envList)
 		util.ExecuteCommand(exec.Command("make"), modulePath, envList)
 		return nil
 	})
@@ -158,8 +160,10 @@ func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig, app
 		if module.IsLocal(mod.Files.Source) && !filepath.IsAbs(modulePath) {
 			modulePath = filepath.Join(dir, modulePath)
 		}
+		flog.Debugf("Loaded module: %s from %s", name, modulePath)
 
 		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
+		flog.Debugf("Env injected: %#v", envList)
 		util.ExecuteCommand(exec.Command("make", "summary"), modulePath, envList)
 		return nil
 	})

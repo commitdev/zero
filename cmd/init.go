@@ -6,6 +6,7 @@ import (
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	initPrompts "github.com/commitdev/zero/internal/init"
 	"github.com/commitdev/zero/pkg/util/exit"
+	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +18,7 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Create new project with provided name and initialize configuration based on user input.",
 	Run: func(cmd *cobra.Command, args []string) {
+		flog.Debugf("Root directory is %s", projectconfig.RootDir)
 		projectContext := initPrompts.Init(projectconfig.RootDir)
 		projectConfigErr := projectconfig.CreateProjectConfigFile(projectconfig.RootDir, projectContext.Name, projectContext)
 
