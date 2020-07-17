@@ -1,19 +1,21 @@
 ![zero](https://github.com/commitdev/zero/blob/master/docs/img/logo-small.png?raw=true)
 
-This is a WIP version of our tool Zero which aims to make it quick and easy for developers to bootstrap a new environment and get to writing code.
-
-For the older, simple tool that just rendered templates, see [commitdev/zero-old][old]
-
-## Press Release
-Learn more about Zero's vision here:
-https://docs.google.com/document/d/1YNRNgCfCHCxmIpD5ZsLYG2xCBxJLFd6CBI0DS_NFqoY/edit
-
-## Project Board
-https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?filterLogic=any&repos=203630543,247773730,257676371,258369081
+Zero is a developer cli tool which aims to make it quick and easy for developers to bootstrap a production ready infrasturcture and get to writing code.
+***
 
 ## Getting Started
 
-Before getting started with Zero on your local machine there are a few prerequisites tools required to get up and running.
+### Download and Install Zero
+Download the latest [zero binary] based on your local system archetecture. unzip your download add copy the zero binary to the desired location then add it to your system path.
+
+Zero curretnly supports:
+| System | Support|
+| --------|:-----:|
+| MacOS   |  ✅   |
+| Linux   |  ✅   |
+| Windows |  ❌   |
+
+Before you can use zero there are
 
 ### Prerequisites
 - [git]
@@ -71,3 +73,5 @@ Documents should all be stored in the [Commit Zero Google Drive][drive]
 [vpc]:      https://aws.amazon.com/vpc/
 [iam]:      https://aws.amazon.com/iam/
 [asg]:      https://aws.amazon.com/autoscaling/
+[press-release]: https://docs.google.com/document/d/1YNRNgCfCHCxmIpD5ZsLYG2xCBxJLFd6CBI0DS_NFqoY/edit
+[zero binary]: https://github.com/commitdev/zero/releases/tag/v0.0.1
