@@ -5,6 +5,8 @@ before:
 builds:
 - env:
   - CGO_ENABLED=0
+  ldflags:
+    - -X github.com/commitdev/zero/cmd.appVersion={{.Version}} -X github.com/commitdev/zero/cmd.appBuild={{.ShortCommit}}
 archives:
 - replacements:
     darwin: Darwin
@@ -34,8 +36,14 @@ brews:
     description: "Allow startup developers to ship to production on day 1."
     dependencies:
       - name: git
+        type: optional
       - name: terraform
+        type: optional
       - name: jq
+        type: optional
       - name: awscli
+        type: optional
+      - name: kubectl
+        type: optional
     test: |
       system "#{bin}/zero version"
