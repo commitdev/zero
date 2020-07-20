@@ -1,28 +1,62 @@
 ![zero](https://github.com/commitdev/zero/blob/master/docs/img/logo-small.png?raw=true)
 
-Zero is a developer cli tool which aims to make it quick and easy for developers to bootstrap a production ready infrasturcture and get to writing code.
+## What is Zero
+
+Zero is an open-source developer platform CLI tool which makes it quick and easy for technical founders & developers to build quality and reliable infrastructure to launch, grow and scale high-quality SaaS applications faster and more cost-effectively.
+
+
+## Why is zero good for startups
+
+As a technical founder or the first technical hire at a startup, your sole focus is to build the logic for your application, and get it into customers’ hands as quickly and reliably as possible. Yet you immediately face multiple hurdles before even writing the first line of code. You’re forced to make many tech trade offs, leading to decision fatigue. You waste countless hours building boilerplate SaaS features not adding direct value to your customers. You spend precious time picking up unfamiliar tech, make wrong choices that result in costly refactoring or rebuilding in the future, and are unaware of tools and best practices that would speed up your product iteration.
+
+## Why is zero reliable, scalable, performant and secure
+
+<!-- TODO: need some help on how to phrase this section  -->
+<!-- Zero is archiected from the ground-up to be reliable  -->
+
+## 
 ***
 
 ## Getting Started
 
-### Download and Install Zero
-Download the latest [zero binary] based on your local system archetecture. unzip your download add copy the zero binary to the desired location then add it to your system path.
+### How to Install and Configure Zero
+
+There are multiples ways to install zero:
+
+- Install Zero using your systems package manager
+
+```
+# MacOS
+brew tap commitdev/zero
+brew install zero
+```
+
+- Install Zero using the binary binary
+
+Download the latest [zero binary] for your systems archetecture. unzip your download add copy the zero binary to the desired location then add it to your system path.
 
 Zero curretnly supports:
-| System | Support|
-| --------|:-----:|
-| MacOS   |  ✅   |
-| Linux   |  ✅   |
-| Windows |  ❌   |
+| System | Support|  Package Manager |
+|---------|:-----:|:------:|
+| MacOS   |  ✅   | `brew` |
+| Linux   |  ✅   |   n/a  |
+| Windows |  ❌   |   n/a  |
 
-Before you can use zero there are
+### Configure zero dependencies
 
-### Prerequisites
+Zero requires some dependencies to function, run the `zero check` command on your system to find out which dependencies you might need to install.
+
+![zero](https://github.com/commitdev/zero/blob/master/docs/img/zero-check.png?raw=true)
+
+
+
+
+<!-- ### Prerequisites
 - [git]
 - [kubectl]
 - [terraform]
 - [jq]
-- [aws-cli]
+- [aws-cli] -->
 
 ### Zero and AWS
 
