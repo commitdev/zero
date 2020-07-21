@@ -62,12 +62,65 @@ Zero requires some dependencies to function, run the `zero check` command on you
 
 1. **For Zero to communicate with your AWS account make sure you [authenticate AWS CLI with your account credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-methods)**
 
+    - **You can also configure your aws cli during the zero porject initilization**
+
+
 2. **You need to [register a new domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) / [host a registered domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/MigratingDNS.html) you would like to use to host  your infrastructure on [Amazon Route 53](https://aws.amazon.com/route53/)**
+
+      - **We recommended you have two domain names one for staging another from production**
+
 
 ___
 
 ## Using zero to spin up your own stack
+Using Zero to spin up your infrastructure is easy and straightforward; using a few commands, you can configure and deploy your very own scalable high-performant infrastructure that is production-ready.
 
+### zero init
+
+```
+# To create and customize a new project you run
+$ zero init
+
+## Sample project initilization
+✔ Project Name: zero-test
+🎉  Initializing project
+✔ EKS + Go + React
+✔ Should the created projects be checked into github automatically? (y/n): y
+✔ What's the root of the github org to create repositories in?: github.com/zero-test-org
+✔ Existing AWS Profiles 
+✔ default
+
+Github personal access token: used for creating repositories for your project
+Requires the following permissions: [repo::public_repo, admin::orgread:org]
+The token can be created at https://github.com/settings/tokens
+✔ Github Personal Access Token with access to the above organization: <MY_GITHUB_ORG_ACCESS_TOKEN>
+
+CircleCI api token: used for setting up CI/CD for your project
+The token can be created at https://app.circleci.com/settings/user/tokens
+✔ Circleci api key for CI/CD: <MY_CIRCLE_CI_ACCESS_TOKEN>
+
+✔ Production Root Host Name (e.g. mydomain.com) - this must be the root of the chosen domain, not a subdomain.: commitzero.com
+✔ Production Frontend Host Name (e.g. app.): app.c0-dtoki.commitzero.com
+✔ Production Backend Host Name (e.g. api.): api.c0-dtoki.commitzero.com
+✔ Staging Root Host Name (e.g. mydomain-staging.com) - this must be the root of the chosen domain, not a sub✔ Staging Root Host Name (e.g. mydomain-staging.com) - this must be the root of the chosen domain, not a subdomain.:cmtzerostage.com
+✔ Staging Frontend Host Name (e.g. app.): app.c0-dtoki.cmtzerostage.com
+✔ Staging Backend Host Name (e.g. api.): api.c0-dtoki.cmtzerostage.com
+✔ What do you want to call the zero-aws-eks-stack project?: infrastructure
+✔ What do you want to call the zero-deployable-backend project?: backend-service
+✔ What do you want to call the zero-deployable-react-frontend project?: frontend
+
+```
+
+### zero create
+```
+# Template the selected modules and configuration specified in zero-project.yml and push to repository.
+zero create
+```
+
+### zero apply
+```
+zero apply
+```
 
 
 ## Zeros' stack
