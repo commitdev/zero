@@ -11,18 +11,13 @@ As a technical founder or the first technical hire at a startup, your sole focus
 
 ## Why is zero Reliable, Scalable, Performant and Secure
 
-Zero leverages Amazons’ Elastic Kubernetes Service. EKS is amazon managed Kubernetes service where you can build and deploy your applications / containers. EKS is deeply integrated with other AWS services such as:
+Zero leverages Amazons’ Elastic Kubernetes Service. EKS is amazon managed Kubernetes service where you can build and deploy your applications/containers. Zero & EKS is deeply integrated with other AWS services such as:
 
 - [Amazon Virtual Private Cloud][vpc]
 - [AWS Identity and Access Management][iam]
 - [Amazon Cloud Watch][acw].
 - [Auto Scaling Groups][asg].
-- etc.
-<!-- TODO: link to list of servies that zero porvieds out of the box -->
-
-<!-- TODO: need some help on explaning why it's performant and secure  -->
-<!-- Zero levrages  -->
-<!-- Zero is archiected from the ground-up to be reliable  -->
+- [And more]
 ___
 
 ## Getting Started
@@ -76,13 +71,13 @@ ___
 Using Zero to spin up your infrastructure is easy and straightforward; using a few commands, you can configure and deploy your very own scalable high-performant infrastructure that is production-ready.
 
 A few caveats:
-- It would be best to [create a GitHub org](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/creating-a-new-organization-from-scratch) where your code is going to live and grant [CircleCi Organization access](https://github.com/settings/connections/applications/78a2ba87f071c28e65bb) to your repositories.
-- During set-up you are required to have 
+- It would be best to [create a GitHub org](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/creating-a-new-organization-from-scratch) where your code is going to live and grant [CircleCi Organization access](https://github.com/settings/connections/applications/78a2ba87f071c28e65bb) to your repositories for Ci/Cd deployment.
+- During set-up you are required to create a GitHub personal access token and a CircleCi access token you should 
 
 ### zero init
 The `init` command creates a new project and outputs an infrastructure configuration file with user input prompted responses into a folder  -> 📁 `YOUR_PROJECT_NAME/zero-project.yml`    
 
-```
+```shell
 # To create and customize a new project you run
 $ zero init
 
@@ -118,7 +113,8 @@ The token can be created at https://app.circleci.com/settings/user/tokens
 
 ### zero create
 The `create` command renders the infrastructure modules you've configured into your project folder and pushed your code to GitHub
-```
+
+```shell
 # Template the selected modules and configuration specified in zero-project.yml and push to repository.
 $ cd zero-init   # change your working dir to YOUR_PROJECT_NAME
 $ zero create
@@ -143,7 +139,8 @@ $ zero create
 
 ### zero apply
 The `apply` command takes the templated modules generated based on your input and spins up a scalable & performant infrastructure for you!
-```
+
+```shell
 $ zero apply
 
 # Sample Output
@@ -190,6 +187,8 @@ ___
 
 ## Contributing to Zero 
 
+Although zero is still in early development, we welcome collaboration; you can join the [#product-zero] slack channel and follow our [project board]. If you'd like to work a specific ticket / issue, reach out to the team on our slack channel.
+
 #### Building this tool
 
 ```shell
@@ -234,3 +233,6 @@ License: N/A
 [zeros vision]: https://docs.google.com/document/d/1YNRNgCfCHCxmIpD5ZsLYG2xCBxJLFd6CBI0DS_NFqoY/edit
 [project board]: [https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?filterLogic=any&repos=203630543,247773730,257676371,258369081]
 [Wget]: https://stackoverflow.com/questions/33886917/how-to-install-wget-in-macos
+[and more]: https://github.com/commitdev/zero-aws-eks-stack/blob/master/docs/resources.md
+[product-zero]: https://commitdev.slack.com/archives/CNSEHQJKY
+[#product-zero]: https://commitdev.slack.com/archives/CNSEHQJKY
