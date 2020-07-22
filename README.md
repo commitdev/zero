@@ -4,7 +4,6 @@
 
 Zero is an open-source developer platform CLI tool which makes it quick and easy for technical founders & developers to build quality and reliable infrastructure to launch, grow and scale high-quality SaaS applications faster and more cost-effectively.
 
-
 ## Why is zero good for startups
 
 As a technical founder or the first technical hire at a startup, your sole focus is to build the logic for your application, and get it into customers’ hands as quickly and reliably as possible. Yet you immediately face multiple hurdles before even writing the first line of code. You’re forced to make many tech trade offs, leading to decision fatigue. You waste countless hours building boilerplate SaaS features not adding direct value to your customers. You spend precious time picking up unfamiliar tech, make wrong choices that result in costly refactoring or rebuilding in the future, and are unaware of tools and best practices that would speed up your product iteration.
@@ -13,20 +12,21 @@ As a technical founder or the first technical hire at a startup, your sole focus
 
 Zero leverages Amazons’ Elastic Kubernetes Service. EKS is amazon managed Kubernetes service where you can build and deploy your applications/containers. Zero & EKS is deeply integrated with other AWS services such as:
 
-- [Amazon Virtual Private Cloud][vpc]
+- [Amazon Virtual Private Cloud][vpc].
 - [AWS Identity and Access Management][iam]
 - [Amazon Cloud Watch][acw].
 - [Auto Scaling Groups][asg].
-- [And more]
+- [And more].
+
 ___
 
 ## Getting Started
 
 ### How to Install and Configure Zero
 
-There are multiples ways to install zero:
+There are multiple ways to install zero:
 
-- Install Zero using your systems package manager
+- Install Zero using your systems package manager.
 
 ```
 # MacOS
@@ -34,7 +34,7 @@ brew tap commitdev/zero
 brew install zero
 ```
 
-- Install Zero using the binary binary
+- Install Zero by downloading the binary.
 
 Download the latest [zero binary] for your systems archetecture. unzip your download add copy the zero binary to the desired location then add it to your system path.
 
@@ -55,27 +55,34 @@ Zero requires some dependencies to function, run the `zero check` command on you
 
 A few caviets:
 
-1. For Zero to communicate with your AWS account make sure you [authenticate AWS CLI with your account credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-methods)
+- For Zero to communicate with your AWS account make sure you [authenticate AWS CLI with your account credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-methods).
 
-    - You can also configure your aws cli during the zero porject initilization
+  - You can also configure your aws cli during the zero project initilization.
 
+- You need to [register a new domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) / [host a registered domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/MigratingDNS.html) you will use to access your infrastructure on [Amazon Route 53](https://aws.amazon.com/route53/).
 
-2. You need to [register a new domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) / [host a registered domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/MigratingDNS.html) you would like to use to host  your infrastructure on [Amazon Route 53](https://aws.amazon.com/route53/)
-
-      - We recommended you have two domain names one for staging another from production
-
+  - We recommended you have two domains one for staging another for production.
 
 ___
 
 ## Using zero to spin up your own stack
+
 Using Zero to spin up your infrastructure is easy and straightforward; using a few commands, you can configure and deploy your very own scalable high-performant infrastructure that is production-ready.
 
-A few caveats:
-- It would be best to [create a GitHub org](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/creating-a-new-organization-from-scratch) where your code is going to live and grant [CircleCi Organization access](https://github.com/settings/connections/applications/78a2ba87f071c28e65bb) to your repositories for Ci/Cd deployment.
-- During set-up you are required to create a GitHub personal access token and a CircleCi access token you should 
+A few caveats before getting started:
+
+- It is recomended practice to [create a GitHub org](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/creating-a-new-organization-from-scratch) where your code is going to live and grant [CircleCi Organization access](https://github.com/settings/connections/applications/78a2ba87f071c28e65bb) to your repositories for CI / CD deployment.
+
+- During set-up, you need to create a GitHub personal access token and a CircleCi access token; you should store your generated tokens securely.
+
+- For your CI build to work, you need to opt into the use of third-party orbs you can find this in your CircleCi Org Setting > Security > Allow Uncertified Orbs.
+
+- It takes about 20 - 35 mins for your deployed frontend application to be globally available through AWS CloudFront CDN.
+
 
 ### zero init
-The `init` command creates a new project and outputs an infrastructure configuration file with user input prompted responses into a folder  -> 📁 `YOUR_PROJECT_NAME/zero-project.yml`    
+
+The `zero init` command creates a new project and outputs an infrastructure configuration file with user input prompted responses into a file.  -> 📁 `YOUR_PROJECT_NAME/zero-project.yml`
 
 ```shell
 # To create and customize a new project you run
@@ -112,7 +119,8 @@ The token can be created at https://app.circleci.com/settings/user/tokens
 ```
 
 ### zero create
-The `create` command renders the infrastructure modules you've configured into your project folder and pushed your code to GitHub
+
+The `zero create` command renders the infrastructure modules you've configured into your project folder and pushed your code to GitHub.
 
 ```shell
 # Template the selected modules and configuration specified in zero-project.yml and push to repository.
@@ -138,7 +146,8 @@ $ zero create
 ```
 
 ### zero apply
-The `apply` command takes the templated modules generated based on your input and spins up a scalable & performant infrastructure for you!
+
+The `zero apply` command takes the templated modules generated based on your input and spins up a scalable & performant infrastructure for you!
 
 ```shell
 $ zero apply
@@ -177,34 +186,38 @@ zero-deployable-backend:
 - Production API: api-dtoki-inf-prod.commitzero.com
 ```
 
-***🎉 Your stack is now up and running follow the links your terminal to visit your application*** 
+***Your stack is now up and running, follow the links your terminal to visit your application 🎉*** 
 
 
 ## Zeros Default Stack
+
 ![systerm-architecture](https://raw.githubusercontent.com/commitdev/zero-aws-eks-stack/master/templates/docs/architecture-overview.svg)
 
+If you would like to learn more about the zero-aws-eks stack, you can read more about it [here](https://github.com/commitdev/zero-aws-eks-stack/blob/master/README.md)
 ___
 
 ## Contributing to Zero 
 
 Although zero is still in early development, we welcome collaboration; you can join the [#product-zero] slack channel and follow our [project board]. If you'd like to work a specific ticket / issue, reach out to the team on our slack channel.
 
-#### Building this tool
+### Building this tool
 
 ```shell
 $ git clone git@github.com:commitdev/zero.git
 $ cd zero && make
 ```
-#### Running the tool locally
+
+### Running the tool locally
 
 To install the CLI into your GOPATH and test it, run:
-```
+
+```shell
 $ make install-go
 $ zero --help
 ```
 
-
 ___
+
 ## Learn More about Zero
 
 Zeros' documents are stored in the [Commit Zero Google Drive][drive]
