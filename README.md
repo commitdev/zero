@@ -4,19 +4,19 @@
 
 Zero is an open-source developer platform CLI tool which makes it quick and easy for technical founders & developers to build quality and reliable infrastructure to launch, grow and scale high-quality SaaS applications faster and more cost-effectively.
 
-## Why is zero good for startups
+## Why is Zero good for startups
 
 As a technical founder or the first technical hire at a startup, your sole focus is to build the logic for your application, and get it into customers’ hands as quickly and reliably as possible. Yet you immediately face multiple hurdles before even writing the first line of code. You’re forced to make many tech trade offs, leading to decision fatigue. You waste countless hours building boilerplate SaaS features not adding direct value to your customers. You spend precious time picking up unfamiliar tech, make wrong choices that result in costly refactoring or rebuilding in the future, and are unaware of tools and best practices that would speed up your product iteration.
 
-## Why is zero Reliable, Scalable, Performant and Secure
+## Why is Zero Reliable, Scalable, Performant and Secure
 
-Zero leverages Amazons’ Elastic Kubernetes Service. EKS is amazon managed Kubernetes service where you can build and deploy your applications/containers. Zero & EKS is deeply integrated with other AWS services such as:
+Reliability: Our infrastructure is built on multiple availability zones making our system highly available and fault tolerant.
 
-- [Amazon Virtual Private Cloud][vpc].
-- [AWS Identity and Access Management][iam]
-- [Amazon Cloud Watch][acw].
-- [Auto Scaling Groups][asg].
-- [And more].
+Scability: Our EKS infrastructure is built on top of EC2 instances, and set up with AWS's [Auto Scaling Groups][asg] is ready to scale whenever the need arises.
+
+Performant: Using Kubernetes leveraging containers for your services reduces overhead on virtual machines.
+
+Security: Properly configured access-control to resources/security groups, using secure vault systems(AWS's secret manager), and following best practices provides great security out of the box.
 
 ___
 
@@ -24,7 +24,7 @@ ___
 
 ### How to Install and Configure Zero
 
-There are multiple ways to install zero:
+There are multiple ways to install Zero:
 
 - Install Zero using your systems package manager.
 
@@ -36,7 +36,7 @@ brew install zero
 
 - Install Zero by downloading the binary.
 
-Download the latest [zero binary] for your systems archetecture. unzip your download add copy the zero binary to the desired location then add it to your system path.
+Download the latest [Zero binary] for your systems archetecture. Unzip your downloaded package add copy the Zero binary to the desired location and add it to your system PATH.
 
 Zero curretnly supports:
 | System | Support|  Package Manager |
@@ -45,23 +45,17 @@ Zero curretnly supports:
 | Linux   |  ✅   |   n/a  |
 | Windows |  ❌   |   n/a  |
 
-### Configure zero dependencies
+### Prerequisites
 
-Zero requires some dependencies to function, run the `zero check` command on your system to find out which other tools/dependencies you might need to install.
+In order to use Zero, run the `zero check` command on your system to find out which other tools / dependencies you might need to install.
 
 ![zero-check](./docs/img/zero-check.png)
 
 [AWS CLI], [Kubectl], [Terraform], [jq], [Git], [Wget]
 
-A few caviets:
+You need to [register a new domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) / [host a registered domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/MigratingDNS.html) you will use to access your infrastructure on [Amazon Route 53](https://aws.amazon.com/route53/).
 
-- For Zero to communicate with your AWS account make sure you [authenticate AWS CLI with your account credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-methods).
-
-  - You can also configure your aws cli during the zero project initilization.
-
-- You need to [register a new domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) / [host a registered domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/MigratingDNS.html) you will use to access your infrastructure on [Amazon Route 53](https://aws.amazon.com/route53/).
-
-  - We recommended you have two domains one for staging another for production.
+> We recommended you have two domains one for staging another for production.
 
 ___
 
@@ -71,13 +65,14 @@ Using Zero to spin up your infrastructure is easy and straightforward; using a f
 
 A few caveats before getting started:
 
+- For Zero to provision resources, you will need to be authenticated with AWS [(authenticate with aws-cli)](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-methods).
+
+  - You can also configure your aws-cli during the zero project initialization.
 - It is recomended practice to [create a GitHub org](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/creating-a-new-organization-from-scratch) where your code is going to live and grant [CircleCi Organization access](https://github.com/settings/connections/applications/78a2ba87f071c28e65bb) to your repositories for CI / CD deployment.
 
 - During set-up, you need to create a GitHub personal access token and a CircleCi access token; you should store your generated tokens securely.
 
 - For your CI build to work, you need to opt into the use of third-party orbs you can find this in your CircleCi Org Setting > Security > Allow Uncertified Orbs.
-
-- It takes about 20 - 35 mins for your deployed frontend application to be globally available through AWS CloudFront CDN.
 
 
 ### zero init
@@ -89,11 +84,11 @@ The `zero init` command creates a new project and outputs an infrastructure conf
 $ zero init
 
 ## Sample project initilization
-✔ Project Name: zero-test
+✔ Project Name: myapp-infra
 🎉  Initializing project
 ✔ EKS + Go + React
 ✔ Should the created projects be checked into github automatically? (y/n): y
-✔ What's the root of the github org to create repositories in?: github.com/zero-test-org
+✔ What's the root of the github org to create repositories in?: github.com/myapp-org
 ✔ Existing AWS Profiles 
 ✔ default
 
@@ -107,11 +102,11 @@ The token can be created at https://app.circleci.com/settings/user/tokens
 ✔ Circleci api key for CI/CD: <MY_CIRCLE_CI_ACCESS_TOKEN>
 ✔ us-west-2
 ✔ Production Root Host Name (e.g. mydomain.com) - this must be the root of the chosen domain, not a subdomain.: commitzero.com
-✔ Production Frontend Host Name (e.g. app.): app-zero-test-prod.
-✔ Production Backend Host Name (e.g. api.): api-zero-test-prod.
+✔ Production Frontend Host Name (e.g. app.): app.
+✔ Production Backend Host Name (e.g. api.): api.
 ✔ Staging Root Host Name (e.g. mydomain-staging.com) - this must be the root of the chosen domain, not a subdomain.: commitzero-stage.com
-✔ Staging Frontend Host Name (e.g. app.): app-zero-test-stage.
-✔ Staging Backend Host Name (e.g. api.): api-zero-test-stage.
+✔ Staging Frontend Host Name (e.g. app.): app.
+✔ Staging Backend Host Name (e.g. api.): api.
 ✔ What do you want to call the zero-aws-eks-stack project?: infrastructure
 ✔ What do you want to call the zero-deployable-backend project?: backend-service
 ✔ What do you want to call the zero-deployable-react-frontend project?: frontend
@@ -137,9 +132,9 @@ $ zero create
 ...
 ✅  Finished templating : infrastructure/terraform/modules/vpc/versions.tf
 ⬆  Done Rendering - committing repositories to version control.
-✅  Repository created: github.com/dtoki-test-org/infrastructure
-✅  Repository created: github.com/dtoki-test-org/backend-service
-✅  Repository created: github.com/dtoki-test-org/frontend
+✅  Repository created: github.com/myapp-org/infrastructure
+✅  Repository created: github.com/myapp-org/backend-service
+✅  Repository created: github.com/myapp-org/frontend
 ✅  Done - run zero apply to create any required infrastructure or execute any other remote commands to prepare your environments.
 
 
@@ -169,21 +164,21 @@ Infrastructure executor: Terraform
 ✅  Done.
 Your projects and infrastructure have been successfully created.  Here are some useful links and commands to get you started:
 zero-aws-eks-stack:
-- Repository URL: github.com/dtoki-test-org/infrastructure-inf
+- Repository URL: github.com/myapp-org/infrastructure
 - To see your kubernetes clusters, run: 'kubectl config get-contexts'
 - To switch to a cluster, use the following commands:
-- for production use: kubectl config use-context arn:aws:eks:us-west-2:514226198018:cluster/dtoki-inf-production-us-west-2
+- for production use: kubectl config use-context arn:aws:eks:us-west-2:123456789:cluster/myapp-infra-production-us-west-2
 
 - To inspect the selected cluster, run 'kubectl get node,service,deployment,pods'
 zero-deployable-react-frontend:
-- Repository URL: github.com/dtoki-test-org/frontend-inf
-- Deployment Pipeline URL: https://app.circleci.com/pipelines/github/dtoki-test-org/frontend-inf
-- Production Landing Page: app-dtoki-inf-prod.commitzero.com
+- Repository URL: github.com/myapp-org/frontend
+- Deployment Pipeline URL: https://app.circleci.com/pipelines/github/myapp-org/frontend
+- Production Landing Page: app.commitzero.com
 
 zero-deployable-backend:
-- Repository URL: github.com/dtoki-test-org/backend-service-inf
-- Deployment Pipeline URL: https://app.circleci.com/pipelines/github/dtoki-test-org/backend-service-inf
-- Production API: api-dtoki-inf-prod.commitzero.com
+- Repository URL: github.com/myapp-org/backend-service
+- Deployment Pipeline URL: https://app.circleci.com/pipelines/github/myapp-org/backend-service
+- Production API: api.commitzero.com
 ```
 
 ***Your stack is now up and running, follow the links your terminal to visit your application 🎉*** 
@@ -193,12 +188,12 @@ zero-deployable-backend:
 
 ![systerm-architecture](https://raw.githubusercontent.com/commitdev/zero-aws-eks-stack/master/templates/docs/architecture-overview.svg)
 
-If you would like to learn more about the zero-aws-eks stack, you can read more about it [here](https://github.com/commitdev/zero-aws-eks-stack/blob/master/README.md)
+If you would like to learn more about the zero-aws-eks stack, you can read more about it [here](https://github.com/commitdev/zero-aws-eks-stack)
 ___
 
 ## Contributing to Zero 
 
-Although zero is still in early development, we welcome collaboration; you can join the [#product-zero] slack channel and follow our [project board]. If you'd like to work a specific ticket / issue, reach out to the team on our slack channel.
+Zero welcomes collaboration from the community; you can open new issues in our GitHub repo, Submit PRs' for bug fixes or browse through the tickets currently open to see what you can contribute too.
 
 ### Building this tool
 
@@ -215,6 +210,12 @@ To install the CLI into your GOPATH and test it, run:
 $ make install-go
 $ zero --help
 ```
+___
+## FAQ
+
+Why is my deployed application not yet accesible?
+
+- It takes about 20 - 35 mins for your deployed application to be globally available through AWS CloudFront CDN.
 
 ___
 
@@ -247,5 +248,3 @@ License: N/A
 [project board]: [https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?filterLogic=any&repos=203630543,247773730,257676371,258369081]
 [Wget]: https://stackoverflow.com/questions/33886917/how-to-install-wget-in-macos
 [and more]: https://github.com/commitdev/zero-aws-eks-stack/blob/master/docs/resources.md
-[product-zero]: https://commitdev.slack.com/archives/CNSEHQJKY
-[#product-zero]: https://commitdev.slack.com/archives/CNSEHQJKY
