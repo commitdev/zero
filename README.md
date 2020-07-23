@@ -186,7 +186,7 @@ zero-deployable-backend:
 
 ## Zeros Default Stack
 
-![systerm-architecture](https://raw.githubusercontent.com/commitdev/zero-aws-eks-stack/master/templates/docs/architecture-overview.svg)
+![systerm-architecture](https://raw.githubusercontent.com/commitdev/zero-aws-eks-stack/master/docs/architecture-overview.svg)
 
 If you would like to learn more about the zero-aws-eks stack, you can read more about it [here](https://github.com/commitdev/zero-aws-eks-stack)
 ___
@@ -199,7 +199,7 @@ Zero welcomes collaboration from the community; you can open new issues in our G
 
 ```shell
 $ git clone git@github.com:commitdev/zero.git
-$ cd zero && make
+$ cd zero && make build
 ```
 
 ### Running the tool locally
@@ -219,9 +219,9 @@ Why is my deployed application not yet accesible?
 
 ___
 
-## Learn More about Zero
+## Planning and Process
 
-Zeros' documents are stored in the [Commit Zero Google Drive][drive]
+Zero's documents are stored in the [Commit Zero Google Drive][drive]
 
 - [UX Design Components][ux]
 - [Zeros Vision]
