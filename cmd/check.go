@@ -99,7 +99,7 @@ func checkSemver(req requirement, actualVersion *semver.Version) bool {
 
 var checkCmd = &cobra.Command{
 	Use:   "check",
-	Short: "Print the check number of commit0",
+	Short: "Print the check number of zero",
 	Run: func(cmd *cobra.Command, args []string) {
 		// Add any new requirements to this slice.
 		required := []requirement{

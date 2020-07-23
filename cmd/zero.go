@@ -10,7 +10,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "zero",
 	Short: "zero gets you to writing code quicker.",
-	Long:  `TODO`,
+	Long:  "Zero is an open-source developer platform CLI tool which makes it quick and easy for technical founders & developers \nto build quality and reliable infrastructure to launch, grow and scale high-quality SaaS applications faster and more cost-effectively.",
 	Run: func(cmd *cobra.Command, args []string) {
 	},
 }
