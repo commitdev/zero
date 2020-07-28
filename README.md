@@ -181,17 +181,16 @@ zero-deployable-backend:
 - Production API: api.commitzero.com
 ```
 
-***Your stack is now up and running, follow the links your terminal to visit your application 🎉*** 
+**Your stack is now up and running, follow the links your terminal to visit your application, Happy coding 🎉🙌** 
 
-
-## Zeros Default Stack
+## Zeros Refrence Stack
 
 ![systerm-architecture](https://raw.githubusercontent.com/commitdev/zero-aws-eks-stack/master/docs/architecture-overview.svg)
 
-If you would like to learn more about the zero-aws-eks stack, you can read more about it [here](https://github.com/commitdev/zero-aws-eks-stack)
+To learn more about the zero-aws-eks stack, see further documentation [here](https://github.com/commitdev/zero-aws-eks-stack)
 ___
 
-## Contributing to Zero 
+## Contributing to Zero
 
 Zero welcomes collaboration from the community; you can open new issues in our GitHub repo, Submit PRs' for bug fixes or browse through the tickets currently open to see what you can contribute too.
 
@@ -210,7 +209,9 @@ To install the CLI into your GOPATH and test it, run:
 $ make install-go
 $ zero --help
 ```
+
 ___
+
 ## FAQ
 
 Why is my deployed application not yet accesible?
