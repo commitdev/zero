@@ -125,7 +125,7 @@ func getProjectNamePrompt() PromptHandler {
 			Default: "",
 		},
 		Condition: NoCondition,
-		Validate:  NoValidation,
+		Validate:  ValidatePname,
 	}
 }
 

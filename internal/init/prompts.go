@@ -88,6 +88,36 @@ func ValidateSAK(input string) error {
 	return nil
 }
 
+// ValidatePname validates Project Name field string input.
+func ValidatePname(input string) error {
+	// the first 62 char out of base64 and -
+	var pName = regexp.MustCompile(`^[A-Za-z0-9-]{1,15}$`)
+	if !pName.MatchString(input) {
+		return errors.New("Invalid project-name (cannot contain special chars except '-' & max len of 15)")
+	}
+	return nil
+}
+
+func validateRootDomain(input string) error {
+	// FIXME: this regex would still accept subdomains a.co.uk a permanent solution matching all TLDs
+	// is not pretty https://publicsuffix.org/list/public_suffix_list.dat another solution would be shortlisting
+	// TLDs to the most commonly used.
+	var rootDomain = regexp.MustCompile(`^([a-z0-9]+(-[a-z0-9]+)*\.{1})+[a-z]{2,}$`)
+	if !rootDomain.MatchString(input) {
+		return errors.New("Invalid root domain name")
+	}
+	return nil
+}
+
+func validateSubDomain(input string) error {
+	// match all char a-z and 0-9 can contain a - must end with a .
+	var subDomainName = regexp.MustCompile(`^([a-z0-9]+(-[a-z0-9]+)*\.)$`)
+	if !subDomainName.MatchString(input) {
+		return errors.New("Invalid subdomain (cannot contain special chars & must end with a '.')")
+	}
+	return nil
+}
+
 // TODO: validation / allow prompt retry ...etc
 func (p PromptHandler) GetParam(projectParams map[string]string) string {
 	var err error
@@ -178,10 +208,24 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 			continue
 		}
 
+		// map module field names to corresponding validate functions.
+		// not optimal solution as changing a field name in the EKS stack would render the map invalid.
+		m := map[string]func(string) error{
+			"productionHostRoot": validateRootDomain,
+			"stagingHostRoot":    validateRootDomain,
+
+			"productionFrontendSubdomain": validateSubDomain,
+			"productionBackendSubdomain":  validateSubDomain,
+			"stagingFrontendSubdomain":    validateSubDomain,
+			"stagingBackendSubdomain":     validateSubDomain,
+		}
+
+		evalFunc := m[promptConfig.Field]
+
 		promptHandler := PromptHandler{
 			Parameter: promptConfig,
 			Condition: NoCondition,
-			Validate:  NoValidation,
+			Validate:  evalFunc,
 		}
 		// merging the context of param and credentals
 		// this treats credentialEnvs as throwaway, parameters is shared between modules
