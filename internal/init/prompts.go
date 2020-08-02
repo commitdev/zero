@@ -88,8 +88,8 @@ func ValidateSAK(input string) error {
 	return nil
 }
 
-// ValidatePname validates Project Name field string input.
-func ValidatePname(input string) error {
+// ValidateProjectName validates Project Name field user input.
+func ValidateProjectName(input string) error {
 	// the first 62 char out of base64 and -
 	var pName = regexp.MustCompile(`^[A-Za-z0-9-]{1,15}$`)
 	if !pName.MatchString(input) {
@@ -200,6 +200,17 @@ func sanitizeParameterValue(str string) string {
 
 // PromptParams renders series of prompt UI based on the config
 func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string, projectCredentials globalconfig.ProjectCredential) (map[string]string, error) {
+	// map module field names to corresponding validate functions.
+	// not optimal solution as changing a field name in the EKS stack would render the map invalid.
+	m := map[string]func(string) error{
+		"productionHostRoot": validateRootDomain,
+		"stagingHostRoot":    validateRootDomain,
+
+		"productionFrontendSubdomain": validateSubDomain,
+		"productionBackendSubdomain":  validateSubDomain,
+		"stagingFrontendSubdomain":    validateSubDomain,
+		"stagingBackendSubdomain":     validateSubDomain,
+	}
 
 	credentialEnvs := projectCredentials.SelectedVendorsCredentialsAsEnv(moduleConfig.RequiredCredentials)
 	for _, promptConfig := range moduleConfig.Parameters {
@@ -208,18 +219,7 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 			continue
 		}
 
-		// map module field names to corresponding validate functions.
-		// not optimal solution as changing a field name in the EKS stack would render the map invalid.
-		m := map[string]func(string) error{
-			"productionHostRoot": validateRootDomain,
-			"stagingHostRoot":    validateRootDomain,
-
-			"productionFrontendSubdomain": validateSubDomain,
-			"productionBackendSubdomain":  validateSubDomain,
-			"stagingFrontendSubdomain":    validateSubDomain,
-			"stagingBackendSubdomain":     validateSubDomain,
-		}
-
+		// evaluate which validation method to use
 		evalFunc := m[promptConfig.Field]
 
 		promptHandler := PromptHandler{
