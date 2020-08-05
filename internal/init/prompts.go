@@ -11,6 +11,7 @@ import (
 
 	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
@@ -91,34 +92,13 @@ func ValidateSAK(input string) error {
 // ValidateProjectName validates Project Name field user input.
 func ValidateProjectName(input string) error {
 	// the first 62 char out of base64 and -
-	var pName = regexp.MustCompile(`^[A-Za-z0-9-]{1,15}$`)
+	var pName = regexp.MustCompile(`^[A-Za-z0-9-]{1,16}$`)
 	if !pName.MatchString(input) {
 		return errors.New("Invalid project-name (cannot contain special chars except '-' & max len of 15)")
 	}
 	return nil
 }
 
-func validateRootDomain(input string) error {
-	// FIXME: this regex would still accept subdomains a.co.uk a permanent solution matching all TLDs
-	// is not pretty https://publicsuffix.org/list/public_suffix_list.dat another solution would be shortlisting
-	// TLDs to the most commonly used.
-	var rootDomain = regexp.MustCompile(`^([a-z0-9]+(-[a-z0-9]+)*\.{1})+[a-z]{2,}$`)
-	if !rootDomain.MatchString(input) {
-		return errors.New("Invalid root domain name")
-	}
-	return nil
-}
-
-func validateSubDomain(input string) error {
-	// match all char a-z and 0-9 can contain a - must end with a .
-	var subDomainName = regexp.MustCompile(`^([a-z0-9]+(-[a-z0-9]+)*\.)$`)
-	if !subDomainName.MatchString(input) {
-		return errors.New("Invalid subdomain (cannot contain special chars & must end with a '.')")
-	}
-	return nil
-}
-
-// TODO: validation / allow prompt retry ...etc
 func (p PromptHandler) GetParam(projectParams map[string]string) string {
 	var err error
 	var result string
@@ -200,18 +180,6 @@ func sanitizeParameterValue(str string) string {
 
 // PromptParams renders series of prompt UI based on the config
 func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string, projectCredentials globalconfig.ProjectCredential) (map[string]string, error) {
-	// map module field names to corresponding validate functions.
-	// not optimal solution as changing a field name in the EKS stack would render the map invalid.
-	m := map[string]func(string) error{
-		"productionHostRoot": validateRootDomain,
-		"stagingHostRoot":    validateRootDomain,
-
-		"productionFrontendSubdomain": validateSubDomain,
-		"productionBackendSubdomain":  validateSubDomain,
-		"stagingFrontendSubdomain":    validateSubDomain,
-		"stagingBackendSubdomain":     validateSubDomain,
-	}
-
 	credentialEnvs := projectCredentials.SelectedVendorsCredentialsAsEnv(moduleConfig.RequiredCredentials)
 	for _, promptConfig := range moduleConfig.Parameters {
 		// deduplicate fields already prompted and received
@@ -219,13 +187,24 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 			continue
 		}
 
-		// evaluate which validation method to use
-		evalFunc := m[promptConfig.Field]
+		var validateFunc func(input string) error = nil
+
+		// type:regex field validation for zero-module.yaml
+		if promptConfig.FieldValidation.Type == constants.RegexValidation {
+			validateFunc = func(input string) error {
+				var regexRule = regexp.MustCompile(promptConfig.FieldValidation.Value)
+				if !regexRule.MatchString(input) {
+					return errors.New(promptConfig.FieldValidation.ErrorMessage)
+				}
+				return nil
+			}
+		}
+		// TODO: type:fuction field validation for zero-module.yaml
 
 		promptHandler := PromptHandler{
 			Parameter: promptConfig,
 			Condition: NoCondition,
-			Validate:  evalFunc,
+			Validate:  validateFunc,
 		}
 		// merging the context of param and credentals
 		// this treats credentialEnvs as throwaway, parameters is shared between modules
@@ -275,4 +254,23 @@ func appendToSet(set []string, toAppend []string) []string {
 		}
 	}
 	return set
+}
+
+// validation fuctions that field validation of type:fuction in zero-module.yaml can select
+// need to implement type:function flow in PromptModuleParams before use
+func validateRootDomain(input string) error {
+	var rootDomain = regexp.MustCompile(`^([a-z0-9]+(-[a-z0-9]+)*\.{1})+[a-z]{2,}$`)
+	if !rootDomain.MatchString(input) {
+		return errors.New("Invalid root domain name")
+	}
+	return nil
+}
+
+func validateSubDomain(input string) error {
+	// match all char a-z and 0-9 can contain a - must end with a .
+	var subDomainName = regexp.MustCompile(`^([a-z0-9]+(-[a-z0-9]+)*\.)$`)
+	if !subDomainName.MatchString(input) {
+		return errors.New("Invalid subdomain (cannot contain special chars & must end with a '.')")
+	}
+	return nil
 }

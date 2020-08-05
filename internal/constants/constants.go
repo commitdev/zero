@@ -8,4 +8,6 @@ const (
 	ZeroHomeDirectory  = ".zero"
 	IgnoredPaths       = "(?i)zero.module.yml|.git/"
 	TemplateExtn       = ".tmpl"
+	RegexValidation    = "regex"
+	FunctionValidation = "function"
 )
