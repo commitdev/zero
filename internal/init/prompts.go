@@ -259,22 +259,3 @@ func appendToSet(set []string, toAppend []string) []string {
 	}
 	return set
 }
-
-// validation fuctions that field validation of type:fuction in zero-module.yaml can select
-// need to implement type:function flow in PromptModuleParams before use
-func validateRootDomain(input string) error {
-	var rootDomain = regexp.MustCompile(`^([a-z0-9]+(-[a-z0-9]+)*\.{1})+[a-z]{2,}$`)
-	if !rootDomain.MatchString(input) {
-		return errors.New("Invalid root domain name")
-	}
-	return nil
-}
-
-func validateSubDomain(input string) error {
-	// match all char a-z and 0-9 can contain a - must end with a .
-	var subDomainName = regexp.MustCompile(`^([a-z0-9]+(-[a-z0-9]+)*\.)$`)
-	if !subDomainName.MatchString(input) {
-		return errors.New("Invalid subdomain (cannot contain special chars & must end with a '.')")
-	}
-	return nil
-}
