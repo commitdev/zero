@@ -101,9 +101,9 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 // promptEnvironments Prompts the user for the environments to apply against and returns a slice of strings representing the environments
 func promptEnvironments() []string {
 	items := map[string][]string{
-		"Staging ":                    {"staging"},
-		"Production":                  {"production"},
-		"Both Staging and Production": {"staging", "production"},
+		"Staging ":                    {"stage"},
+		"Production":                  {"prod"},
+		"Both Staging and Production": {"stage", "prod"},
 	}
 
 	var labels []string
