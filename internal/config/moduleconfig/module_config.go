@@ -17,13 +17,20 @@ type ModuleConfig struct {
 }
 
 type Parameter struct {
-	Field   string
-	Label   string   `yaml:"label,omitempty"`
-	Options []string `yaml:"options,omitempty"`
-	Execute string   `yaml:"execute,omitempty"`
-	Value   string   `yaml:"value,omitempty"`
-	Default string   `yaml:"default,omitempty"`
-	Info    string   `yaml:"info,omitempty"`
+	Field           string
+	Label           string   `yaml:"label,omitempty"`
+	Options         []string `yaml:"options,omitempty"`
+	Execute         string   `yaml:"execute,omitempty"`
+	Value           string   `yaml:"value,omitempty"`
+	Default         string   `yaml:"default,omitempty"`
+	Info            string   `yaml:"info,omitempty"`
+	FieldValidation Validate `yaml:"fieldValidation,omitempty"`
+}
+
+type Validate struct {
+	Type         string `yaml:"type,omitempty"`
+	Value        string `yaml:"value,omitempty"`
+	ErrorMessage string `yaml:"errorMessage,omitempty"`
 }
 
 type TemplateConfig struct {

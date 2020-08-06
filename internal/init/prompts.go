@@ -11,6 +11,7 @@ import (
 
 	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
@@ -88,7 +89,20 @@ func ValidateSAK(input string) error {
 	return nil
 }
 
-// TODO: validation / allow prompt retry ...etc
+// ValidateProjectName validates Project Name field user input.
+func ValidateProjectName(input string) error {
+	// the first 62 char out of base64 and -
+	var pName = regexp.MustCompile(`^[A-Za-z0-9-]{1,16}$`)
+	if !pName.MatchString(input) {
+		// error if char len is greater than 16
+		if len(input) > constants.MaxPnameLength {
+			return errors.New("Invalid, Project Name: (cannot exceed a max length of 16)")
+		}
+		return errors.New("Invalid, Project Name: (can only contain alphanumeric chars & '-')")
+	}
+	return nil
+}
+
 func (p PromptHandler) GetParam(projectParams map[string]string) string {
 	var err error
 	var result string
@@ -170,7 +184,6 @@ func sanitizeParameterValue(str string) string {
 
 // PromptParams renders series of prompt UI based on the config
 func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string, projectCredentials globalconfig.ProjectCredential) (map[string]string, error) {
-
 	credentialEnvs := projectCredentials.SelectedVendorsCredentialsAsEnv(moduleConfig.RequiredCredentials)
 	for _, promptConfig := range moduleConfig.Parameters {
 		// deduplicate fields already prompted and received
@@ -178,10 +191,24 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 			continue
 		}
 
+		var validateFunc func(input string) error = nil
+
+		// type:regex field validation for zero-module.yaml
+		if promptConfig.FieldValidation.Type == constants.RegexValidation {
+			validateFunc = func(input string) error {
+				var regexRule = regexp.MustCompile(promptConfig.FieldValidation.Value)
+				if !regexRule.MatchString(input) {
+					return errors.New(promptConfig.FieldValidation.ErrorMessage)
+				}
+				return nil
+			}
+		}
+		// TODO: type:fuction field validation for zero-module.yaml
+
 		promptHandler := PromptHandler{
 			Parameter: promptConfig,
 			Condition: NoCondition,
-			Validate:  NoValidation,
+			Validate:  validateFunc,
 		}
 		// merging the context of param and credentals
 		// this treats credentialEnvs as throwaway, parameters is shared between modules
