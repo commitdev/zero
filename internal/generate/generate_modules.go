@@ -15,8 +15,9 @@ import (
 	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/flog"
-
 	"github.com/commitdev/zero/pkg/util/fs"
+
+	"github.com/gabriel-vasile/mimetype"
 )
 
 // Generate accepts a projectconfig struct and renders the templates for all referenced modules
@@ -52,7 +53,15 @@ func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
 			mod.Parameters,
 		}
 
-		fileTemplates := newTemplates(moduleDir, outputDir, false)
+		fileTemplates, binFiles := newTemplates(moduleDir, outputDir, false)
+
+		//FIXME: remove me; debug log;
+		// for _, binFile := range binFiles {
+		// 	fmt.Printf("%s\n", "Bin files to just copy over:")
+		// 	fmt.Printf("%+v\n", binFile)
+		// }
+
+		// TODO: function to copy binFile src -> dest.
 
 		executeTemplates(fileTemplates, templateData, delimiters)
 	}
@@ -65,9 +74,17 @@ type TemplateConfig struct {
 	isTemplate  bool
 }
 
+type BinFileConfig struct {
+	source      string
+	destination string
+	mineType    string
+}
+
+// FIXME: refactor function name
 // newTemplates walks the module directory to find all to be templated
-func newTemplates(moduleDir string, outputDir string, overwrite bool) []*TemplateConfig {
+func newTemplates(moduleDir string, outputDir string, overwrite bool) ([]*TemplateConfig, []*BinFileConfig) {
 	templates := []*TemplateConfig{}
+	binFile := []*BinFileConfig{}
 
 	paths, err := getAllFilePathsInDirectory(moduleDir)
 	if err != nil {
@@ -77,6 +94,29 @@ func newTemplates(moduleDir string, outputDir string, overwrite bool) []*Templat
 	for _, path := range paths {
 		ignoredPaths, _ := regexp.Compile(constants.IgnoredPaths)
 		if ignoredPaths.MatchString(path) {
+			continue
+		}
+
+		// detect the file type
+		detectedMIME, err := mimetype.DetectFile(path)
+		if err != nil {
+			panic(err)
+		}
+
+		// detect if the file type is binary
+		isBinary := true
+		for mime := detectedMIME; mime != nil; mime = mime.Parent() {
+			if mime.Is("text/plain") {
+				isBinary = false
+			}
+		}
+
+		if isBinary {
+			binFile = append(binFile, &BinFileConfig{
+				source:      path,
+				destination: fs.ReplacePath(path, moduleDir, outputDir),
+				mineType:    detectedMIME.String(),
+			})
 			continue
 		}
 
@@ -100,7 +140,7 @@ func newTemplates(moduleDir string, outputDir string, overwrite bool) []*Templat
 			isTemplate:  hasTmpltSuffix,
 		})
 	}
-	return templates
+	return templates, binFile
 }
 
 // getAllFilePathsInDirectory Recursively get all file paths in directory, including sub-directories.

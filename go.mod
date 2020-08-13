@@ -28,5 +28,6 @@ require (
 	golang.org/x/sys v0.0.0-20200602225109-6fdc65e7d980 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.2.2
+	github.com/gabriel-vasile/mimetype v1.1.1
 
 )
