@@ -2,11 +2,12 @@ package generate
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
 	"regexp"
-	"strings"
 	"sync"
 	"text/template"
 
@@ -53,38 +54,23 @@ func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
 			mod.Parameters,
 		}
 
-		fileTemplates, binFiles := newTemplates(moduleDir, outputDir, false)
+		txtTypeFiles, binTypeFiles := sortFileType(moduleDir, outputDir, false)
 
-		//FIXME: remove me; debug log;
-		// for _, binFile := range binFiles {
-		// 	fmt.Printf("%s\n", "Bin files to just copy over:")
-		// 	fmt.Printf("%+v\n", binFile)
-		// }
-
-		// TODO: function to copy binFile src -> dest.
-
-		executeTemplates(fileTemplates, templateData, delimiters)
+		executeTemplates(txtTypeFiles, templateData, delimiters)
+		copyBinFiles(binTypeFiles)
 	}
 	return nil
 }
 
-type TemplateConfig struct {
+type fileConfig struct {
 	source      string
 	destination string
-	isTemplate  bool
 }
 
-type BinFileConfig struct {
-	source      string
-	destination string
-	mineType    string
-}
-
-// FIXME: refactor function name
-// newTemplates walks the module directory to find all to be templated
-func newTemplates(moduleDir string, outputDir string, overwrite bool) ([]*TemplateConfig, []*BinFileConfig) {
-	templates := []*TemplateConfig{}
-	binFile := []*BinFileConfig{}
+// sortFileType walks the module directory to find and classify all files into bin / text/plain (non-bin) types.
+func sortFileType(moduleDir string, outputDir string, overwrite bool) ([]*fileConfig, []*fileConfig) {
+	binTypeFiles := []*fileConfig{}
+	txtTypeFiles := []*fileConfig{}
 
 	paths, err := getAllFilePathsInDirectory(moduleDir)
 	if err != nil {
@@ -97,34 +83,6 @@ func newTemplates(moduleDir string, outputDir string, overwrite bool) ([]*Templa
 			continue
 		}
 
-		// detect the file type
-		detectedMIME, err := mimetype.DetectFile(path)
-		if err != nil {
-			panic(err)
-		}
-
-		// detect if the file type is binary
-		isBinary := true
-		for mime := detectedMIME; mime != nil; mime = mime.Parent() {
-			if mime.Is("text/plain") {
-				isBinary = false
-			}
-		}
-
-		if isBinary {
-			binFile = append(binFile, &BinFileConfig{
-				source:      path,
-				destination: fs.ReplacePath(path, moduleDir, outputDir),
-				mineType:    detectedMIME.String(),
-			})
-			continue
-		}
-
-		_, file := filepath.Split(path)
-		hasTmpltSuffix := strings.HasSuffix(file, constants.TemplateExtn)
-		if hasTmpltSuffix {
-			file = strings.Replace(file, constants.TemplateExtn, "", -1)
-		}
 		outputPath := fs.ReplacePath(path, moduleDir, outputDir)
 
 		if !overwrite {
@@ -134,13 +92,34 @@ func newTemplates(moduleDir string, outputDir string, overwrite bool) ([]*Templa
 			}
 		}
 
-		templates = append(templates, &TemplateConfig{
+		// detect the file type
+		detectedMIME, err := mimetype.DetectFile(path)
+		if err != nil {
+			panic(err)
+		}
+
+		// detect root file type
+		isBinary := true
+		for mime := detectedMIME; mime != nil; mime = mime.Parent() {
+			if mime.Is("text/plain") {
+				isBinary = false
+			}
+		}
+
+		if isBinary {
+			binTypeFiles = append(binTypeFiles, &fileConfig{
+				source:      path,
+				destination: outputPath,
+			})
+			continue
+		}
+
+		txtTypeFiles = append(txtTypeFiles, &fileConfig{
 			source:      path,
 			destination: outputPath,
-			isTemplate:  hasTmpltSuffix,
 		})
 	}
-	return templates, binFile
+	return txtTypeFiles, binTypeFiles
 }
 
 // getAllFilePathsInDirectory Recursively get all file paths in directory, including sub-directories.
@@ -162,7 +141,7 @@ func getAllFilePathsInDirectory(moduleDir string) ([]string, error) {
 	return paths, nil
 }
 
-func executeTemplates(templates []*TemplateConfig, data interface{}, delimiters []string) {
+func executeTemplates(templates []*fileConfig, data interface{}, delimiters []string) {
 	var wg sync.WaitGroup
 	leftDelim := delimiters[0]
 	rightDelim := delimiters[1]
@@ -201,4 +180,41 @@ func executeTemplates(templates []*TemplateConfig, data interface{}, delimiters 
 	}
 
 	wg.Wait()
+}
+
+func copyBinFiles(binTypeFiles []*fileConfig) {
+
+	for _, binFile := range binTypeFiles {
+		source := binFile.source
+		dest := binFile.destination
+
+		// create dir
+		outputDirPath, _ := path.Split(dest)
+		err := fs.CreateDirs(outputDirPath)
+		if err != nil {
+			flog.Errorf("Error creating directory '%s': %v", source, err)
+		}
+
+		// create refs to src and dest
+		from, err := os.Open(source)
+		if err != nil {
+			flog.Errorf("Error opening file to read '%s' : %v", source, err)
+		}
+		defer from.Close()
+
+		to, err := os.OpenFile(dest, os.O_RDWR|os.O_CREATE, 0666)
+		if err != nil {
+			log.Fatal(err)
+			flog.Errorf("Error creating file '%s': %v", dest, err)
+		}
+		defer to.Close()
+
+		// copy file
+		_, err = io.Copy(to, from)
+		if err != nil {
+			flog.Errorf("Error copying file '%s' : %v", source, err)
+		} else {
+			flog.Successf("Finished copying file : %s", dest)
+		}
+	}
 }
