@@ -86,7 +86,7 @@ $ zero init
 ## Sample project initilization
 ✔ Project Name: myapp-infra
 🎉  Initializing project
-✔ EKS + Go + React
+✔ EKS + Go + React + Gatsby
 ✔ Should the created projects be checked into github automatically? (y/n): y
 ✔ What's the root of the github org to create repositories in?: github.com/myapp-org
 ✔ Existing AWS Profiles 

@@ -10,9 +10,10 @@ func GetRegistry() Registry {
 	return Registry{
 		// TODO: better place to store these options as configuration file or any source
 		{
-			"EKS + Go + React",
+			"EKS + Go + React + Gatsby",
 			[]string{
 				"github.com/commitdev/zero-aws-eks-stack",
+				"github.com/commitdev/zero-deployable-landing-page",
 				"github.com/commitdev/zero-deployable-backend",
 				"github.com/commitdev/zero-deployable-react-frontend",
 			},
