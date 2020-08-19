@@ -143,6 +143,14 @@ var checkCmd = &cobra.Command{
 				minVersion: "2.17.1",
 				docsURL:    "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git",
 			},
+			{
+				name:       "Wget\t\t",
+				command:    "wget",
+				args:       []string{"--version"},
+				regexStr:   `^GNU Wget (0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)`,
+				minVersion: "1.20.3",
+				docsURL:    "https://www.gnu.org/software/wget/",
+			},
 		}
 
 		// Store and errors from the commands we run.
