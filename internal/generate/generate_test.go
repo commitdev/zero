@@ -29,10 +29,9 @@ func TestGenerateModules(t *testing.T) {
 	projectConfig := projectconfig.ZeroProjectConfig{
 		Name: "foo",
 		Modules: projectconfig.Modules{
-			"mod1": projectconfig.NewModule(map[string]string{"test": "bar"}, tmpDir, "n/a", baseTestFixturesDir, []string{}),
+			"mod1": projectconfig.NewModule(map[string]string{"test": "bar"}, tmpDir, "github.com/fake-org/repo-foo", baseTestFixturesDir, []string{}),
 		},
 	}
-
 	generate.Generate(projectConfig)
 
 	content, err := ioutil.ReadFile(filepath.Join(tmpDir, "file_to_template.txt"))
@@ -40,6 +39,7 @@ func TestGenerateModules(t *testing.T) {
 
 	expectedContent := `Name is foo
 Params.test is bar
+Files.Repository is github.com/fake-org/repo-foo
 `
 	assert.Equal(t, string(content), expectedContent)
 }

@@ -1,2 +1,3 @@
 Name is {{.Name}}
 Params.test is {{.Params.test}}
+Files.Repository is {{.Files.Repository}}
