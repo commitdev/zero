@@ -45,5 +45,7 @@ brews:
         type: optional
       - name: kubectl
         type: optional
+      - name: wget
+        type: optional
     test: |
       system "#{bin}/zero version"

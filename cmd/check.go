@@ -124,7 +124,7 @@ var checkCmd = &cobra.Command{
 				command:    "terraform",
 				args:       []string{"version"},
 				regexStr:   `Terraform v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)`,
-				minVersion: "0.12.0",
+				minVersion: "0.13.0",
 				docsURL:    "https://www.terraform.io/downloads.html",
 			},
 			{
@@ -142,6 +142,14 @@ var checkCmd = &cobra.Command{
 				regexStr:   `^git version (0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)`,
 				minVersion: "2.17.1",
 				docsURL:    "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git",
+			},
+			{
+				name:       "Wget\t\t",
+				command:    "wget",
+				args:       []string{"--version"},
+				regexStr:   `^GNU Wget (0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)`,
+				minVersion: "1.14.0",
+				docsURL:    "https://www.gnu.org/software/wget/",
 			},
 		}
 
