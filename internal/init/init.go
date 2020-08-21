@@ -103,7 +103,7 @@ func loadAllModules(moduleSources []string) (map[string]moduleconfig.ModuleConfi
 
 // promptAllModules takes a map of all the modules and prompts the user for values for all the parameters
 func promptAllModules(modules map[string]moduleconfig.ModuleConfig, projectCredentials globalconfig.ProjectCredential) map[string]string {
-	parameterValues := make(map[string]string)
+	parameterValues := map[string]string{"projectName": projectCredentials.ProjectName}
 	for _, config := range modules {
 		var err error
 
