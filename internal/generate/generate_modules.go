@@ -49,9 +49,11 @@ func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
 		templateData := struct {
 			Name   string
 			Params projectconfig.Parameters
+			Files  projectconfig.Files
 		}{
 			projectConfig.Name,
 			mod.Parameters,
+			mod.Files,
 		}
 
 		txtTypeFiles, binTypeFiles := sortFileType(moduleDir, outputDir, false)
