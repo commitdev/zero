@@ -89,7 +89,7 @@ $ zero init
 ✔ EKS + Go + React + Gatsby
 ✔ Should the created projects be checked into github automatically? (y/n): y
 ✔ What's the root of the github org to create repositories in?: github.com/myapp-org
-✔ Existing AWS Profiles 
+✔ Existing AWS Profiles
 ✔ default
 
 Github personal access token: used for creating repositories for your project
@@ -181,7 +181,7 @@ zero-deployable-backend:
 - Production API: api.commitzero.com
 ```
 
-***Your stack is now up and running, follow the links your terminal to visit your application 🎉*** 
+***Your stack is now up and running, follow the links your terminal to visit your application 🎉***
 
 
 ## Zeros Default Stack
@@ -191,7 +191,7 @@ zero-deployable-backend:
 If you would like to learn more about the zero-aws-eks stack, you can read more about it [here](https://github.com/commitdev/zero-aws-eks-stack)
 ___
 
-## Contributing to Zero 
+## Contributing to Zero
 
 Zero welcomes collaboration from the community; you can open new issues in our GitHub repo, Submit PRs' for bug fixes or browse through the tickets currently open to see what you can contribute too.
 
@@ -210,6 +210,25 @@ To install the CLI into your GOPATH and test it, run:
 $ make install-go
 $ zero --help
 ```
+
+### Releasing a new version on GitHub and Brew
+
+We are using a tool called `goreleaser` which you can get from brew if you're on MacOS:
+`brew install goreleaser`
+
+After you have the tool, you can follow these steps:
+```
+export GITHUB_TOKEN=<your token with access to write to the zero repo>
+git tag -a <version number like v0.0.1> -m "Some message about this release"
+git push origin <version number>
+goreleaser release
+```
+
+This will create a new release in GitHub and automatically collect all the commits since the last release into a changelog.
+It will also build binaries for various OSes and attach them to the release and push them to brew.
+The configuration for goreleaser is in [.goreleaser.yml](.goreleaser.yml)
+
+
 ___
 ## FAQ
 
