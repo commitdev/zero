@@ -38,7 +38,7 @@ brew install zero
 
 Download the latest [Zero binary] for your systems archetecture. Unzip your downloaded package add copy the Zero binary to the desired location and add it to your system PATH.
 
-Zero curretnly supports:
+Zero currently supports:
 | System | Support|  Package Manager |
 |---------|:-----:|:------:|
 | MacOS   |  ✅   | `brew` |
