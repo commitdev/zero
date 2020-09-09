@@ -19,6 +19,15 @@ func GetRegistry() Registry {
 			},
 		},
 		{
+			"EKS + NodeJS + React + Gatsby",
+			[]string{
+				"github.com/commitdev/zero-aws-eks-stack",
+				"github.com/commitdev/zero-deployable-landing-page",
+				"github.com/commitdev/zero-deployable-node-backend",
+				"github.com/commitdev/zero-deployable-react-frontend",
+			},
+		},
+		{
 			"Custom", []string{},
 		},
 	}
