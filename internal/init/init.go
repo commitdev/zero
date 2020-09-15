@@ -19,7 +19,7 @@ import (
 )
 
 // Create cloud provider context
-func Init(outDir string) *projectconfig.ZeroProjectConfig {
+func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfig {
 	projectConfig := defaultProjConfig()
 
 	projectConfig.Name = getProjectNamePrompt().GetParam(projectConfig.Parameters)
@@ -34,7 +34,7 @@ func Init(outDir string) *projectconfig.ZeroProjectConfig {
 		exit.Fatal("Error creating root: %v ", err)
 	}
 
-	moduleSources := chooseStack(registry.GetRegistry())
+	moduleSources := chooseStack(registry.GetRegistry(localModulePath))
 	moduleConfigs, mappedSources := loadAllModules(moduleSources)
 
 	prompts := getProjectPrompts(projectConfig.Name, moduleConfigs)

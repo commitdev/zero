@@ -219,7 +219,7 @@ We are using a tool called `goreleaser` which you can get from brew if you're on
 After you have the tool, you can follow these steps:
 ```
 export GITHUB_TOKEN=<your token with access to write to the zero repo>
-git tag -a <version number like v0.0.1> -m "Some message about this release"
+git tag -s -a <version number like v0.0.1> -m "Some message about this release"
 git push origin <version number>
 goreleaser release
 ```

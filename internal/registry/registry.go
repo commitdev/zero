@@ -6,25 +6,25 @@ type Stack struct {
 	ModuleSources []string
 }
 
-func GetRegistry() Registry {
+func GetRegistry(path string) Registry {
 	return Registry{
 		// TODO: better place to store these options as configuration file or any source
 		{
 			"EKS + Go + React + Gatsby",
 			[]string{
-				"github.com/commitdev/zero-aws-eks-stack",
-				"github.com/commitdev/zero-deployable-landing-page",
-				"github.com/commitdev/zero-deployable-backend",
-				"github.com/commitdev/zero-deployable-react-frontend",
+				path+"/zero-aws-eks-stack",
+				path+"/zero-deployable-landing-page",
+				path+"/zero-deployable-backend",
+				path+"/zero-deployable-react-frontend",
 			},
 		},
 		{
 			"EKS + NodeJS + React + Gatsby",
 			[]string{
-				"github.com/commitdev/zero-aws-eks-stack",
-				"github.com/commitdev/zero-deployable-landing-page",
-				"github.com/commitdev/zero-deployable-node-backend",
-				"github.com/commitdev/zero-deployable-react-frontend",
+				path+"/zero-aws-eks-stack",
+				path+"/zero-deployable-landing-page",
+				path+"/zero-deployable-node-backend",
+				path+"/zero-deployable-react-frontend",
 			},
 		},
 		{
