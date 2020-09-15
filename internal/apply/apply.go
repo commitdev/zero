@@ -106,10 +106,7 @@ func promptEnvironments() []string {
 		"Both Staging and Production": {"stage", "prod"},
 	}
 
-	var labels []string
-	for label := range items {
-		labels = append(labels, label)
-	}
+	labels := []string{"Staging", "Production", "Both Staging and Production"}
 
 	providerPrompt := promptui.Select{
 		Label: "Environments",
