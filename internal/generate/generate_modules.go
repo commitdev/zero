@@ -22,7 +22,7 @@ import (
 )
 
 // Generate accepts a projectconfig struct and renders the templates for all referenced modules
-func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
+func Generate(projectConfig projectconfig.ZeroProjectConfig, overwriteFiles bool) error {
 	flog.Infof(":clock: Fetching Modules")
 
 	// Make sure module sources are on disk
@@ -56,7 +56,7 @@ func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
 			mod.Files,
 		}
 
-		txtTypeFiles, binTypeFiles := sortFileType(moduleDir, outputDir, false)
+		txtTypeFiles, binTypeFiles := sortFileType(moduleDir, outputDir, overwriteFiles)
 
 		executeTemplates(txtTypeFiles, templateData, delimiters)
 		copyBinFiles(binTypeFiles)
