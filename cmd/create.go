@@ -15,10 +15,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var createConfigPath string
+var (
+	createConfigPath string
+	overwriteFiles   bool
+)
 
 func init() {
 	createCmd.PersistentFlags().StringVarP(&createConfigPath, "config", "c", constants.ZeroProjectYml, "config path")
+	createCmd.PersistentFlags().BoolVarP(&overwriteFiles, "overwrite", "o", false, "overwrite pre-existing files")
 
 	rootCmd.AddCommand(createCmd)
 }
@@ -38,7 +42,7 @@ func Create(dir string, createConfigPath string) {
 	configFilePath := path.Join(dir, createConfigPath)
 	projectConfig := projectconfig.LoadConfig(configFilePath)
 
-	generate.Generate(*projectConfig)
+	generate.Generate(*projectConfig, overwriteFiles)
 
 	if projectConfig.ShouldPushRepositories {
 		flog.Infof(":up_arrow: Done Rendering - committing repositories to version control.")

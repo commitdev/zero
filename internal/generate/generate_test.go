@@ -32,7 +32,7 @@ func TestGenerateModules(t *testing.T) {
 			"mod1": projectconfig.NewModule(map[string]string{"test": "bar"}, tmpDir, "github.com/fake-org/repo-foo", baseTestFixturesDir, []string{}),
 		},
 	}
-	generate.Generate(projectConfig)
+	generate.Generate(projectConfig, true)
 
 	content, err := ioutil.ReadFile(filepath.Join(tmpDir, "file_to_template.txt"))
 	assert.NoError(t, err)
