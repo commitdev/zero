@@ -67,6 +67,7 @@ func Generate(projectConfig projectconfig.ZeroProjectConfig) error {
 type fileConfig struct {
 	source      string
 	destination string
+	modeBits    os.FileMode
 }
 
 // sortFileType walks the module directory to find and classify all files into bin / text/plain (non-bin) types.
@@ -94,6 +95,11 @@ func sortFileType(moduleDir string, outputDir string, overwrite bool) ([]*fileCo
 			}
 		}
 
+		fileInfo, err := os.Stat(path)
+		if err != nil {
+			panic(err)
+		}
+
 		// detect the file type
 		detectedMIME, err := mimetype.DetectFile(path)
 		if err != nil {
@@ -112,6 +118,7 @@ func sortFileType(moduleDir string, outputDir string, overwrite bool) ([]*fileCo
 			binTypeFiles = append(binTypeFiles, &fileConfig{
 				source:      path,
 				destination: outputPath,
+				modeBits:    fileInfo.Mode().Perm(),
 			})
 			continue
 		}
@@ -119,6 +126,7 @@ func sortFileType(moduleDir string, outputDir string, overwrite bool) ([]*fileCo
 		txtTypeFiles = append(txtTypeFiles, &fileConfig{
 			source:      path,
 			destination: outputPath,
+			modeBits:    fileInfo.Mode().Perm(),
 		})
 	}
 	return txtTypeFiles, binTypeFiles
@@ -169,6 +177,12 @@ func executeTemplates(templates []*fileConfig, data interface{}, delimiters []st
 		if err != nil {
 			flog.Errorf("Error initializing file '%s'", err)
 		}
+
+		err = f.Chmod(tmpltConfig.modeBits)
+		if err != nil {
+			flog.Errorf("Error changing mode bits '%s'", err)
+		}
+
 		// @TODO if strict mode then only copy file
 		name := path.Base(source)
 		template, err := template.New(name).Delims(leftDelim, rightDelim).Funcs(util.FuncMap).ParseFiles(source)
@@ -185,7 +199,6 @@ func executeTemplates(templates []*fileConfig, data interface{}, delimiters []st
 }
 
 func copyBinFiles(binTypeFiles []*fileConfig) {
-
 	for _, binFile := range binTypeFiles {
 		source := binFile.source
 		dest := binFile.destination
@@ -204,7 +217,7 @@ func copyBinFiles(binTypeFiles []*fileConfig) {
 		}
 		defer from.Close()
 
-		to, err := os.OpenFile(dest, os.O_RDWR|os.O_CREATE, 0666)
+		to, err := os.OpenFile(dest, os.O_RDWR|os.O_CREATE, binFile.modeBits)
 		if err != nil {
 			log.Fatal(err)
 			flog.Errorf("Error creating file '%s': %v", dest, err)
