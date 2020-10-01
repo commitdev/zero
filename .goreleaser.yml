@@ -55,7 +55,7 @@ nfpms:
     id: zero
     package_name: zero
     vendor: Commit.dev
-    homepage: https://www.commit.dev
+    homepage: https://github.com/commitdev/zero
     maintainer: commitdev <contact@commit.dev>
     description: "Allow startup developers to ship to production on day 1."
     formats:
