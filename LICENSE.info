@@ -1,0 +1,37 @@
+For human-readable text about the license itself, see LICENSE.
+
+For SPDX licensing information, see LICENSE.spdx.
+
+The remainder of this file contains license information for this project's dependencies.
+
+Each dependency is listed on one line, in the format:
+
+dependency_name;licenses;
+
+'licenses' is one ore more licenses, using the SPDX identifier, comma separated if more than one, with no spaces.
+
+github.com/aws/aws-sdk-go;v1.30.12;Apache-2.0
+github.com/coreos/go-semver;v0.2.0;Apache-2.0
+github.com/gabriel-vasile/mimetype;v1.1.1;MIT
+github.com/google/go-cmp;v0.3.1;BSD-3-Clause
+github.com/google/uuid;v1.1.1;BSD-3-Clause
+github.com/hashicorp/go-getter;MPL-2.0
+github.com/hashicorp/terraform;MPL-2.0
+github.com/k0kubun/colorstring;MIT
+github.com/k0kubun/pp;MIT
+github.com/kyokomi/emoji;MIT
+github.com/logrusorgru/aurora;Unlicense
+github.com/lunixbochs/vtclean;MIT
+github.com/machinebox/graphql;Apache-2.0
+github.com/manifoldco/promptui;BSD-3-Clause
+github.com/matryer/is;v1.3.0;MIT
+github.com/mattn/go-colorable;MIT
+github.com/niemeyer/pretty;MIT
+github.com/sirupsen/logrus;MIT
+github.com/spf13/cobra;Apache-2.0
+github.com/stretchr/testify;MIT
+github.com/termie/go-shutil;PSF-2.0,MIT
+golang.org/x/net;BSD-3-Clause
+golang.org/x/sys;BSD-3-Clause
+gopkg.in/check.v1;BSD-2-Clause
+gopkg.in/yaml.v2;Apache-2.0,MIT
