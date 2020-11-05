@@ -26,9 +26,17 @@ type Module struct {
 	DependsOn  []string   `yaml:"dependsOn,omitempty"`
 	Parameters Parameters `yaml:"parameters,omitempty"`
 	Files      Files
+	Conditions []Condition `yaml:"conditions,omitempty"`
 }
 
 type Parameters map[string]string
+
+type Condition struct {
+	Action     string   `yaml:"action"`
+	MatchField string   `yaml:"matchField"`
+	WhenValue  string   `yaml:"whenValue"`
+	Data       []string `yaml:"data,omitempty"`
+}
 
 type Files struct {
 	Directory  string `yaml:"dir,omitempty"`
@@ -77,7 +85,7 @@ func (c *ZeroProjectConfig) GetDAG() dag.AcyclicGraph {
 	return g
 }
 
-func NewModule(parameters Parameters, directory string, repository string, source string, dependsOn []string) Module {
+func NewModule(parameters Parameters, directory string, repository string, source string, dependsOn []string, conditions []Condition) Module {
 	return Module{
 		Parameters: parameters,
 		DependsOn:  dependsOn,
@@ -86,5 +94,6 @@ func NewModule(parameters Parameters, directory string, repository string, sourc
 			Repository: repository,
 			Source:     source,
 		},
+		Conditions: conditions,
 	}
 }

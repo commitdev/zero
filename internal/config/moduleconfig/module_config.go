@@ -14,6 +14,7 @@ type ModuleConfig struct {
 	TemplateConfig      `yaml:"template"`
 	RequiredCredentials []string `yaml:"requiredCredentials"`
 	Parameters          []Parameter
+	Conditions          []Condition `yaml:"conditions,omitempty"`
 }
 
 type Parameter struct {
@@ -25,6 +26,13 @@ type Parameter struct {
 	Default         string   `yaml:"default,omitempty"`
 	Info            string   `yaml:"info,omitempty"`
 	FieldValidation Validate `yaml:"fieldValidation,omitempty"`
+}
+
+type Condition struct {
+	Action     string   `yaml:"action"`
+	MatchField string   `yaml:"matchField"`
+	WhenValue  string   `yaml:"whenValue"`
+	Data       []string `yaml:"data,omitempty"`
 }
 
 type Validate struct {
@@ -50,5 +58,6 @@ func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 	if err != nil {
 		return config, err
 	}
+
 	return config, nil
 }

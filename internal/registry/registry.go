@@ -12,19 +12,19 @@ func GetRegistry(path string) Registry {
 		{
 			"EKS + Go + React + Gatsby",
 			[]string{
-				path+"/zero-aws-eks-stack",
-				path+"/zero-deployable-landing-page",
-				path+"/zero-deployable-backend",
-				path+"/zero-deployable-react-frontend",
+				path + "/zero-aws-eks-stack",
+				path + "/zero-deployable-landing-page",
+				path + "/zero-deployable-backend",
+				path + "/zero-deployable-react-frontend",
 			},
 		},
 		{
 			"EKS + NodeJS + React + Gatsby",
 			[]string{
-				path+"/zero-aws-eks-stack",
-				path+"/zero-deployable-landing-page",
-				path+"/zero-deployable-node-backend",
-				path+"/zero-deployable-react-frontend",
+				path + "/zero-aws-eks-stack",
+				path + "/zero-deployable-landing-page",
+				path + "/zero-deployable-node-backend",
+				path + "/zero-deployable-react-frontend",
 			},
 		},
 		{

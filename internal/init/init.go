@@ -59,6 +59,7 @@ func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfi
 		repoName := prompts[moduleName].GetParam(initParams)
 		repoURL := fmt.Sprintf("%s/%s", initParams["GithubRootOrg"], repoName)
 		projectModuleParams := make(projectconfig.Parameters)
+		projectModuleConditions := []projectconfig.Condition{}
 
 		// Loop through all the prompted values and find the ones relevant to this module
 		for parameterKey, parameterValue := range projectParameters {
@@ -67,9 +68,26 @@ func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfi
 					projectModuleParams[parameterKey] = parameterValue
 				}
 			}
-
 		}
-		projectConfig.Modules[moduleName] = projectconfig.NewModule(projectModuleParams, repoName, repoURL, mappedSources[moduleName], module.DependsOn)
+
+		for _, condition := range module.Conditions {
+			newCond := projectconfig.Condition{
+				Action:     condition.Action,
+				MatchField: condition.MatchField,
+				WhenValue:  condition.WhenValue,
+				Data:       condition.Data,
+			}
+			projectModuleConditions = append(projectModuleConditions, newCond)
+		}
+
+		projectConfig.Modules[moduleName] = projectconfig.NewModule(
+			projectModuleParams,
+			repoName,
+			repoURL,
+			mappedSources[moduleName],
+			module.DependsOn,
+			projectModuleConditions,
+		)
 	}
 
 	// TODO: load ~/.zero/config.yml (or credentials)
