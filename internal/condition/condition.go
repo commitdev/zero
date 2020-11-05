@@ -43,13 +43,13 @@ func Perform(cond projectconfig.Condition, mod projectconfig.Module) {
 	}
 }
 
-// Excludes files from template rendering.
+// Excludes paths from template rendering.
 // This occurs after-the-fact. That is, we render all templates to disk, then
-// use files to determine which files to remove from disk.
+// use 'paths' to determine which files and directories to remove from disk.
 //
-func ignoreFile(files []string, mod projectconfig.Module) {
-	for _, file := range files {
+func ignoreFile(paths []string, mod projectconfig.Module) {
+	for _, file := range paths {
 		filepath := path.Join(mod.Files.Directory, file)
-		os.Remove(filepath)
+		os.RemoveAll(filepath)
 	}
 }
