@@ -29,7 +29,7 @@ func TestGenerateModules(t *testing.T) {
 	projectConfig := projectconfig.ZeroProjectConfig{
 		Name: "foo",
 		Modules: projectconfig.Modules{
-			"mod1": projectconfig.NewModule(map[string]string{"test": "bar"}, tmpDir, "github.com/fake-org/repo-foo", baseTestFixturesDir, []string{}),
+			"mod1": projectconfig.NewModule(map[string]string{"test": "bar"}, tmpDir, "github.com/fake-org/repo-foo", baseTestFixturesDir, []string{}, []projectconfig.Condition{}),
 		},
 	}
 	generate.Generate(projectConfig, true)

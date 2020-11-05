@@ -11,6 +11,7 @@ import (
 	"sync"
 	"text/template"
 
+	"github.com/commitdev/zero/internal/condition"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/module"
@@ -47,19 +48,25 @@ func Generate(projectConfig projectconfig.ZeroProjectConfig, overwriteFiles bool
 
 		// Data that will be passed in to each template
 		templateData := struct {
-			Name   string
-			Params projectconfig.Parameters
-			Files  projectconfig.Files
+			Name       string
+			Params     projectconfig.Parameters
+			Files      projectconfig.Files
+			Conditions []projectconfig.Condition
 		}{
 			projectConfig.Name,
 			mod.Parameters,
 			mod.Files,
+			mod.Conditions,
 		}
 
 		txtTypeFiles, binTypeFiles := sortFileType(moduleDir, outputDir, overwriteFiles)
 
 		executeTemplates(txtTypeFiles, templateData, delimiters)
 		copyBinFiles(binTypeFiles)
+
+		for _, cond := range mod.Conditions {
+			condition.Perform(cond, mod)
+		}
 	}
 	return nil
 }

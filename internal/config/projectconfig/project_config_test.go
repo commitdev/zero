@@ -40,9 +40,9 @@ func TestLoadConfig(t *testing.T) {
 func eksGoReactSampleModules() projectconfig.Modules {
 	parameters := projectconfig.Parameters{"a": "b"}
 	return projectconfig.Modules{
-		"aws-eks-stack":             projectconfig.NewModule(parameters, "zero-aws-eks-stack", "github.com/something/repo1", "github.com/commitdev/zero-aws-eks-stack", []string{}),
-		"deployable-backend":        projectconfig.NewModule(parameters, "zero-deployable-backend", "github.com/something/repo2", "github.com/commitdev/zero-deployable-backend", []string{}),
-		"deployable-react-frontend": projectconfig.NewModule(parameters, "zero-deployable-react-frontend", "github.com/something/repo3", "github.com/commitdev/zero-deployable-react-frontend", []string{}),
+		"aws-eks-stack":             projectconfig.NewModule(parameters, "zero-aws-eks-stack", "github.com/something/repo1", "github.com/commitdev/zero-aws-eks-stack", []string{}, []projectconfig.Condition{}),
+		"deployable-backend":        projectconfig.NewModule(parameters, "zero-deployable-backend", "github.com/something/repo2", "github.com/commitdev/zero-deployable-backend", []string{}, []projectconfig.Condition{}),
+		"deployable-react-frontend": projectconfig.NewModule(parameters, "zero-deployable-react-frontend", "github.com/something/repo3", "github.com/commitdev/zero-deployable-react-frontend", []string{}, []projectconfig.Condition{}),
 	}
 }
 
