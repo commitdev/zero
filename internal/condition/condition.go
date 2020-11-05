@@ -1,9 +1,24 @@
+// This module is invoked when we do template rendering during "zero create."
+//
+// Each module can have a "conditions" section in their zero-module.yml that
+// specifies a condition in the form:
+//
+//   conditions:
+//     - action: ignoreFile
+//       matchField: <the name of a parameter in zero-module.yml>
+//       whenValue: <value for the matchField that triggers this condition>
+//       data:
+//       - <arbitrary string>
+//
+// The structure for this is defined in:
+// internal/config/projectconfig/project_config.go.
+// The definition is in that file simply to avoid cyclic dependencies; but
+// The logic for each type of condition exists here.
+//
+// See: internal/generate/generate_modules.go
+// See: internal/config/projectconfig/project_config.go
+//
 package condition
-
-/*
-NOTE: To avoid cyclic dependencies, the actual struct datatype is not defined here.
-It is doubly defined - once in project_config.go and once in module_config.go.
-*/
 
 import (
 	"os"
@@ -12,6 +27,7 @@ import (
 	"github.com/commitdev/zero/internal/config/projectconfig"
 )
 
+// Function dispatch for any kind of condition.
 func Perform(cond projectconfig.Condition, mod projectconfig.Module) {
 	value, found := mod.Parameters[cond.MatchField]
 
@@ -27,8 +43,12 @@ func Perform(cond projectconfig.Condition, mod projectconfig.Module) {
 	}
 }
 
-func ignoreFile(data []string, mod projectconfig.Module) {
-	for _, file := range data {
+// Excludes files from template rendering.
+// This occurs after-the-fact. That is, we render all templates to disk, then
+// use files to determine which files to remove from disk.
+//
+func ignoreFile(files []string, mod projectconfig.Module) {
+	for _, file := range files {
 		filepath := path.Join(mod.Files.Directory, file)
 		os.Remove(filepath)
 	}
