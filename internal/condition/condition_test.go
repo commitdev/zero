@@ -1,6 +1,7 @@
 package condition_test
 
 import (
+	"encoding/base64"
 	"math/rand"
 	"os"
 	"testing"
@@ -12,7 +13,7 @@ import (
 func testSetup(paramKey, paramValue string) (string, projectconfig.Module) {
 	bytes := make([]byte, 15)
 	_, _ = rand.Read(bytes)
-	name := string(bytes[:])
+	name := string(base64.StdEncoding.EncodeToString(bytes[:]))
 
 	_, _ = os.Create(name)
 
