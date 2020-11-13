@@ -188,7 +188,15 @@ zero-deployable-backend:
 
 ![systerm-architecture](https://raw.githubusercontent.com/commitdev/zero-aws-eks-stack/master/docs/architecture-overview.svg)
 
-If you would like to learn more about the zero-aws-eks stack, you can read more about it [here](https://github.com/commitdev/zero-aws-eks-stack)
+The core zero modules currently available are:
+| Project | URL |
+|---|---|
+| AWS Infrastructure | [https://github.com/commitdev/zero-aws-eks-stack](https://github.com/commitdev/zero-aws-eks-stack) |
+| Backend (Go)  | [https://github.com/commitdev/zero-deployable-backend](https://github.com/commitdev/zero-deployable-backend) |
+| Backend (Node.js)  | [https://github.com/commitdev/zero-deployable-node-backend](https://github.com/commitdev/zero-deployable-node-backend) |
+| Frontend (React) | [https://github.com/commitdev/zero-deployable-react-frontend](https://github.com/commitdev/zero-deployable-react-frontend) |
+| Static Site (Gatsby) | [https://github.com/commitdev/zero-deployable-landing-page](https://github.com/commitdev/zero-deployable-landing-page) |
+
 ___
 
 ## Contributing to Zero
