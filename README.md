@@ -44,7 +44,7 @@ Security: Properly configured access-control to resources/security groups, using
 - Feature Flagging integration with [LaunchDarkly][launchdarkly] (Optional) (In Progress)
 
 ### Frontend
-- React examply project automatically set up and deployed to your new infrastructure
+- React example project automatically set up, deployed and served securely to your customers
 - CI pipeline built with CircleCI. Just merge a PR and a deploy will start. Your code will be built and tested, deployed to staging, then prompt you to push to production
 - File upload / download support using signed Cloudfront URLs (Optional)
 - User management integration with Kratos - Just style the example login / signup flow to look the way you want (Optional)
