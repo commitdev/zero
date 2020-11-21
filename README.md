@@ -10,7 +10,7 @@ As a technical founder or the first technical hire at a startup, your sole focus
 
 Zero was built by a team of engineers with many years of experience in building and scaling startups. We have faced all the problems you will and want to provide a way for new startups to avoid all those pitfalls. We also want to help you learn about the tech choices we made so your team can become proficient in some of the great tech we have included.
 
-Everything built by Zero is yours. After running the commands to generate your infrastructure, backend, and frontend, all the code is checked in your your source control repositories and becomes the basis for your new system. We provide constant updates and new modules that you can pull in on an ongoing basis, but you can also feel free to customize as much as you like with no strings attached. If you do happen to make a change to core functionality and feel like contributing it back to the project, we'd love that too!
+Everything built by Zero is yours. After running the commands to generate your infrastructure, backend, and frontend, all the code is checked into your source control repositories and becomes the basis for your new system. We provide constant updates and new modules that you can pull in on an ongoing basis, but you can also feel free to customize as much as you like with no strings attached. If you do happen to make a change to core functionality and feel like contributing it back to the project, we'd love that too!
 
 ## Why is Zero Reliable, Scalable, Performant and Secure
 
