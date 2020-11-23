@@ -35,7 +35,7 @@ Security: Properly configured access-control to resources/security groups, using
 - Local/Cloud Hybrid developer environment using Skaffold and Telepresence (In Progress)
 
 ### Backend
-- Golang or Node example project automatically set up and deployed to your new infrastructure
+- Golang or Node.js example project automatically set up, Dockerized, and deployed to your new Kubernetes cluster
 - CI pipeline built with [CircleCI][circleci]. Just merge a PR and a deploy will start. Your code will be built and tested, deployed to staging, then prompt you to push to production
 - File upload / download support using signed Cloudfront URLs (Optional)
 - Email support using [SendGrid][sendgrid] or AWS SES (Optional)
