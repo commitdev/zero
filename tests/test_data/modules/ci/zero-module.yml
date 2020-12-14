@@ -1,6 +1,6 @@
 name: "CI templates"
-description: ""
-author: ""
+description: "CI description"
+author: "CI author"
 icon: ""
 thumbnail: ""
 
@@ -10,8 +10,8 @@ requiredCredentials:
   - github
 
 # Template variables to populate, these could be overwritten by the file spefic frontmatter variables
-template: 
-  # strictMode: true # will only parse files that includes the .tmpl.* extension, otherwise it will copy file 
+template:
+  # strictMode: true # will only parse files that includes the .tmpl.* extension, otherwise it will copy file
   delimiters:
     - "<%"
     - "%>"
@@ -19,16 +19,15 @@ template:
   outputDir: ".circleci"
 
 # required context parameters: will throw a warning message at the end if any of the context parameters are not present
-# contextRequired: 
+# contextRequired:
 #   - cognitoPoolID
 #   - cognitoClientID
 
 # parameters required from user to populate the template params
-parameters: 
+parameters:
   - field: platform
     label: CI Platform
     # default: github
-    options: 
+    options:
       - github
       - circlci
-
