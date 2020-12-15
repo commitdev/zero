@@ -81,7 +81,7 @@ func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 		flog.Errorf("%v is missing information", filePath)
 
 		for _, m := range missing {
-			flog.Errorf("\t %v\n", m)
+			flog.Errorf("\t %v", m)
 		}
 
 		log.Fatal("")
