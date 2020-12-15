@@ -66,9 +66,6 @@ func (cfg ModuleConfig) collectMissing() []string {
 func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 	config := ModuleConfig{}
 
-	var required = []string{}
-	fmt.Printf("%+#v\n", required)
-
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return config, err
