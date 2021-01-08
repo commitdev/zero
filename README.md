@@ -1,4 +1,4 @@
-![zero](https://github.com/commitdev/zero/blob/master/docs/img/logo-small.png?raw=true)
+![zero](https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo-small.png)
 
 ## What is Zero
 
