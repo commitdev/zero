@@ -2,26 +2,30 @@
 
 ## What is Zero
 
-Zero is a tool which makes it quick and easy for technical founders & developers to build everything they need to launch and grow high-quality SaaS applications faster and more cost-effectively.
+Zero is a tool which makes it quick and easy for startup technical founders & developers to build everything they need to launch and grow high-quality SaaS applications faster and more cost-effectively.
 
 ## Why is Zero good for startups
 
 As a technical founder or the first technical hire at a startup, your sole focus is to build the logic for your application and get it into customers’ hands as quickly and reliably as possible. Yet you immediately face multiple hurdles before even writing the first line of code. You’re forced to make many tech trade-offs, leading to decision fatigue. You waste countless hours building boilerplate SaaS features not adding direct value to your customers. You spend precious time picking up unfamiliar tech, make wrong choices that result in costly refactoring or rebuilding in the future, and are unaware of tools and best practices that would speed up your product iteration.
 
-Zero was built by a team of engineers with many years of experience in building and scaling startups. We have faced all the problems you will and want to provide a way for new startups to avoid all those pitfalls. We also want to help you learn about the tech choices we made so your team can become proficient in some of the great tech we have included.
+Zero was built by a team of engineers with many years of experience in building and scaling startups. We have faced all the problems you will and want to provide a way for new startups to avoid all those pitfalls. We also want to help you learn about the tech choices we made so your team can become proficient in some of the great tools we have included.
 
 Everything built by Zero is yours. After running the commands to generate your infrastructure, backend, and frontend, all the code is checked into your source control repositories and becomes the basis for your new system. We provide constant updates and new modules that you can pull in on an ongoing basis, but you can also feel free to customize as much as you like with no strings attached. If you do happen to make a change to core functionality and feel like contributing it back to the project, we'd love that too!
+
+[Read about the day-to-day experience of using a system set up using Zero](docs/real-world-usage.md)
+
 
 ## Why is Zero Reliable, Scalable, Performant and Secure
 
 Reliability: Your infrastructure will be set up in multiple availability zones making it highly available and fault tolerant. All production workloads will run with multiple instances by default, using AWS ELB and Nginx to load balance traffic. All infrastructure is represented with code using [Hashicorp Terraform][terraform] so your environments are reproducible, auditable, and easy to configure.
 
-Scability: Your services will be running in Kubernetes, with the EKS nodes running in an AWS [Auto Scaling Group][asg]. Both the application workloads and cluster size are ready to scale whenever the need arises. Your frontend assets will be stored in S3 and served from AWS' Cloudfront CDN which operates at global scale.
+Scalability: Your services will be running in Kubernetes, with the EKS nodes running in an AWS [Auto Scaling Group][asg]. Both the application workloads and cluster size are ready to scale whenever the need arises. Your frontend assets will be stored in S3 and served from AWS' Cloudfront CDN which operates at global scale.
 
-Security: Properly configured access-control to resources/security groups, using secure vault systems (AWS Secret Manager, Kubernetes secrets), and following best practices provides great security out of the box. Our practices are built on top of multiple security audits and penetration tests. Automatic certificate management using [Let's Encrypt][letsencrypt], database encryption, VPN support, and more means your traffic will always be encrypted. Built-in application features like user authentication help you bullet-proof your application by using existing, tested tools rather than reinventing the wheel when it comes to features like user management and auth.
+Security: Properly configured access-control to resources/security groups, using secret storage systems (AWS Secret Manager, Kubernetes secrets), and following best practices provides great security out of the box. Our practices are built on top of multiple security audits and penetration tests. Automatic certificate management using [Let's Encrypt][letsencrypt], database encryption, VPN support, and more means your traffic will always be encrypted. Built-in application features like user authentication help you bullet-proof your application by using existing, tested tools rather than reinventing the wheel when it comes to features like user management and auth.
 
 
 ## What do you get out of the box?
+[Read about why we made these technology choices and where they are most applicable](docs/technology-choices.md)
 ### Infrastructure
 - Fully configured infrastructure-as-code AWS environment including:
   - VPCs per environment (staging, production) with pre-configured subnets, security groups, etc.
@@ -29,27 +33,25 @@ Security: Properly configured access-control to resources/security groups, using
   - RDS database for your application (Postgres or MySQL)
   - S3 buckets and Cloudfront distributions to serve your assets
 - Logging and Metrics collected automatically using either Cloudwatch or Prometheus + Grafana, Elasticsearch + Kibana
-- VPN using [Wireguard][wireguard]
+- VPN using [Wireguard][wireguard] (Optional)
 - User management and Identity / Access Proxy using Ory [Kratos][kratos] and [Oathkeeper][oathkeeper] (Optional)
-- Tooling to make it easy to set up secure access for your team
-- Local/Cloud Hybrid developer environment using Skaffold and Telepresence (In Progress)
+- Tooling to make it easy to set up secure access for your dev team
+- Local/Cloud Hybrid developer environment using Telepresence (Optional)
 
 ### Backend
 - Golang or Node.js example project automatically set up, Dockerized, and deployed to your new Kubernetes cluster
-- CI pipeline built with [CircleCI][circleci]. Just merge a PR and a deploy will start. Your code will be built and tested, deployed to staging, then prompt you to push to production
+- CI pipeline built with [CircleCI][circleci] or GitHubActions. Just merge a PR and a deploy will start. Your code will be built and tested, deployed to staging, then prompt you to push to production
 - File upload / download support using signed Cloudfront URLs (Optional)
 - Email support using [SendGrid][sendgrid] or AWS SES (Optional)
 - Notification support for sending and receiving messages in your application (web, mobile, SMS, Email, etc.) (Optional) (In Progress)
 - User management integration with Kratos and Oathkeeper - No need to handle login, signup, authentication yourself (Optional)
-- Feature Flagging integration with [LaunchDarkly][launchdarkly] (Optional) (In Progress)
 
 ### Frontend
 - React example project automatically set up, deployed and served securely to your customers
-- CI pipeline built with CircleCI. Just merge a PR and a deploy will start. Your code will be built and tested, deployed to staging, then prompt you to push to production
+- CI pipeline built with CircleCI or GitHub Actions. Just merge a PR and a deploy will start. Your code will be built and tested, deployed to staging, then prompt you to push to production
 - File upload / download support using signed Cloudfront URLs (Optional)
 - User management integration with Kratos - Just style the example login / signup flow to look the way you want (Optional)
 - Static site example project using Gatsby to easily make a landing page, also set up with a CI Pipeline using CircleCI (Optional)
-- Feature Flagging integration with LaunchDarkly (Optional) (In Progress)
 
 ___
 
@@ -69,7 +71,7 @@ brew install zero
 
 - Install Zero by downloading the binary.
 
-Download the latest [Zero binary] for your systems archetecture. Unzip your downloaded package add copy the Zero binary to the desired location and add it to your system PATH.
+Download the latest [Zero binary] for your systems architecture. Unzip your downloaded package and copy the Zero binary to the desired location and add it to your system PATH.
 
 Zero currently supports:
 | System | Support|  Package Manager |
@@ -88,25 +90,30 @@ In order to use Zero, run the `zero check` command on your system to find out wh
 
 You need to [register a new domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) / [host a registered domain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/MigratingDNS.html) you will use to access your infrastructure on [Amazon Route 53](https://aws.amazon.com/route53/).
 
-> We recommended you have two domains - one for staging and another for production. For example, mydomain.com and mydomain-staging.com. This will lead to environments that are more similar, rather than trying to use a subdomain for staging which may cause issues in your app later on.
+> We recommended you have two domains - one for staging and another for production. For example, mydomain.com and mydomain-staging.com. This will lead to environments that are more similar, rather than trying to use a subdomain like staging.mydomain.com for staging which may cause issues in your app later on.
 
 ___
 
 ## Using zero to spin up your own stack
 
-Using Zero to spin up your infrastructure is easy and straightforward; using a few commands, you can configure and deploy your very own scalable high-performant infrastructure that is production-ready.
+Using Zero to spin up your infrastructure and application is easy and straightforward. Using just a few commands, you can configure and deploy your very own scalable, high-performance, production-ready infrastructure.
 
 A few caveats before getting started:
 
 - For Zero to provision resources, you will need to be authenticated with AWS [(authenticate with aws-cli)](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-methods).
 
-  - You can also configure your aws-cli during the zero project initialization.
-- It is recomended practice to [create a GitHub org](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/creating-a-new-organization-from-scratch) where your code is going to live and grant [CircleCi Organization access](https://github.com/settings/connections/applications/78a2ba87f071c28e65bb) to your repositories for CI / CD deployment.
+- It is recommended practice to [create a GitHub org](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/creating-a-new-organization-from-scratch) where your code is going to live. If you choose, after creating your codebases, Zero will automatically create repositories and check in your code for you. You will need to [create a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) to enable this.
 
-- During set-up, you need to create a GitHub personal access token and a CircleCi access token; you should store your generated tokens securely.
+- You will need a GitHub Personal Access Token if you want Zero
+<details>
+  <summary>If using CircleCI as your build pipeline ...</summary>
 
-- For your CI build to work, you need to opt into the use of third-party orbs you can find this in your CircleCi Org Setting > Security > Allow Uncertified Orbs.
+  - Grant [CircleCi Organization access](https://github.com/settings/connections/applications/78a2ba87f071c28e65bb) to your repositories to allow pulling the code during the build pipeline.
 
+  - You will need to [create a CircleCi access token](https://circleci.com/docs/2.0/managing-api-tokens/) and enter it during the setup process; you should store your generated tokens securely.
+
+  - For your CI build to work, you need to opt into the use of third-party orbs. You can find this in your CircleCi Org Setting > Security > Allow Uncertified Orbs.
+</details>
 
 ### zero init
 
@@ -116,7 +123,7 @@ The `zero init` command creates a new project and outputs an infrastructure conf
 # To create and customize a new project you run
 $ zero init
 
-## Sample project initilization
+## Sample project initialization
 ✔ Project Name: myapp-infra
 🎉  Initializing project
 ✔ EKS + Go + React + Gatsby
@@ -148,10 +155,10 @@ The token can be created at https://app.circleci.com/settings/user/tokens
 
 ### zero create
 
-The `zero create` command renders the infrastructure modules you've configured into your project folder and pushed your code to GitHub.
+The `zero create` command renders the infrastructure modules you've configured into your project folder and pushes your code to GitHub.
 
 ```shell
-# Template the selected modules and configuration specified in zero-project.yml and push to repository.
+# Template the selected modules and configuration specified in zero-project.yml and push to the repository.
 $ cd zero-init   # change your working dir to YOUR_PROJECT_NAME
 $ zero create
 
@@ -215,7 +222,7 @@ zero-deployable-backend:
 - Production API: api.commitzero.com
 ```
 
-***Your stack is now up and running, follow the links your terminal to visit your application 🎉***
+***Your stack is now up and running, follow the links in your terminal to visit your application 🎉***
 
 
 ## Zero Default Stack
@@ -274,7 +281,7 @@ The configuration for goreleaser is in [.goreleaser.yml](.goreleaser.yml)
 ___
 ## FAQ
 
-Why is my deployed application not yet accesible?
+Why is my deployed application not yet accessible?
 
 - It takes about 20 - 35 mins for your deployed application to be globally available through AWS CloudFront CDN.
 
