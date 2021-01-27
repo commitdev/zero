@@ -2,7 +2,7 @@
 
 ## Real-world Usage Scenarios
 
-### Working on and deploying a change
+### Developing and deploying application changes
 1. Clone your git repository.
 2. Make a branch, start working on your code.
 3. If using the Telepresence dev experience, run the `start-dev-env.sh` script to allow you to use the hybrid cloud environment as you work, to run and test your code in a realistic environment.
