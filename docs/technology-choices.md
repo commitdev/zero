@@ -3,7 +3,7 @@
 ## Technology Choices
 As we add features to Zero, we rely heavily on our years of experience with founding and growing startups, and judge tools and technologies based on the axes of:
 - Quality - Is it the best tool for the job? Will it allow a project to start small and scale big?
-- Ease of integration - Is it easy to set up automatically and in a way that is easy to understand and maintain for the developers and operators of the project?
+- Simplicity - Is it easy to set up automatically and in a way that is easy to understand and maintain for the developers and operators of the project?
 - Price - Ideally we look for open source tools, but there are some tools we integrate with that have a cost if we see it as providing enough value to justify that cost. In this case we will often try to also include an open source alternative.
 
 When there are multiple technologies that we consider to be front-runners, we try to add multiple options, along with documentation and use cases to describe in which situations each tool might be the right choice for a project.
@@ -42,7 +42,9 @@ Compared to serverless, it is much easier to control, monitor, and have visibili
 
 [RDS MySQL](https://aws.amazon.com/rds/mysql/) / [RDS Postgresql](https://aws.amazon.com/rds/postgresql/)
 
-RDS MySQL and Postgres give you all the benefits of these RDBMS tools without the burden of managing them yourself. Either one of these database technologies are great for most startups, and allow you to scale quite large, depending on your schema design and data set. For large or complex data you can also potentially move to [RDS Aurora](https://aws.amazon.com/elasticsearch-service/) which has additional functionality which allows you to scale further.
+RDS MySQL and Postgres give you all the benefits of these RDBMS tools without the burden of managing them yourself. Either one of these database technologies are great for most startups, and allow you to scale quite large, depending on your schema design and data set.
+
+For large or complex data you can also potentially move to [RDS Aurora](https://aws.amazon.com/rds/aurora/) which has additional functionality which allows you to scale further.
 
 #### **Logging**
 
@@ -119,13 +121,17 @@ Whichever language you choose will be automatically set up, Dockerized, and depl
 
 [Golang](https://golang.org/)
 
-Go is a great language for backend application development, especially in a microservices environment. It is a typed, compiled language and can create small, self-contained binaries for any operating system. It has a huge community, and is used by some very significant open source projects such as Kubernetes, and the HashiCorp tools.
+Go is a great language for backend application development, especially in a microservices environment. It is a typed, compiled language with powerful support for parallel processing, and can create small, self-contained binaries for any operating system. It has a huge community, and is used by some very significant open source projects such as Kubernetes, and the HashiCorp tools.
+
+Being a compiled language may slightly raise the barrier to entry for newer developers. Lack of generic types and traditional object-oriented features, and preference for code generation may deter more experienced but unfamiliar developers.
 
 _- OR -_
 
 [Node.js](https://nodejs.org/en/)
 
 Node.js is an extremely popular language for backend development. It has a huge community and tons of libraries available, since it is based on JavaScript. It can also be beneficial to use JavaScript for both the backend and frontend, in case developers are not familiar with other backend languages.
+
+Being a [single-threaded](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/), interpreted language, Node may not be ideal for high-performance applications.
 
 
 ### Frontend

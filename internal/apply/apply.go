@@ -93,6 +93,7 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
 		envList = util.AppendProjectEnvToCmdEnv(credentialEnvs, envList)
 		flog.Debugf("Env injected: %#v", envList)
+		flog.Infof("Executing apply command for %s...", modConfig.Name)
 		util.ExecuteCommand(exec.Command("make"), modulePath, envList)
 		return nil
 	})
