@@ -8,14 +8,16 @@ Zero is a tool which makes it quick and easy for startup technical founders & de
 
 As a technical founder or the first technical hire at a startup, your sole focus is to build the logic for your application and get it into customers’ hands as quickly and reliably as possible. Yet you immediately face multiple hurdles before even writing the first line of code. You’re forced to make many tech trade-offs, leading to decision fatigue. You waste countless hours building boilerplate SaaS features not adding direct value to your customers. You spend precious time picking up unfamiliar tech, make wrong choices that result in costly refactoring or rebuilding in the future, and are unaware of tools and best practices that would speed up your product iteration.
 
-Zero was built by a team of engineers with many years of experience in building and scaling startups. We have faced all the problems you will and want to provide a way for new startups to avoid all those pitfalls. We also want to help you learn about the tech choices we made so your team can become proficient in some of the great tools we have included.
+Zero was built by a team of engineers with many years of experience in building and scaling startups. We have faced all the problems you will and want to provide a way for new startups to avoid all those pitfalls. We also want to help you learn about the tech choices we made so your team can become proficient in some of the great tools we have included. The system you get starts small but allows you to scale well into the future when you need to.
 
-Everything built by Zero is yours. After running the commands to generate your infrastructure, backend, and frontend, all the code is checked into your source control repositories and becomes the basis for your new system. We provide constant updates and new modules that you can pull in on an ongoing basis, but you can also feel free to customize as much as you like with no strings attached. If you do happen to make a change to core functionality and feel like contributing it back to the project, we'd love that too!
+Everything built by Zero is yours. After using Zero to generate your infrastructure, backend, and frontend, all the code is checked into your source control repositories and becomes the basis for your new system. We provide constant updates and new modules that you can pull in on an ongoing basis, but you can also feel free to customize as much as you like with no strings attached. If you do happen to make a change to core functionality and feel like contributing it back to the project, we'd love that too!
+
+It's easy to get started, the only thing you'll need is an AWS account. Just enter your AWS CLI tokens or choose your existing profile during the setup process and everything is built for you automatically using infrastructure-as-code so you can see exactly what's happening and easily modify it if necessary.
 
 [Read about the day-to-day experience of using a system set up using Zero](docs/real-world-usage.md)
 
 
-## Why is Zero Reliable, Scalable, Performant and Secure
+## Why is Zero Reliable, Scalable, Performant, and Secure
 
 Reliability: Your infrastructure will be set up in multiple availability zones making it highly available and fault tolerant. All production workloads will run with multiple instances by default, using AWS ELB and Nginx to load balance traffic. All infrastructure is represented with code using [Hashicorp Terraform][terraform] so your environments are reproducible, auditable, and easy to configure.
 
@@ -25,11 +27,14 @@ Security: Properly configured access-control to resources/security groups, using
 
 
 ## What do you get out of the box?
-[Read about why we made these technology choices and where they are most applicable](docs/technology-choices.md)
+[Read about why we made these technology choices and where they are most applicable.](docs/technology-choices.md)
+
+[Check out some resources for learning more about these technologies.](docs/learning-resources.md)
+
 ### Infrastructure
 - Fully configured infrastructure-as-code AWS environment including:
   - VPCs per environment (staging, production) with pre-configured subnets, security groups, etc.
-  - EKS Kubernetes cluster per environment, pre-configured with tools like cert-manager, external-dns, nginx-ingress-controller
+  - EKS Kubernetes cluster per environment, pre-configured with helpful tools like cert-manager, external-dns, nginx-ingress-controller
   - RDS database for your application (Postgres or MySQL)
   - S3 buckets and Cloudfront distributions to serve your assets
 - Logging and Metrics collected automatically using either Cloudwatch or Prometheus + Grafana, Elasticsearch + Kibana
