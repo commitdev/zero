@@ -8,15 +8,6 @@ As we add features to Zero, we rely heavily on our years of experience with foun
 
 When there are multiple technologies that we consider to be front-runners, we try to add multiple options, along with documentation and use cases to describe in which situations each tool might be the right choice for a project.
 
-### Core principles
-**[Twelve-Factor App](https://12factor.net/)**
-
-The Twelve-Factor App is a methodology for building Software-as-a-Service that encourages building applications in a way that inherently makes them more stable, secure, failure-safe, easier to measure, and easier to reason about. As much as possible we try to stick with these principles when building Zero, as we have seen it to be a very effective way to build scalable, manageable applications.
-
-**[CNCF](https://www.cncf.io/)**
-
-The Cloud Native Computing Foundation hosts and promotes a bunch of great open source software, including Kubernetes, Prometheus, Helm, Fluentd, and Envoy. Their principles and the design of many of the CNCF projects really resonate with the team behind Zero, and we try to make use of CNCF-backed tools whenever possible.
-
 ### Infrastructure
 #### **Cloud Provider**
 
@@ -164,3 +155,11 @@ _- OR -_
 
 GitHub Actions is newer than CircleCI, so it's features are a bit more limited, but the fact that it is integrated with GitHub makes it much easier to get started with. Also similar, it has a free tier with paid versions that add more concurrency. GHA would be useful for projects that don't require a lot of advanced features, visualization, etc.
 
+### Fundamentals
+**[Twelve-Factor App](https://12factor.net/)**
+
+The Twelve-Factor App is a methodology for building Software-as-a-Service that encourages building applications in a way that inherently makes them more stable, secure, failure-safe, easier to measure, and easier to reason about. As much as possible we try to stick with these principles when building Zero, as we have seen it to be a very effective way to build scalable, manageable applications.
+
+**[CNCF](https://www.cncf.io/)**
+
+The Cloud Native Computing Foundation hosts and promotes a bunch of great open source software, including Kubernetes, Prometheus, Helm, Fluentd, and Envoy. Their principles and the design of many of the CNCF projects really resonate with the team behind Zero, and we try to make use of CNCF-backed tools whenever possible.

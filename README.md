@@ -2,7 +2,9 @@
 
 ## What is Zero
 
-Zero is a tool which makes it quick and easy for startup technical founders & developers to build everything they need to launch and grow high-quality SaaS applications faster and more cost-effectively.
+Zero is an open source tool which makes it quick and easy for startup technical founders and developers to build everything they need to launch and grow high-quality SaaS applications faster and more cost-effectively.
+
+Zero sets up everything you need so you can immediately start building your product.
 
 ## Why is Zero good for startups
 
@@ -45,7 +47,7 @@ Security: Properly configured access-control to resources/security groups, using
 
 ### Backend
 - Golang or Node.js example project automatically set up, Dockerized, and deployed to your new Kubernetes cluster
-- CI pipeline built with [CircleCI][circleci] or GitHubActions. Just merge a PR and a deploy will start. Your code will be built and tested, deployed to staging, then prompt you to push to production
+- CI pipeline built with [CircleCI][circleci] or GitHub Actions. Just merge a PR and a deploy will start. Your code will be built and tested, deployed to staging, then prompt you to push to production
 - File upload / download support using signed Cloudfront URLs (Optional)
 - Email support using [SendGrid][sendgrid] or AWS SES (Optional)
 - Notification support for sending and receiving messages in your application (web, mobile, SMS, Email, etc.) (Optional) (In Progress)
