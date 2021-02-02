@@ -19,7 +19,7 @@ It's easy to get started, the only thing you'll need is an AWS account. Just ent
 
 ## Why is Zero Reliable, Scalable, Performant, and Secure
 
-Reliability: Your infrastructure will be set up in multiple availability zones making it highly available and fault tolerant. All production workloads will run with multiple instances by default, using AWS ELB and Nginx to load balance traffic. All infrastructure is represented with code using [Hashicorp Terraform][terraform] so your environments are reproducible, auditable, and easy to configure.
+Reliability: Your infrastructure will be set up in multiple availability zones making it highly available and fault tolerant. All production workloads will run with multiple instances by default, using AWS ELB and Nginx to load balance traffic. All infrastructure is represented with code using [HashiCorp Terraform][terraform] so your environments are reproducible, auditable, and easy to configure.
 
 Scalability: Your services will be running in Kubernetes, with the EKS nodes running in an AWS [Auto Scaling Group][asg]. Both the application workloads and cluster size are ready to scale whenever the need arises. Your frontend assets will be stored in S3 and served from AWS' Cloudfront CDN which operates at global scale.
 
