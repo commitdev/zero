@@ -111,7 +111,6 @@ A few caveats before getting started:
 
 - It is recommended practice to [create a GitHub org](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/creating-a-new-organization-from-scratch) where your code is going to live. If you choose, after creating your codebases, Zero will automatically create repositories and check in your code for you. You will need to [create a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) to enable this.
 
-- You will need a GitHub Personal Access Token if you want Zero
 <details>
   <summary>If using CircleCI as your build pipeline ...</summary>
 
