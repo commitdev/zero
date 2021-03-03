@@ -22,7 +22,10 @@ import (
 func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfig {
 	projectConfig := defaultProjConfig()
 
-	projectConfig.Name = getProjectNamePrompt().GetParam(projectConfig.Parameters)
+	projectRootParams := map[string]string{}
+	promptName := getProjectNamePrompt()
+	promptName.RunPrompt(projectRootParams)
+	projectConfig.Name = projectRootParams[promptName.Field]
 
 	rootDir := path.Join(outDir, projectConfig.Name)
 	flog.Infof(":tada: Initializing project")
@@ -41,44 +44,23 @@ func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfi
 
 	initParams := make(map[string]string)
 	projectConfig.ShouldPushRepositories = true
-	initParams["ShouldPushRepositories"] = prompts["ShouldPushRepositories"].GetParam(initParams)
+	prompts["ShouldPushRepositories"].RunPrompt(initParams)
 	if initParams["ShouldPushRepositories"] == "n" {
 		projectConfig.ShouldPushRepositories = false
 	}
 
 	// Prompting for push-up stream, then conditionally prompting for github
-	initParams["GithubRootOrg"] = prompts["GithubRootOrg"].GetParam(initParams)
-	projectCredentials := globalconfig.GetProjectCredentials(projectConfig.Name)
-	credentialPrompts := getCredentialPrompts(projectCredentials, moduleConfigs)
-	projectCredentials = promptCredentialsAndFillProjectCreds(credentialPrompts, projectCredentials)
-	globalconfig.Save(projectCredentials)
-	projectParameters := promptAllModules(moduleConfigs, projectCredentials)
+	prompts["GithubRootOrg"].RunPrompt(initParams)
+
+	projectData := promptAllModules(moduleConfigs)
 
 	// Map parameter values back to specific modules
 	for moduleName, module := range moduleConfigs {
-		repoName := prompts[moduleName].GetParam(initParams)
+		prompts[moduleName].RunPrompt(initParams)
+		repoName := initParams[prompts[moduleName].Field]
 		repoURL := fmt.Sprintf("%s/%s", initParams["GithubRootOrg"], repoName)
-		projectModuleParams := make(projectconfig.Parameters)
-		projectModuleConditions := []projectconfig.Condition{}
-
-		// Loop through all the prompted values and find the ones relevant to this module
-		for parameterKey, parameterValue := range projectParameters {
-			for _, moduleParameter := range module.Parameters {
-				if moduleParameter.Field == parameterKey {
-					projectModuleParams[parameterKey] = parameterValue
-				}
-			}
-		}
-
-		for _, condition := range module.Conditions {
-			newCond := projectconfig.Condition{
-				Action:     condition.Action,
-				MatchField: condition.MatchField,
-				WhenValue:  condition.WhenValue,
-				Data:       condition.Data,
-			}
-			projectModuleConditions = append(projectModuleConditions, newCond)
-		}
+		projectModuleParams := moduleconfig.SummarizeParameters(module, projectData)
+		projectModuleConditions := moduleconfig.SummarizeConditions(module)
 
 		projectConfig.Modules[moduleName] = projectconfig.NewModule(
 			projectModuleParams,
@@ -89,9 +71,6 @@ func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfi
 			projectModuleConditions,
 		)
 	}
-
-	// TODO: load ~/.zero/config.yml (or credentials)
-	// TODO: prompt global credentials
 
 	return &projectConfig
 }
@@ -117,20 +96,6 @@ func loadAllModules(moduleSources []string) (map[string]moduleconfig.ModuleConfi
 		mappedSources[mod.Name] = moduleSource
 	}
 	return modules, mappedSources
-}
-
-// promptAllModules takes a map of all the modules and prompts the user for values for all the parameters
-func promptAllModules(modules map[string]moduleconfig.ModuleConfig, projectCredentials globalconfig.ProjectCredential) map[string]string {
-	parameterValues := map[string]string{"projectName": projectCredentials.ProjectName}
-	for _, config := range modules {
-		var err error
-
-		parameterValues, err = PromptModuleParams(config, parameterValues, projectCredentials)
-		if err != nil {
-			exit.Fatal("Exiting prompt:  %v\n", err)
-		}
-	}
-	return parameterValues
 }
 
 // Project name is prompt individually because the rest of the prompts

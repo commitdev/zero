@@ -25,8 +25,8 @@ func TestGetParam(t *testing.T) {
 			initPrompts.NoValidation,
 		}
 
-		result := prompt.GetParam(projectParams)
-		assert.Equal(t, "my-acconut-id", result)
+		prompt.RunPrompt(projectParams)
+		assert.Equal(t, "my-acconut-id", projectParams[param.Field])
 	})
 
 	t.Run("executes with project context", func(t *testing.T) {
@@ -41,10 +41,9 @@ func TestGetParam(t *testing.T) {
 			initPrompts.NoValidation,
 		}
 
-		result := prompt.GetParam(map[string]string{
-			"INJECTEDENV": "SOME_ENV_VAR_VALUE",
-		})
-		assert.Equal(t, "SOME_ENV_VAR_VALUE", result)
+		projectParams := map[string]string{"INJECTEDENV": "SOME_ENV_VAR_VALUE"}
+		prompt.RunPrompt(projectParams)
+		assert.Equal(t, "SOME_ENV_VAR_VALUE", projectParams[param.Field])
 	})
 
 	t.Run("Should return static value", func(t *testing.T) {
@@ -59,8 +58,27 @@ func TestGetParam(t *testing.T) {
 			initPrompts.NoValidation,
 		}
 
-		result := prompt.GetParam(projectParams)
-		assert.Equal(t, "lorem-ipsum", result)
+		prompt.RunPrompt(projectParams)
+		assert.Equal(t, "lorem-ipsum", projectParams[param.Field])
 	})
 
+	t.Run("Prompt value to retain existing params", func(t *testing.T) {
+		projectParams = map[string]string{
+			"existing_value": "foo",
+		}
+		param := moduleconfig.Parameter{
+			Field: "new_value",
+			Value: "bar",
+		}
+
+		prompt := initPrompts.PromptHandler{
+			param,
+			initPrompts.NoCondition,
+			initPrompts.NoValidation,
+		}
+
+		prompt.RunPrompt(projectParams)
+		assert.Equal(t, "foo", projectParams["existing_value"])
+		assert.Equal(t, "bar", projectParams[param.Field])
+	})
 }

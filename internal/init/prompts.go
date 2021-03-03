@@ -16,6 +16,7 @@ import (
 	"github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
+	"github.com/k0kubun/pp"
 	"github.com/manifoldco/promptui"
 	"gopkg.in/yaml.v2"
 )
@@ -103,7 +104,13 @@ func ValidateProjectName(input string) error {
 	return nil
 }
 
-func (p PromptHandler) GetParam(projectParams map[string]string) string {
+// Getting param to fill in to zero-project.yml, there are multiple ways of obtaining the value
+// values go into params depending on `Condition` as the highest precedence (Whether it gets this value)
+// then follows this order to determine HOW it obtains that value
+// 1. Execute (this could potentially be refactored into type + data)
+// 2. type: specific ways of obtaining values (in AWS credential case it will set 2 values to the map)
+//3.
+func (p PromptHandler) RunPrompt(projectParams map[string]string) {
 	var err error
 	var result string
 
@@ -117,6 +124,8 @@ func (p PromptHandler) GetParam(projectParams map[string]string) string {
 		// it wouldnt leak things the module shouldnt have access to
 		if p.Parameter.Execute != "" {
 			result = executeCmd(p.Parameter.Execute, projectParams)
+		} else if p.Parameter.Type != "" {
+			CustomPromptHandler(p.Parameter.Type, projectParams)
 		} else if p.Parameter.Value != "" {
 			result = p.Parameter.Value
 		} else {
@@ -126,9 +135,11 @@ func (p PromptHandler) GetParam(projectParams map[string]string) string {
 			exit.Fatal("Exiting prompt:  %v\n", err)
 		}
 
-		return sanitizeParameterValue(result)
+		// Append the result to parameter map
+		projectParams[p.Field] = sanitizeParameterValue(result)
+	} else {
+		flog.Debugf("Skipping prompt(%s) due to condition failed", p.Field)
 	}
-	return ""
 }
 
 func promptParameter(prompt PromptHandler) (error, string) {
@@ -165,6 +176,7 @@ func promptParameter(prompt PromptHandler) (error, string) {
 }
 
 func executeCmd(command string, envVars map[string]string) string {
+	pp.Print(envVars)
 	cmd := exec.Command("bash", "-c", command)
 	cmd.Env = util.AppendProjectEnvToCmdEnv(envVars, os.Environ())
 	out, err := cmd.Output()
@@ -183,22 +195,22 @@ func sanitizeParameterValue(str string) string {
 }
 
 // PromptParams renders series of prompt UI based on the config
-func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string, projectCredentials globalconfig.ProjectCredential) (map[string]string, error) {
-	credentialEnvs := projectCredentials.SelectedVendorsCredentialsAsEnv(moduleConfig.RequiredCredentials)
-	for _, promptConfig := range moduleConfig.Parameters {
+func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string) (map[string]string, error) {
+
+	for _, parameter := range moduleConfig.Parameters {
 		// deduplicate fields already prompted and received
-		if _, isAlreadySet := parameters[promptConfig.Field]; isAlreadySet {
+		if _, isAlreadySet := parameters[parameter.Field]; isAlreadySet {
 			continue
 		}
 
 		var validateFunc func(input string) error = nil
 
 		// type:regex field validation for zero-module.yaml
-		if promptConfig.FieldValidation.Type == constants.RegexValidation {
+		if parameter.FieldValidation.Type == constants.RegexValidation {
 			validateFunc = func(input string) error {
-				var regexRule = regexp.MustCompile(promptConfig.FieldValidation.Value)
+				var regexRule = regexp.MustCompile(parameter.FieldValidation.Value)
 				if !regexRule.MatchString(input) {
-					return errors.New(promptConfig.FieldValidation.ErrorMessage)
+					return errors.New(parameter.FieldValidation.ErrorMessage)
 				}
 				return nil
 			}
@@ -206,21 +218,64 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 		// TODO: type:fuction field validation for zero-module.yaml
 
 		promptHandler := PromptHandler{
-			Parameter: promptConfig,
-			Condition: NoCondition,
+			Parameter: parameter,
+			Condition: paramConditionsMapper(parameter.Conditions),
 			Validate:  validateFunc,
 		}
 		// merging the context of param and credentals
 		// this treats credentialEnvs as throwaway, parameters is shared between modules
 		// so credentials should not be in parameters as it gets returned to parent
-		for k, v := range parameters {
-			credentialEnvs[k] = v
-		}
-		result := promptHandler.GetParam(credentialEnvs)
+		// for k, v := range parameters {
+		// 	credentialEnvs[k] = v
+		// }
+		promptHandler.RunPrompt(parameters)
 
-		parameters[promptConfig.Field] = result
+		// parameters[parameter.Field] = result
+		pp.Print("Module is done processing %s", moduleConfig.Name)
+		pp.Print(parameters)
 	}
 	return parameters, nil
+}
+
+// promptAllModules takes a map of all the modules and prompts the user for values for all the parameters
+// Important: This is done here because in this step we share the parameter across modules,
+// meaning if module A and B both asks for region, it will reuse the response for both (and is deduped during runtime)
+func promptAllModules(modules map[string]moduleconfig.ModuleConfig) map[string]string {
+	parameterValues := map[string]string{}
+	for _, config := range modules {
+		var err error
+
+		parameterValues, err = PromptModuleParams(config, parameterValues)
+		if err != nil {
+			exit.Fatal("Exiting prompt:  %v\n", err)
+		}
+	}
+	return parameterValues
+}
+
+func paramConditionsMapper(conditions []moduleconfig.Condition) CustomConditionSignature {
+	if len(conditions) == 0 {
+		return NoCondition
+	} else {
+		return func(params map[string]string) bool {
+			// Prompts must pass every condition to proceed
+			for i := 0; i < len(conditions); i++ {
+				if !conditionHandler(conditions[i])(params) {
+					flog.Debugf("Did not meet condition %v, expected %v to be %v", conditions[i].Action, conditions[i].MatchField, conditions[i].WhenValue)
+					return false
+				}
+			}
+			return true
+		}
+	}
+}
+func conditionHandler(cond moduleconfig.Condition) CustomConditionSignature {
+	if cond.Action == "KeyMatchCondition" {
+		return KeyMatchCondition(cond.MatchField, cond.WhenValue)
+	} else {
+		flog.Errorf("Unsupported condition")
+		return nil
+	}
 }
 
 func promptCredentialsAndFillProjectCreds(credentialPrompts []CredentialPrompts, creds globalconfig.ProjectCredential) globalconfig.ProjectCredential {
@@ -232,7 +287,7 @@ func promptCredentialsAndFillProjectCreds(credentialPrompts []CredentialPrompts,
 
 		// vendors like AWS have multiple prompts (accessKeyId and secretAccessKey)
 		for _, prompt := range prompts.Prompts {
-			vendorPromptValues[prompt.Field] = prompt.GetParam(vendorPromptValues)
+			prompt.RunPrompt(vendorPromptValues)
 		}
 		promptsValues[vendor] = vendorPromptValues
 	}

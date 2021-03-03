@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/commitdev/zero/internal/config/moduleconfig"
+	"github.com/k0kubun/pp"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/commitdev/zero/internal/module"
@@ -44,6 +45,17 @@ func TestParseModuleConfig(t *testing.T) {
 		}
 		assert.Equal(t, "platform", param.Field)
 		assert.Equal(t, "CI Platform", param.Label)
+		assert.Equal(t, false, param.OmitFromProjectFile)
+
+		useCredsParam, _ := findParameter(mod.Parameters, "useExistingAwsProfile")
+		assert.Equal(t, "useExistingAwsProfile", useCredsParam.Field)
+		assert.Equal(t, "Use credentials from an existing AWS profile?", useCredsParam.Label)
+		assert.Equal(t, true, useCredsParam.OmitFromProjectFile)
+		pp.Print(useCredsParam)
+
+		awsCredsParam, _ := findParameter(mod.Parameters, "awsCredentials")
+		pp.Print(awsCredsParam)
+
 	})
 
 	t.Run("requiredCredentials are loaded", func(t *testing.T) {

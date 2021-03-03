@@ -9,8 +9,10 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/iancoleman/strcase"
+	"github.com/pkg/errors"
 )
 
 type ModuleConfig struct {
@@ -25,20 +27,23 @@ type ModuleConfig struct {
 }
 
 type Parameter struct {
-	Field           string
-	Label           string   `yaml:"label,omitempty"`
-	Options         []string `yaml:"options,omitempty"`
-	Execute         string   `yaml:"execute,omitempty"`
-	Value           string   `yaml:"value,omitempty"`
-	Default         string   `yaml:"default,omitempty"`
-	Info            string   `yaml:"info,omitempty"`
-	FieldValidation Validate `yaml:"fieldValidation,omitempty"`
+	Field               string
+	Label               string      `yaml:"label,omitempty"`
+	Options             []string    `yaml:"options,omitempty"`
+	Execute             string      `yaml:"execute,omitempty"`
+	Value               string      `yaml:"value,omitempty"`
+	Default             string      `yaml:"default,omitempty"`
+	Info                string      `yaml:"info,omitempty"`
+	FieldValidation     Validate    `yaml:"fieldValidation,omitempty"`
+	Type                string      `yaml:"type,omitempty"`
+	OmitFromProjectFile bool        `yaml:"omitFromProjectFile,omitempty"`
+	Conditions          []Condition `yaml:"conditions,omitempty"`
 }
 
 type Condition struct {
 	Action     string   `yaml:"action"`
 	MatchField string   `yaml:"matchField"`
-	WhenValue  string   `yaml:"whenValue"`
+	WhenValue  string   `yaml:"whenValue,omitempty"`
 	Data       []string `yaml:"data,omitempty"`
 }
 
@@ -76,6 +81,7 @@ func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 		return config, err
 	}
 
+	validateParams(config.Parameters)
 	missing := config.collectMissing()
 	if len(missing) > 0 {
 		flog.Errorf("%v is missing information", filePath)
@@ -88,6 +94,15 @@ func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 	}
 
 	return config, nil
+}
+
+func validateParams(params []Parameter) error {
+	for _, param := range params {
+		if param.Type != "" {
+			return errors.Errorf("type is not supported")
+		}
+	}
+	return nil
 }
 
 // Recurses through a datastructure to find any missing data.
@@ -157,4 +172,35 @@ func findMissing(obj reflect.Value, path, metadata string, missing *[]string) {
 			findMissing(fieldVal, prefix, fieldTags, missing)
 		}
 	}
+}
+
+func SummarizeParameters(module ModuleConfig, allParams map[string]string) map[string]string {
+	moduleParams := make(projectconfig.Parameters)
+	// Loop through all the prompted values and find the ones relevant to this module
+	for parameterKey, parameterValue := range allParams {
+		for _, moduleParameter := range module.Parameters {
+			if moduleParameter.Field == parameterKey {
+				if moduleParameter.OmitFromProjectFile {
+					flog.Debugf("Omitted %s from %s", parameterKey, module.Name)
+				} else {
+					moduleParams[parameterKey] = parameterValue
+				}
+			}
+		}
+	}
+	return moduleParams
+}
+
+func SummarizeConditions(module ModuleConfig) []projectconfig.Condition {
+	moduleConditions := []projectconfig.Condition{}
+	for _, condition := range module.Conditions {
+		newCond := projectconfig.Condition{
+			Action:     condition.Action,
+			MatchField: condition.MatchField,
+			WhenValue:  condition.WhenValue,
+			Data:       condition.Data,
+		}
+		moduleConditions = append(moduleConditions, newCond)
+	}
+	return moduleConditions
 }

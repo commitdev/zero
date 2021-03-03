@@ -31,3 +31,34 @@ parameters:
     options:
       - github
       - circlci
+  - field: circleci_api_key
+    label: "Circle CI API Key to setup your CI/CD for repositories"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: platform
+      whenValue: "circlci"
+  - field: useExistingAwsProfile
+    label: "Use credentials from an existing AWS profile?"
+    options:
+      - "yes"
+      - "no"
+    omitFromProjectFile: yes
+  - field: profilePicker
+    omitFromProjectFile: yes
+    type: AWSProfilePicker
+    conditions:
+    - action: KeyMatchCondition
+      whenValue: "yes"
+      matchField: useExistingAwsProfile
+  - field: accessKeyId
+    label: AWS AccessKeyId
+    conditions:
+    - action: KeyMatchCondition
+      whenValue: "no"
+      matchField: useExistingAwsProfile
+  - field: secretAccessKey
+    label: AWS SecretAccessKey
+    conditions:
+    - action: KeyMatchCondition
+      whenValue: "no"
+      matchField: useExistingAwsProfile

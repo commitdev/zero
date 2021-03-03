@@ -11,12 +11,28 @@ import (
 	"github.com/commitdev/zero/internal/config/globalconfig"
 )
 
+type AWSResourceConfig struct {
+	AccessKeyID     string `yaml:"accessKeyId,omitempty" env:"AWS_ACCESS_KEY_ID,omitempty"`
+	SecretAccessKey string `yaml:"secretAccessKey,omitempty" env:"AWS_SECRET_ACCESS_KEY,omitempty"`
+}
+
 func AwsCredsPath() string {
 	usr, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
 	}
 	return filepath.Join(usr.HomeDir, ".aws/credentials")
+}
+
+func FillAWSProfile(profileName string, paramsToFill map[string]string) error {
+	awsPath := AwsCredsPath()
+	awsCreds, err := credentials.NewSharedCredentials(awsPath, profileName).Get()
+	if err != nil {
+		return err
+	}
+	paramsToFill["accessKeyId"] = awsCreds.AccessKeyID
+	paramsToFill["secretAccessKey"] = awsCreds.SecretAccessKey
+	return nil
 }
 
 func GetAWSProfileProjectCredentials(profileName string, creds globalconfig.ProjectCredential) globalconfig.ProjectCredential {
