@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/commitdev/zero/internal/util"
 )
 
 type AWSResourceConfig struct {
@@ -25,14 +26,25 @@ func awsCredsPath() string {
 	return filepath.Join(usr.HomeDir, ".aws/credentials")
 }
 
+func fetchAWSConfig(awsPath string, profileName string) (error, AWSResourceConfig) {
+
+	awsCreds, err := credentials.NewSharedCredentials(awsPath, profileName).Get()
+	if err != nil {
+		return err, AWSResourceConfig{}
+	}
+	return nil, AWSResourceConfig{
+		AccessKeyID:     awsCreds.AccessKeyID,
+		SecretAccessKey: awsCreds.SecretAccessKey,
+	}
+}
+
 func FillAWSProfile(profileName string, paramsToFill map[string]string) error {
 	awsPath := GetAWSCredsPath()
-	awsCreds, err := credentials.NewSharedCredentials(awsPath, profileName).Get()
+	err, awsCreds := fetchAWSConfig(awsPath, profileName)
 	if err != nil {
 		return err
 	}
-	paramsToFill["accessKeyId"] = awsCreds.AccessKeyID
-	paramsToFill["secretAccessKey"] = awsCreds.SecretAccessKey
+	util.ReflectStructValueIntoMap(awsCreds, "yaml", paramsToFill)
 	return nil
 }
 
