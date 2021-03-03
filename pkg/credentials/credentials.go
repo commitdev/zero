@@ -8,7 +8,6 @@ import (
 	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/commitdev/zero/internal/config/globalconfig"
 )
 
 type AWSResourceConfig struct {
@@ -16,7 +15,9 @@ type AWSResourceConfig struct {
 	SecretAccessKey string `yaml:"secretAccessKey,omitempty" env:"AWS_SECRET_ACCESS_KEY,omitempty"`
 }
 
-func AwsCredsPath() string {
+var GetAWSCredsPath = awsCredsPath
+
+func awsCredsPath() string {
 	usr, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
@@ -25,7 +26,7 @@ func AwsCredsPath() string {
 }
 
 func FillAWSProfile(profileName string, paramsToFill map[string]string) error {
-	awsPath := AwsCredsPath()
+	awsPath := GetAWSCredsPath()
 	awsCreds, err := credentials.NewSharedCredentials(awsPath, profileName).Get()
 	if err != nil {
 		return err
@@ -33,21 +34,6 @@ func FillAWSProfile(profileName string, paramsToFill map[string]string) error {
 	paramsToFill["accessKeyId"] = awsCreds.AccessKeyID
 	paramsToFill["secretAccessKey"] = awsCreds.SecretAccessKey
 	return nil
-}
-
-func GetAWSProfileProjectCredentials(profileName string, creds globalconfig.ProjectCredential) globalconfig.ProjectCredential {
-	awsPath := AwsCredsPath()
-	return GetAWSProfileCredentials(awsPath, profileName, creds)
-}
-
-func GetAWSProfileCredentials(credsPath string, profileName string, creds globalconfig.ProjectCredential) globalconfig.ProjectCredential {
-	awsCreds, err := credentials.NewSharedCredentials(credsPath, profileName).Get()
-	if err != nil {
-		log.Fatal(err)
-	}
-	creds.AWSResourceConfig.AccessKeyID = awsCreds.AccessKeyID
-	creds.AWSResourceConfig.SecretAccessKey = awsCreds.SecretAccessKey
-	return creds
 }
 
 // GetAWSProfiles returns a list of AWS forprofiles set up on the user's sytem

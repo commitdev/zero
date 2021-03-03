@@ -9,16 +9,13 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
-	"github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/k0kubun/pp"
 	"github.com/manifoldco/promptui"
-	"gopkg.in/yaml.v2"
 )
 
 // Constant to maintain prompt orders so users can have the same flow,
@@ -276,34 +273,6 @@ func conditionHandler(cond moduleconfig.Condition) CustomConditionSignature {
 		flog.Errorf("Unsupported condition")
 		return nil
 	}
-}
-
-func promptCredentialsAndFillProjectCreds(credentialPrompts []CredentialPrompts, creds globalconfig.ProjectCredential) globalconfig.ProjectCredential {
-	promptsValues := map[string]map[string]string{}
-
-	for _, prompts := range credentialPrompts {
-		vendor := prompts.Vendor
-		vendorPromptValues := map[string]string{}
-
-		// vendors like AWS have multiple prompts (accessKeyId and secretAccessKey)
-		for _, prompt := range prompts.Prompts {
-			prompt.RunPrompt(vendorPromptValues)
-		}
-		promptsValues[vendor] = vendorPromptValues
-	}
-
-	// FIXME: what is a good way to dynamically modify partial data of a struct
-	// current just marashing to yaml, then unmarshaling into the base struct
-	yamlContent, _ := yaml.Marshal(promptsValues)
-	yaml.Unmarshal(yamlContent, &creds)
-
-	// Fill AWS credentials based on profile from ~/.aws/credentials
-	if val, ok := promptsValues["aws"]; ok {
-		if val["use_aws_profile"] == awsPickProfile {
-			creds = credentials.GetAWSProfileProjectCredentials(val["aws_profile"], creds)
-		}
-	}
-	return creds
 }
 
 func appendToSet(set []string, toAppend []string) []string {

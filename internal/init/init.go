@@ -6,13 +6,10 @@ import (
 	"path"
 	"sync"
 
-	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/registry"
-	"github.com/commitdev/zero/internal/util"
-	project "github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/manifoldco/promptui"
@@ -149,123 +146,6 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 	}
 
 	return handlers
-}
-
-func getCredentialPrompts(projectCredentials globalconfig.ProjectCredential, moduleConfigs map[string]moduleconfig.ModuleConfig) []CredentialPrompts {
-	var uniqueVendors []string
-	for _, module := range moduleConfigs {
-		uniqueVendors = appendToSet(uniqueVendors, module.RequiredCredentials)
-	}
-
-	// map is to keep track of which vendor they belong to, to fill them back into the projectConfig
-	prompts := []CredentialPrompts{}
-	for _, vendor := range AvailableVendorOrders {
-		if util.ItemInSlice(uniqueVendors, vendor) {
-			vendorPrompts := CredentialPrompts{vendor, mapVendorToPrompts(projectCredentials, vendor)}
-			prompts = append(prompts, vendorPrompts)
-		}
-	}
-	return prompts
-}
-
-func mapVendorToPrompts(projectCred globalconfig.ProjectCredential, vendor string) []PromptHandler {
-	var prompts []PromptHandler
-	profiles, err := project.GetAWSProfiles()
-	if err != nil {
-		profiles = []string{}
-	}
-
-	// if no profiles available, dont prompt use to pick profile
-	customAwsPickProfileCondition := func(param map[string]string) bool {
-		if len(profiles) == 0 {
-			flog.Infof(":warning: No AWS profiles found, please manually input AWS credentials")
-			return false
-		} else {
-			return true
-		}
-	}
-
-	// condition for prompting manual AWS credentials input
-	customAwsMustInputCondition := func(param map[string]string) bool {
-		toPickProfile := awsPickProfile
-		if val, ok := param["use_aws_profile"]; ok && val != toPickProfile {
-			return true
-		}
-		return false
-	}
-
-	switch vendor {
-	case "aws":
-		awsPrompts := []PromptHandler{
-			{
-				Parameter: moduleconfig.Parameter{
-					Field:   "use_aws_profile",
-					Label:   "Use credentials from existing AWS profiles?",
-					Options: []string{awsPickProfile, awsManualInputCredentials},
-				},
-				Condition: customAwsPickProfileCondition,
-				Validate:  NoValidation,
-			},
-			{
-				Parameter: moduleconfig.Parameter{
-					Field:   "aws_profile",
-					Label:   "Select AWS Profile",
-					Options: profiles,
-				},
-				Condition: KeyMatchCondition("use_aws_profile", awsPickProfile),
-				Validate:  NoValidation,
-			},
-			{
-				Parameter: moduleconfig.Parameter{
-					Field:   "accessKeyId",
-					Label:   "AWS Access Key ID",
-					Default: projectCred.AWSResourceConfig.AccessKeyID,
-					Info: `AWS Access Key ID/Secret: used for provisioning infrastructure in AWS
-The token can be generated at https://console.aws.amazon.com/iam/home?#/security_credentials`,
-				},
-				Condition: CustomCondition(customAwsMustInputCondition),
-				Validate:  ValidateAKID,
-			},
-			{
-				Parameter: moduleconfig.Parameter{
-					Field:   "secretAccessKey",
-					Label:   "AWS Secret access key",
-					Default: projectCred.AWSResourceConfig.SecretAccessKey,
-				},
-				Condition: CustomCondition(customAwsMustInputCondition),
-				Validate:  ValidateSAK,
-			},
-		}
-		prompts = append(prompts, awsPrompts...)
-	case "github":
-		githubPrompt := PromptHandler{
-			Parameter: moduleconfig.Parameter{
-				Field:   "accessToken",
-				Label:   "Github Personal Access Token with access to the above organization",
-				Default: projectCred.GithubResourceConfig.AccessToken,
-				Info: `Github personal access token: used for creating repositories for your project
-Requires the following permissions: [repo::public_repo, admin::orgread:org]
-The token can be created at https://github.com/settings/tokens`,
-			},
-			Condition: NoCondition,
-			Validate:  NoValidation,
-		}
-		prompts = append(prompts, githubPrompt)
-	case "circleci":
-		circleCiPrompt := PromptHandler{
-			Parameter: moduleconfig.Parameter{
-				Field:   "apiKey",
-				Label:   "Circleci api key for CI/CD",
-				Default: projectCred.CircleCiResourceConfig.ApiKey,
-				Info: `CircleCI api token: used for setting up CI/CD for your project
-The token can be created at https://app.circleci.com/settings/user/tokens`,
-			},
-			Condition: NoCondition,
-			Validate:  NoValidation,
-		}
-		prompts = append(prompts, circleCiPrompt)
-	}
-	return prompts
 }
 
 func chooseCloudProvider(projectConfig *projectconfig.ZeroProjectConfig) {
