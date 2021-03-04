@@ -12,7 +12,6 @@ import (
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/iancoleman/strcase"
-	"github.com/pkg/errors"
 )
 
 type ModuleConfig struct {
@@ -38,12 +37,13 @@ type Parameter struct {
 	Type                string      `yaml:"type,omitempty"`
 	OmitFromProjectFile bool        `yaml:"omitFromProjectFile,omitempty"`
 	Conditions          []Condition `yaml:"conditions,omitempty"`
+	EnvVarName          string      `yaml:"envVarName,omitempty"`
 }
 
 type Condition struct {
 	Action     string   `yaml:"action"`
 	MatchField string   `yaml:"matchField"`
-	WhenValue  string   `yaml:"whenValue,omitempty"`
+	WhenValue  string   `yaml:"whenValue"`
 	Data       []string `yaml:"data,omitempty"`
 }
 
@@ -68,6 +68,17 @@ func (cfg ModuleConfig) collectMissing() []string {
 	return missing
 }
 
+func (cfg ModuleConfig) GetParamEnvVarTranslationMap() map[string]string {
+	translationMap := make(map[string]string)
+	for i := 0; i < len(cfg.Parameters); i++ {
+		param := cfg.Parameters[i]
+		if param.EnvVarName != "" {
+			translationMap[param.Field] = param.EnvVarName
+		}
+	}
+	return translationMap
+}
+
 func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 	config := ModuleConfig{}
 
@@ -81,7 +92,6 @@ func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 		return config, err
 	}
 
-	validateParams(config.Parameters)
 	missing := config.collectMissing()
 	if len(missing) > 0 {
 		flog.Errorf("%v is missing information", filePath)
@@ -94,15 +104,6 @@ func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 	}
 
 	return config, nil
-}
-
-func validateParams(params []Parameter) error {
-	for _, param := range params {
-		if param.Type != "" {
-			return errors.Errorf("type is not supported")
-		}
-	}
-	return nil
 }
 
 // Recurses through a datastructure to find any missing data.

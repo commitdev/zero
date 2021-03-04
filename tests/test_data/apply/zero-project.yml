@@ -4,6 +4,7 @@ modules:
     project1:
         parameters:
             foo: bar
+            param1: baz
         files:
             dir: project1
             repo: github.com/commitdev/project1

@@ -14,7 +14,6 @@ import (
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
-	"github.com/k0kubun/pp"
 	"github.com/manifoldco/promptui"
 )
 
@@ -107,7 +106,7 @@ func ValidateProjectName(input string) error {
 // 1. Execute (this could potentially be refactored into type + data)
 // 2. type: specific ways of obtaining values (in AWS credential case it will set 2 values to the map)
 //3.
-func (p PromptHandler) RunPrompt(projectParams map[string]string) {
+func (p PromptHandler) RunPrompt(projectParams map[string]string, envVarTranslationMap map[string]string) {
 	var err error
 	var result string
 
@@ -120,7 +119,7 @@ func (p PromptHandler) RunPrompt(projectParams map[string]string) {
 		// so if community module has an `execute: twitter tweet $ENV`
 		// it wouldnt leak things the module shouldnt have access to
 		if p.Parameter.Execute != "" {
-			result = executeCmd(p.Parameter.Execute, projectParams)
+			result = executeCmd(p.Parameter.Execute, projectParams, envVarTranslationMap)
 		} else if p.Parameter.Type != "" {
 			CustomPromptHandler(p.Parameter.Type, projectParams)
 		} else if p.Parameter.Value != "" {
@@ -172,10 +171,11 @@ func promptParameter(prompt PromptHandler) (error, string) {
 	return nil, result
 }
 
-func executeCmd(command string, envVars map[string]string) string {
-	pp.Print(envVars)
+func executeCmd(command string, envVars map[string]string, envVarTranslationMap map[string]string) string {
 	cmd := exec.Command("bash", "-c", command)
-	cmd.Env = util.AppendProjectEnvToCmdEnv(envVars, os.Environ())
+	// Might need to pass down module's translation map as well,
+	// currently only works in `zero apply`
+	cmd.Env = util.AppendProjectEnvToCmdEnv(envVars, os.Environ(), envVarTranslationMap)
 	out, err := cmd.Output()
 	flog.Debugf("Running command: %s", command)
 	if err != nil {
@@ -193,7 +193,7 @@ func sanitizeParameterValue(str string) string {
 
 // PromptParams renders series of prompt UI based on the config
 func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string) (map[string]string, error) {
-
+	envVarTranslationMap := moduleConfig.GetParamEnvVarTranslationMap()
 	for _, parameter := range moduleConfig.Parameters {
 		// deduplicate fields already prompted and received
 		if _, isAlreadySet := parameters[parameter.Field]; isAlreadySet {
@@ -225,12 +225,9 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 		// for k, v := range parameters {
 		// 	credentialEnvs[k] = v
 		// }
-		promptHandler.RunPrompt(parameters)
-
-		// parameters[parameter.Field] = result
-		pp.Print("Module is done processing %s", moduleConfig.Name)
-		pp.Print(parameters)
+		promptHandler.RunPrompt(parameters, envVarTranslationMap)
 	}
+	flog.Debugf("Module %s prompt: \n %#v", moduleConfig.Name, parameters)
 	return parameters, nil
 }
 
@@ -257,8 +254,9 @@ func paramConditionsMapper(conditions []moduleconfig.Condition) CustomConditionS
 		return func(params map[string]string) bool {
 			// Prompts must pass every condition to proceed
 			for i := 0; i < len(conditions); i++ {
-				if !conditionHandler(conditions[i])(params) {
-					flog.Debugf("Did not meet condition %v, expected %v to be %v", conditions[i].Action, conditions[i].MatchField, conditions[i].WhenValue)
+				cond := conditions[i]
+				if !conditionHandler(cond)(params) {
+					flog.Debugf("Did not meet condition %v, expected %v to be %v", cond.Action, cond.MatchField, cond.WhenValue)
 					return false
 				}
 			}

@@ -20,8 +20,9 @@ func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfi
 	projectConfig := defaultProjConfig()
 
 	projectRootParams := map[string]string{}
+	emptyEnvVarTranslationMap := map[string]string{}
 	promptName := getProjectNamePrompt()
-	promptName.RunPrompt(projectRootParams)
+	promptName.RunPrompt(projectRootParams, emptyEnvVarTranslationMap)
 	projectConfig.Name = projectRootParams[promptName.Field]
 
 	rootDir := path.Join(outDir, projectConfig.Name)
@@ -41,19 +42,19 @@ func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfi
 
 	initParams := make(map[string]string)
 	projectConfig.ShouldPushRepositories = true
-	prompts["ShouldPushRepositories"].RunPrompt(initParams)
+	prompts["ShouldPushRepositories"].RunPrompt(initParams, emptyEnvVarTranslationMap)
 	if initParams["ShouldPushRepositories"] == "n" {
 		projectConfig.ShouldPushRepositories = false
 	}
 
 	// Prompting for push-up stream, then conditionally prompting for github
-	prompts["GithubRootOrg"].RunPrompt(initParams)
+	prompts["GithubRootOrg"].RunPrompt(initParams, emptyEnvVarTranslationMap)
 
 	projectData := promptAllModules(moduleConfigs)
 
 	// Map parameter values back to specific modules
 	for moduleName, module := range moduleConfigs {
-		prompts[moduleName].RunPrompt(initParams)
+		prompts[moduleName].RunPrompt(initParams, emptyEnvVarTranslationMap)
 		repoName := initParams[prompts[moduleName].Field]
 		repoURL := fmt.Sprintf("%s/%s", initParams["GithubRootOrg"], repoName)
 		projectModuleParams := moduleconfig.SummarizeParameters(module, projectData)

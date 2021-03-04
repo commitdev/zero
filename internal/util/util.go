@@ -114,11 +114,15 @@ func ExecuteCommandOutput(cmd *exec.Cmd, pathPrefix string, envars []string) str
 	return string(out)
 }
 
-// AppendProjectEnvToCmdEnv will add all the keys and values from envMap
-// into envList as key-value pair strings (e.g.: "key=value")
-func AppendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []string {
+// Allow module definition to use an alternative env-var-name than field while apply
+func AppendProjectEnvToCmdEnv(envMap map[string]string, envList []string, translationMap map[string]string) []string {
+
 	for key, val := range envMap {
 		if val != "" {
+			// overwrite key if exist in translation map
+			if val, ok := translationMap[key]; ok {
+				key = val
+			}
 			envList = append(envList, fmt.Sprintf("%s=%s", key, val))
 		}
 	}

@@ -52,13 +52,17 @@ parameters:
       matchField: useExistingAwsProfile
   - field: accessKeyId
     label: AWS AccessKeyId
+    envVarName: "AWS_ACCESS_KEY_ID"
     conditions:
     - action: KeyMatchCondition
       whenValue: "no"
       matchField: useExistingAwsProfile
   - field: secretAccessKey
+    envVarName: "AWS_SECRET_ACCESS_KEY"
     label: AWS SecretAccessKey
     conditions:
     - action: KeyMatchCondition
       whenValue: "no"
       matchField: useExistingAwsProfile
+  - field: testExecute
+    execute: echo $AWS_ACCESS_KEY_ID

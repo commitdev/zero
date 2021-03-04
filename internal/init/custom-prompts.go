@@ -4,7 +4,6 @@ import (
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	project "github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/flog"
-	"github.com/k0kubun/pp"
 )
 
 func CustomPromptHandler(promptType string, params map[string]string) {
@@ -31,11 +30,9 @@ func AWSProfilePicker(params map[string]string) {
 		Validate:  NoValidation,
 	}
 	_, value := promptParameter(awsPrompt)
-	pp.Print(value)
 	credErr := project.FillAWSProfile(value, params)
 	if credErr != nil {
 		flog.Errorf("Failed to retrieve profile, falling back to User input")
 		params["useExistingAwsProfile"] = "no"
 	}
-	pp.Print(params)
 }

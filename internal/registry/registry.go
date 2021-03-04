@@ -8,12 +8,6 @@ type Stack struct {
 
 func GetRegistry(path string) Registry {
 	return Registry{
-		{
-			"test",
-			[]string{
-				"/Users/davidcheung/projects/commit0/tests/test_data/modules/ci/",
-			},
-		},
 		// TODO: better place to store these options as configuration file or any source
 		{
 			"EKS + Go + React + Gatsby",

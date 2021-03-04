@@ -47,7 +47,11 @@ func Create(dir string, createConfigPath string) {
 		flog.Infof(":up_arrow: Done Rendering - committing repositories to version control.")
 
 		for _, module := range projectConfig.Modules {
-			vcs.InitializeRepository(module.Files.Repository, module.Parameters["github_access_token"])
+			err, githubApiKey := module.ReadVendorCredentials("github")
+			if err != nil {
+				flog.Errorf(err.Error())
+			}
+			vcs.InitializeRepository(module.Files.Repository, githubApiKey)
 		}
 	} else {
 		flog.Infof(":up_arrow: Done Rendering - you will need to commit the created projects to version control.")

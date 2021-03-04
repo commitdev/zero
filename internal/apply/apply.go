@@ -13,6 +13,7 @@ import (
 	"github.com/commitdev/zero/internal/util"
 	"github.com/hashicorp/terraform/dag"
 
+	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
@@ -86,12 +87,22 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 			exit.Fatal("Failed to load module config, credentials cannot be injected properly")
 		}
 
-		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
+		envVarTranslationMap := modConfig.GetParamEnvVarTranslationMap()
+		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList, envVarTranslationMap)
 		flog.Debugf("Env injected: %#v", envList)
 		flog.Infof("Executing apply command for %s...", modConfig.Name)
 		util.ExecuteCommand(exec.Command("make"), modulePath, envList)
 		return nil
 	})
+}
+
+func getParameterDefinition(modConfig moduleconfig.ModuleConfig, field string) moduleconfig.Parameter {
+	for i := 0; i < len(modConfig.Parameters); i++ {
+		if field == modConfig.Parameters[i].Field {
+			return modConfig.Parameters[i]
+		}
+	}
+	return moduleconfig.Parameter{}
 }
 
 // promptEnvironments Prompts the user for the environments to apply against and returns a slice of strings representing the environments
@@ -155,7 +166,12 @@ func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig, app
 		}
 		flog.Debugf("Loaded module: %s from %s", name, modulePath)
 
-		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
+		modConfig, err := module.ParseModuleConfig(modulePath)
+		if err != nil {
+			exit.Fatal("Failed to load module config, credentials cannot be injected properly")
+		}
+		envVarTranslationMap := modConfig.GetParamEnvVarTranslationMap()
+		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList, envVarTranslationMap)
 		flog.Debugf("Env injected: %#v", envList)
 		util.ExecuteCommand(exec.Command("make", "summary"), modulePath, envList)
 		return nil
