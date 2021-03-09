@@ -100,12 +100,14 @@ func ValidateProjectName(input string) error {
 	return nil
 }
 
-// Getting param to fill in to zero-project.yml, there are multiple ways of obtaining the value
+// RunPrompt obtains the value of PromptHandler depending on the parameter's definition
+// for the project config,  there are multiple ways of obtaining the value
 // values go into params depending on `Condition` as the highest precedence (Whether it gets this value)
 // then follows this order to determine HOW it obtains that value
 // 1. Execute (this could potentially be refactored into type + data)
 // 2. type: specific ways of obtaining values (in AWS credential case it will set 2 values to the map)
-//3.
+// 3. value: directly assigns a value to a parameter
+// 4. prompt: requires users to select an option OR input a string
 func (p PromptHandler) RunPrompt(projectParams map[string]string, envVarTranslationMap map[string]string) {
 	var err error
 	var result string
