@@ -114,7 +114,8 @@ func ExecuteCommandOutput(cmd *exec.Cmd, pathPrefix string, envars []string) str
 	return string(out)
 }
 
-// Allow module definition to use an alternative env-var-name than field while apply
+// AppendProjectEnvToCmdEnv converts a key-value pair map into a slice of `key=value`s
+// allow module definition to use an alternative env-var-name than field while apply
 func AppendProjectEnvToCmdEnv(envMap map[string]string, envList []string, translationMap map[string]string) []string {
 
 	for key, val := range envMap {
@@ -148,7 +149,7 @@ func ItemInSlice(slice []string, target string) bool {
 	return false
 }
 
-// Given a resource of struct type as
+// ReflectStructValueIntoMap receives a resource of struct type as
 // type AWSCreds struct{
 // 	AccessKeyID  string `yaml:"accessKeyId,omitempty"`
 // 	SecretAccessKey  string `yaml:"accessKeyId,omitempty"`
