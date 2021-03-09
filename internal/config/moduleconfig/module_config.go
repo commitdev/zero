@@ -68,7 +68,8 @@ func (cfg ModuleConfig) collectMissing() []string {
 	return missing
 }
 
-// Module can get a map of parameter's field name => desired env-var name
+// GetParamEnvVarTranslationMap returns a map for translating parameter's `Field` into env-var keys
+// It loops through each parameter then adds to translation map if applicable
 // for zero apply / zero init's prompt execute,
 // this is useful for translating params like AWS credentials for running the AWS cli
 func (cfg ModuleConfig) GetParamEnvVarTranslationMap() map[string]string {
@@ -178,7 +179,7 @@ func findMissing(obj reflect.Value, path, metadata string, missing *[]string) {
 	}
 }
 
-// Receives all parameters gathered from prompts during `Zero init`
+// SummarizeParameters receives all parameters gathered from prompts during `Zero init`
 // and based on module definition to construct the parameters of interest for each module
 func SummarizeParameters(module ModuleConfig, allParams map[string]string) map[string]string {
 	moduleParams := make(projectconfig.Parameters)
@@ -197,8 +198,8 @@ func SummarizeParameters(module ModuleConfig, allParams map[string]string) map[s
 	return moduleParams
 }
 
-// During zero init, we parse the module config and append the condition into the zero-project file
-// This gathers the conditions to append into project config
+// SummarizeConditions collects conditions from module-definition
+// then append the condition into the zero-project configuration
 func SummarizeConditions(module ModuleConfig) []projectconfig.Condition {
 	moduleConditions := []projectconfig.Condition{}
 	for _, condition := range module.Conditions {

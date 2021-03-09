@@ -9,6 +9,7 @@ import (
 	"github.com/commitdev/zero/pkg/util/flog"
 )
 
+// CustomPromptHandler handles non-input and enum options prompts
 // zero-module's parameters allow prompts to specify types of custom actions
 // this allows non-standard enum / string input to be added, such as AWS profile picker
 func CustomPromptHandler(promptType string, params map[string]string) error {

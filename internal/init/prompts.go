@@ -191,7 +191,7 @@ func sanitizeParameterValue(str string) string {
 	return re.ReplaceAllString(str, "")
 }
 
-// PromptParams renders series of prompt UI based on the config
+// PromptModuleParams renders series of prompt UI based on the config
 func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[string]string) (map[string]string, error) {
 	envVarTranslationMap := moduleConfig.GetParamEnvVarTranslationMap()
 	for _, parameter := range moduleConfig.Parameters {
