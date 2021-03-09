@@ -30,7 +30,9 @@ type Module struct {
 	Conditions []Condition `yaml:"conditions,omitempty"`
 }
 
-func (m Module) ReadVendorCredentials(vendor string) (error, string) {
+// Based on parsed project config's module, retrieve the vendor's credential
+// for pre-defined functionalities. (eg: pushing repos to github)
+func ReadVendorCredentialsFromModule(m Module, vendor string) (error, string) {
 	// this mapping could be useful for module config as well
 	vendorToParamMap := map[string]string{
 		"github":   "githubAccessToken",

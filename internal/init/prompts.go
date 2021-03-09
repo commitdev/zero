@@ -121,7 +121,7 @@ func (p PromptHandler) RunPrompt(projectParams map[string]string, envVarTranslat
 		if p.Parameter.Execute != "" {
 			result = executeCmd(p.Parameter.Execute, projectParams, envVarTranslationMap)
 		} else if p.Parameter.Type != "" {
-			CustomPromptHandler(p.Parameter.Type, projectParams)
+			err = CustomPromptHandler(p.Parameter.Type, projectParams)
 		} else if p.Parameter.Value != "" {
 			result = p.Parameter.Value
 		} else {

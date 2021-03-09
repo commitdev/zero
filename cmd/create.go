@@ -47,7 +47,7 @@ func Create(dir string, createConfigPath string) {
 		flog.Infof(":up_arrow: Done Rendering - committing repositories to version control.")
 
 		for _, module := range projectConfig.Modules {
-			err, githubApiKey := module.ReadVendorCredentials("github")
+			err, githubApiKey := projectconfig.ReadVendorCredentialsFromModule(module, "github")
 			if err != nil {
 				flog.Errorf(err.Error())
 			}
