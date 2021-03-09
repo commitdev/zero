@@ -38,6 +38,8 @@ func fetchAWSConfig(awsPath string, profileName string) (error, AWSResourceConfi
 	}
 }
 
+// FillAWSProfile receives the AWS profile name, then parses
+// the accessKeyId / secretAccessKey values into a map
 func FillAWSProfile(profileName string, paramsToFill map[string]string) error {
 	awsPath := GetAWSCredsPath()
 	err, awsCreds := fetchAWSConfig(awsPath, profileName)
