@@ -39,7 +39,7 @@ func promptAWSProfilePicker(params map[string]string) {
 		Validate:  NoValidation,
 	}
 	_, value := promptParameter(awsPrompt)
-	credErr := project.FillAWSProfile(value, params)
+	credErr := project.FillAWSProfile("", value, params)
 	if credErr != nil {
 		flog.Errorf("Failed to retrieve profile, falling back to User input")
 		params["useExistingAwsProfile"] = "no"

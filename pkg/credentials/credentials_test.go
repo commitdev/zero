@@ -9,12 +9,10 @@ import (
 
 func TestFillAWSProfileCredentials(t *testing.T) {
 	mockAwsCredentialFilePath := "../../tests/test_data/aws/mock_credentials.yml"
-	credentials.GetAWSCredsPath = func() string {
-		return mockAwsCredentialFilePath
-	}
+
 	t.Run("fills project credentials", func(t *testing.T) {
 		params := map[string]string{}
-		err := credentials.FillAWSProfile("default", params)
+		err := credentials.FillAWSProfile(mockAwsCredentialFilePath, "default", params)
 		if err != nil {
 			panic(err)
 		}
@@ -25,7 +23,7 @@ func TestFillAWSProfileCredentials(t *testing.T) {
 
 	t.Run("supports non-default profiles", func(t *testing.T) {
 		params := map[string]string{}
-		err := credentials.FillAWSProfile("foobar", params)
+		err := credentials.FillAWSProfile(mockAwsCredentialFilePath, "foobar", params)
 		if err != nil {
 			panic(err)
 		}

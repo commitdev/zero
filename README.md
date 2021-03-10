@@ -101,6 +101,13 @@ You need to [register a new domain](https://docs.aws.amazon.com/Route53/latest/D
 
 ___
 
+### Building blocks of Zero
+### Module Definition
+Module definition defines the information needed for the module to run (`zero apply`).
+Also declares dependency used to determine the order of execution with other modules.
+
+See [`zero-module.yml` reference](./docs/module-definition.md) for details. 
+___
 ## Using zero to spin up your own stack
 
 Using Zero to spin up your infrastructure and application is easy and straightforward. Using just a few commands, you can configure and deploy your very own scalable, high-performance, production-ready infrastructure.

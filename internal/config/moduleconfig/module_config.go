@@ -180,7 +180,8 @@ func findMissing(obj reflect.Value, path, metadata string, missing *[]string) {
 }
 
 // SummarizeParameters receives all parameters gathered from prompts during `Zero init`
-// and based on module definition to construct the parameters of interest for each module
+// and based on module definition to construct the parameters for each module for zero-project.yml
+// filters out parameters defined as OmitFromProjectFile: true
 func SummarizeParameters(module ModuleConfig, allParams map[string]string) map[string]string {
 	moduleParams := make(projectconfig.Parameters)
 	// Loop through all the prompted values and find the ones relevant to this module
@@ -198,8 +199,8 @@ func SummarizeParameters(module ModuleConfig, allParams map[string]string) map[s
 	return moduleParams
 }
 
-// SummarizeConditions collects conditions from module-definition
-// then append the condition into the zero-project configuration
+// SummarizeConditions based on conditions from zero-module.yml
+// creates and returns slice of conditions for project config
 func SummarizeConditions(module ModuleConfig) []projectconfig.Condition {
 	moduleConditions := []projectconfig.Condition{}
 	for _, condition := range module.Conditions {

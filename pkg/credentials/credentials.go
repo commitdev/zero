@@ -16,8 +16,6 @@ type AWSResourceConfig struct {
 	SecretAccessKey string `yaml:"secretAccessKey,omitempty" env:"AWS_SECRET_ACCESS_KEY,omitempty"`
 }
 
-var GetAWSCredsPath = awsCredsPath
-
 func awsCredsPath() string {
 	usr, err := user.Current()
 	if err != nil {
@@ -40,9 +38,12 @@ func fetchAWSConfig(awsPath string, profileName string) (error, AWSResourceConfi
 
 // FillAWSProfile receives the AWS profile name, then parses
 // the accessKeyId / secretAccessKey values into a map
-func FillAWSProfile(profileName string, paramsToFill map[string]string) error {
-	awsPath := GetAWSCredsPath()
-	err, awsCreds := fetchAWSConfig(awsPath, profileName)
+func FillAWSProfile(pathToCredentials string, profileName string, paramsToFill map[string]string) error {
+	if pathToCredentials == "" {
+		pathToCredentials = awsCredsPath()
+	}
+
+	err, awsCreds := fetchAWSConfig(pathToCredentials, profileName)
 	if err != nil {
 		return err
 	}
