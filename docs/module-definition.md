@@ -11,6 +11,7 @@ It also declares the module's  dependencies to determine the order of execution 
 | `icon`        | string          | Path to logo image                               |
 | `parameters`  | list(Parameter) | Parameters to prompt users                       |
 
+
 ### Template
 | Parameters   | Type    | Description                                                           |
 |--------------|---------|-----------------------------------------------------------------------|
@@ -18,6 +19,17 @@ It also declares the module's  dependencies to determine the order of execution 
 | `delimiters` | tuple   | A tuple of open delimiter and ending delimiter eg: `<%` and `%>`      |
 | `inputDir`   | string  | Folder to template from the module, becomes the module root for users |
 | `outputDir`  | string  | local directory name for the module, gets commited to version control |
+
+### Condition(module)
+Module conditions are considered during template phase (`zero create`), based on parameters supplied from project-definition,
+modules can decide to have specific files ignored from the user's module. For example if user picks `userAuth: no`, we can ignore the auth resources via templating.
+
+| Parameters   | Type         | Description                                                                                                                                           |
+|--------------|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `action`     | enum(string) | type of condition, currently supports [`ignoreFile`]                                                                                                  |
+| `matchField` | string       | Allows you to condition prompt based on another parameter's value                                                                                     |
+| `WhenValue`  | string       | Matches for this value to satisfy the condition                                                                                                       |
+| `data`       | list(string) | Supply extra data for condition to run   `ignoreFile`: provide list of paths (file or directory path) to omit from module when condition is satisfied |
 
 ### Parameter:
 Parameter defines the prompt during zero-init.
@@ -46,7 +58,11 @@ Note: Default is supplied as the starting point of the user's manual input (Not 
 | `conditions`          | list(Condition) | Conditions for prompt to run, if supplied all conditions must pass                                                        |
 | `envVarName`          | string          | During `zero apply` parameters are available as env-vars, defaults to field name but can be overwritten with `envVarName` |
 
-### Condition
+### Condition(paramters)
+Parameters conditions are considered while running user prompts, prompts are
+executed in order of the yml, and will be skipped if conditions are not satisfied.
+For example if a user decide to not use circleCI, condition can be used to skip the circleCI_api_key prompt.
+
 | Parameters   | Type         | Description                                                       |
 |--------------|--------------|-------------------------------------------------------------------|
 | `action`     | enum(string) | type of condition, currently supports [`KeyMatchCondition`]         |
