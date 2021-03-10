@@ -102,6 +102,11 @@ You need to [register a new domain](https://docs.aws.amazon.com/Route53/latest/D
 ___
 
 ### Building blocks of Zero
+
+### Project Definition:
+Each project is defined by this project definition file, this manifest contains your project details, and is the source of truth for the templating(`zero create`) and provision(`zero apply`) steps.
+
+See [`zero-project.yml` reference](./docs/project-definition.md) for details. 
 ### Module Definition
 Module definition defines the information needed for the module to run (`zero apply`).
 Also declares dependency used to determine the order of execution with other modules.
