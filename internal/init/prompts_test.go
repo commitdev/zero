@@ -166,4 +166,18 @@ func TestGetParam(t *testing.T) {
 		assert.NotContains(t, projectParams, "failing_condition", "Expected to fail condition and not set value")
 		assert.Equal(t, "pass", projectParams["multiple_condition"], "Expected to pass multiple condition and set value")
 	})
+
+	t.Run("Should return error upon unsupported custom prompt type", func(t *testing.T) {
+
+		projectParams = map[string]string{}
+		params := []moduleconfig.Parameter{
+			{
+				Field: "param1",
+				Type:  "random-type",
+			},
+		}
+		module := moduleconfig.ModuleConfig{Parameters: params}
+		_, err := initPrompts.PromptModuleParams(module, projectParams)
+		assert.Equal(t, "Unsupported custom prompt type random-type.", err.Error())
+	})
 }

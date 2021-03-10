@@ -108,7 +108,7 @@ func ValidateProjectName(input string) error {
 // 2. type: specific ways of obtaining values (in AWS credential case it will set 2 values to the map)
 // 3. value: directly assigns a value to a parameter
 // 4. prompt: requires users to select an option OR input a string
-func (p PromptHandler) RunPrompt(projectParams map[string]string, envVarTranslationMap map[string]string) {
+func (p PromptHandler) RunPrompt(projectParams map[string]string, envVarTranslationMap map[string]string) error {
 	var err error
 	var result string
 
@@ -130,7 +130,7 @@ func (p PromptHandler) RunPrompt(projectParams map[string]string, envVarTranslat
 			err, result = promptParameter(p)
 		}
 		if err != nil {
-			exit.Fatal("Exiting prompt:  %v\n", err)
+			return err
 		}
 
 		// Append the result to parameter map
@@ -138,6 +138,7 @@ func (p PromptHandler) RunPrompt(projectParams map[string]string, envVarTranslat
 	} else {
 		flog.Debugf("Skipping prompt(%s) due to condition failed", p.Field)
 	}
+	return nil
 }
 
 func promptParameter(prompt PromptHandler) (error, string) {
@@ -227,7 +228,10 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 		// for k, v := range parameters {
 		// 	credentialEnvs[k] = v
 		// }
-		promptHandler.RunPrompt(parameters, envVarTranslationMap)
+		err := promptHandler.RunPrompt(parameters, envVarTranslationMap)
+		if err != nil {
+			return parameters, err
+		}
 	}
 	flog.Debugf("Module %s prompt: \n %#v", moduleConfig.Name, parameters)
 	return parameters, nil
@@ -243,7 +247,7 @@ func promptAllModules(modules map[string]moduleconfig.ModuleConfig) map[string]s
 
 		parameterValues, err = PromptModuleParams(config, parameterValues)
 		if err != nil {
-			exit.Fatal("Exiting prompt:  %v\n", err)
+			exit.Fatal("Exiting prompt(%s):  %v\n", config.Name, err)
 		}
 	}
 	return parameterValues

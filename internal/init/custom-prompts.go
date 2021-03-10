@@ -6,7 +6,6 @@ import (
 
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	project "github.com/commitdev/zero/pkg/credentials"
-	"github.com/commitdev/zero/pkg/util/flog"
 )
 
 // CustomPromptHandler handles non-input and enum options prompts
@@ -16,17 +15,21 @@ func CustomPromptHandler(promptType string, params map[string]string) error {
 	switch promptType {
 
 	case "AWSProfilePicker":
-		promptAWSProfilePicker(params)
+		err := promptAWSProfilePicker(params)
+		if err != nil {
+			params["useExistingAwsProfile"] = "no"
+			return err
+		}
 	default:
 		return errors.New(fmt.Sprintf("Unsupported custom prompt type %s.", promptType))
 	}
 	return nil
 }
 
-func promptAWSProfilePicker(params map[string]string) {
+func promptAWSProfilePicker(params map[string]string) error {
 	profiles, err := project.GetAWSProfiles()
 	if err != nil {
-		profiles = []string{}
+		return err
 	}
 
 	awsPrompt := PromptHandler{
@@ -41,7 +44,7 @@ func promptAWSProfilePicker(params map[string]string) {
 	_, value := promptParameter(awsPrompt)
 	credErr := project.FillAWSProfile("", value, params)
 	if credErr != nil {
-		flog.Errorf("Failed to retrieve profile, falling back to User input")
-		params["useExistingAwsProfile"] = "no"
+		return errors.New("Failed to retrieve profile, falling back to User input")
 	}
+	return nil
 }
