@@ -1,6 +1,6 @@
 ## Module Definition: `zero-module.yml`
-Module definition defines the information needed for the module to run (`zero apply`).
-Also declares dependency used to determine the order of execution with other modules.
+This file is the definition of a Zero module. It contains a list of all the required parameters to be able to prompt a user for choices during `zero init`, information about how to template the contents of the module during `zero create`, and the information needed for the module to run (`zero apply`).
+It also declares the module's  dependencies to determine the order of execution in relation to other modules.
 
 | Parameters    | type            | Description                |
 |---------------|-----------------|----------------------------|
