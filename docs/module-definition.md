@@ -2,13 +2,22 @@
 This file is the definition of a Zero module. It contains a list of all the required parameters to be able to prompt a user for choices during `zero init`, information about how to template the contents of the module during `zero create`, and the information needed for the module to run (`zero apply`).
 It also declares the module's  dependencies to determine the order of execution in relation to other modules.
 
-| Parameters    | type            | Description                |
-|---------------|-----------------|----------------------------|
-| `name`        | string          | Name of module             |
-| `description` | string          | Description of the module  |
-| `author`      | string          | Author of the module       |
-| `icon`        | string          | Path to logo image         |
-| `parameters`  | list(Parameter) | Parameters to prompt users |
+| Parameters    | type            | Description                                      |
+|---------------|-----------------|--------------------------------------------------|
+| `name`        | string          | Name of module                                   |
+| `description` | string          | Description of the module                        |
+| `template`    | template        | default settings for templating out the module   |
+| `author`      | string          | Author of the module                             |
+| `icon`        | string          | Path to logo image                               |
+| `parameters`  | list(Parameter) | Parameters to prompt users                       |
+
+### Template
+| Parameters   | Type    | Description                                                           |
+|--------------|---------|-----------------------------------------------------------------------|
+| `strictMode` | boolean | whether strict mode is enabled                                        |
+| `delimiters` | tuple   | A tuple of open delimiter and ending delimiter eg: `<%` and `%>`      |
+| `inputDir`   | string  | Folder to template from the module, becomes the module root for users |
+| `outputDir`  | string  | local directory name for the module, gets commited to version control |
 
 ### Parameter:
 Parameter defines the prompt during zero-init.
@@ -44,7 +53,6 @@ Note: Default is supplied as the starting point of the user's manual input (Not 
 | `matchField` | string       | Allows you to condition prompt based on another parameter's value |
 | `WhenValue`  | string       | Matches for this value to satisfy the condition                   |
 | `data`       | list(string) | Supply extra data for condition to run                            |
-
 
 ### Validation
 
