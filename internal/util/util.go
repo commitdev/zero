@@ -152,7 +152,7 @@ func ItemInSlice(slice []string, target string) bool {
 // ReflectStructValueIntoMap receives a resource of struct type as
 // type AWSCreds struct{
 // 	AccessKeyID  string `yaml:"accessKeyId,omitempty"`
-// 	SecretAccessKey  string `yaml:"accessKeyId,omitempty"`
+// 	SecretAccessKey  string `yaml:"secretAccessKey,omitempty"`
 // }{
 // 	AccessKeyID: "FOO",
 // 	SecretAccessKey: "BAR",
