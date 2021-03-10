@@ -202,15 +202,15 @@ func SummarizeParameters(module ModuleConfig, allParams map[string]string) map[s
 // SummarizeConditions based on conditions from zero-module.yml
 // creates and returns slice of conditions for project config
 func SummarizeConditions(module ModuleConfig) []projectconfig.Condition {
-	moduleConditions := []projectconfig.Condition{}
-	for _, condition := range module.Conditions {
-		newCond := projectconfig.Condition{
+	moduleConditions := make([]projectconfig.Condition, len(module.Conditions))
+
+	for i, condition := range module.Conditions {
+		moduleConditions[i] = projectconfig.Condition{
 			Action:     condition.Action,
 			MatchField: condition.MatchField,
 			WhenValue:  condition.WhenValue,
 			Data:       condition.Data,
 		}
-		moduleConditions = append(moduleConditions, newCond)
 	}
 	return moduleConditions
 }
