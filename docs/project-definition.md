@@ -1,7 +1,7 @@
 ### Project Definition: `zero-project.yml`
-Each project is defined by this project definition file, this manifest contains your project details, and is the source of truth for the templating(`zero create`) and provision(`zero apply`) steps. 
+Each project is defined by this file. This manifest reflects all the options a user chose during the `zero init` step. It defines which modules are part of the project, each of their parameters, and is the source of truth for the templating (`zero create`) and provision (`zero apply`) steps. 
 
-`zero-project.yml` is created from `zero-init`, and defines which modules are part of the project and what each module's parameters are for the subsequence steps.
+_Note: This file contains credentials, so make sure it is not shared with others._
 
 | Parameters               | Type         | Description                                    |
 |--------------------------|--------------|------------------------------------------------|
