@@ -1,6 +1,7 @@
 package projectconfig
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 
@@ -27,6 +28,24 @@ type Module struct {
 	Parameters Parameters `yaml:"parameters,omitempty"`
 	Files      Files
 	Conditions []Condition `yaml:"conditions,omitempty"`
+}
+
+// ReadVendorCredentialsFromModule uses parsed project-config's module
+// based on vendor parameter, retrieve the vendor's credential
+// for pre-defined functionalities (eg: Github api key for pushing repos to github)
+func ReadVendorCredentialsFromModule(m Module, vendor string) (error, string) {
+	// this mapping could be useful for module config as well
+	vendorToParamMap := map[string]string{
+		"github":   "githubAccessToken",
+		"circleci": "circleciApiKey",
+	}
+	if parameterKey, ok := vendorToParamMap[vendor]; ok {
+		if val, ok := m.Parameters[parameterKey]; ok {
+			return nil, val
+		}
+		return errors.New("Parameter not found in module."), ""
+	}
+	return errors.New("Unsupported vendor provided."), ""
 }
 
 type Parameters map[string]string

@@ -8,10 +8,15 @@ import (
 	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/commitdev/zero/internal/config/globalconfig"
+	"github.com/commitdev/zero/internal/util"
 )
 
-func AwsCredsPath() string {
+type AWSResourceConfig struct {
+	AccessKeyID     string `key:"accessKeyId"`
+	SecretAccessKey string `key:"secretAccessKey"`
+}
+
+func awsCredsPath() string {
 	usr, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
@@ -19,19 +24,31 @@ func AwsCredsPath() string {
 	return filepath.Join(usr.HomeDir, ".aws/credentials")
 }
 
-func GetAWSProfileProjectCredentials(profileName string, creds globalconfig.ProjectCredential) globalconfig.ProjectCredential {
-	awsPath := AwsCredsPath()
-	return GetAWSProfileCredentials(awsPath, profileName, creds)
+func fetchAWSConfig(awsPath string, profileName string) (error, AWSResourceConfig) {
+
+	awsCreds, err := credentials.NewSharedCredentials(awsPath, profileName).Get()
+	if err != nil {
+		return err, AWSResourceConfig{}
+	}
+	return nil, AWSResourceConfig{
+		AccessKeyID:     awsCreds.AccessKeyID,
+		SecretAccessKey: awsCreds.SecretAccessKey,
+	}
 }
 
-func GetAWSProfileCredentials(credsPath string, profileName string, creds globalconfig.ProjectCredential) globalconfig.ProjectCredential {
-	awsCreds, err := credentials.NewSharedCredentials(credsPath, profileName).Get()
-	if err != nil {
-		log.Fatal(err)
+// FillAWSProfile receives the AWS profile name, then parses
+// the accessKeyId / secretAccessKey values into a map
+func FillAWSProfile(pathToCredentialsFile string, profileName string, paramsToFill map[string]string) error {
+	if pathToCredentialsFile == "" {
+		pathToCredentialsFile = awsCredsPath()
 	}
-	creds.AWSResourceConfig.AccessKeyID = awsCreds.AccessKeyID
-	creds.AWSResourceConfig.SecretAccessKey = awsCreds.SecretAccessKey
-	return creds
+
+	err, awsCreds := fetchAWSConfig(pathToCredentialsFile, profileName)
+	if err != nil {
+		return err
+	}
+	util.ReflectStructValueIntoMap(awsCreds, "key", paramsToFill)
+	return nil
 }
 
 // GetAWSProfiles returns a list of AWS forprofiles set up on the user's sytem

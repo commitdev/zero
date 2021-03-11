@@ -6,13 +6,10 @@ import (
 	"path"
 	"sync"
 
-	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/module"
 	"github.com/commitdev/zero/internal/registry"
-	"github.com/commitdev/zero/internal/util"
-	project "github.com/commitdev/zero/pkg/credentials"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/manifoldco/promptui"
@@ -22,7 +19,11 @@ import (
 func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfig {
 	projectConfig := defaultProjConfig()
 
-	projectConfig.Name = getProjectNamePrompt().GetParam(projectConfig.Parameters)
+	projectRootParams := map[string]string{}
+	emptyEnvVarTranslationMap := map[string]string{}
+	promptName := getProjectNamePrompt()
+	promptName.RunPrompt(projectRootParams, emptyEnvVarTranslationMap)
+	projectConfig.Name = projectRootParams[promptName.Field]
 
 	rootDir := path.Join(outDir, projectConfig.Name)
 	flog.Infof(":tada: Initializing project")
@@ -41,44 +42,23 @@ func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfi
 
 	initParams := make(map[string]string)
 	projectConfig.ShouldPushRepositories = true
-	initParams["ShouldPushRepositories"] = prompts["ShouldPushRepositories"].GetParam(initParams)
+	prompts["ShouldPushRepositories"].RunPrompt(initParams, emptyEnvVarTranslationMap)
 	if initParams["ShouldPushRepositories"] == "n" {
 		projectConfig.ShouldPushRepositories = false
 	}
 
 	// Prompting for push-up stream, then conditionally prompting for github
-	initParams["GithubRootOrg"] = prompts["GithubRootOrg"].GetParam(initParams)
-	projectCredentials := globalconfig.GetProjectCredentials(projectConfig.Name)
-	credentialPrompts := getCredentialPrompts(projectCredentials, moduleConfigs)
-	projectCredentials = promptCredentialsAndFillProjectCreds(credentialPrompts, projectCredentials)
-	globalconfig.Save(projectCredentials)
-	projectParameters := promptAllModules(moduleConfigs, projectCredentials)
+	prompts["GithubRootOrg"].RunPrompt(initParams, emptyEnvVarTranslationMap)
+
+	projectData := promptAllModules(moduleConfigs)
 
 	// Map parameter values back to specific modules
 	for moduleName, module := range moduleConfigs {
-		repoName := prompts[moduleName].GetParam(initParams)
+		prompts[moduleName].RunPrompt(initParams, emptyEnvVarTranslationMap)
+		repoName := initParams[prompts[moduleName].Field]
 		repoURL := fmt.Sprintf("%s/%s", initParams["GithubRootOrg"], repoName)
-		projectModuleParams := make(projectconfig.Parameters)
-		projectModuleConditions := []projectconfig.Condition{}
-
-		// Loop through all the prompted values and find the ones relevant to this module
-		for parameterKey, parameterValue := range projectParameters {
-			for _, moduleParameter := range module.Parameters {
-				if moduleParameter.Field == parameterKey {
-					projectModuleParams[parameterKey] = parameterValue
-				}
-			}
-		}
-
-		for _, condition := range module.Conditions {
-			newCond := projectconfig.Condition{
-				Action:     condition.Action,
-				MatchField: condition.MatchField,
-				WhenValue:  condition.WhenValue,
-				Data:       condition.Data,
-			}
-			projectModuleConditions = append(projectModuleConditions, newCond)
-		}
+		projectModuleParams := moduleconfig.SummarizeParameters(module, projectData)
+		projectModuleConditions := moduleconfig.SummarizeConditions(module)
 
 		projectConfig.Modules[moduleName] = projectconfig.NewModule(
 			projectModuleParams,
@@ -89,9 +69,6 @@ func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfi
 			projectModuleConditions,
 		)
 	}
-
-	// TODO: load ~/.zero/config.yml (or credentials)
-	// TODO: prompt global credentials
 
 	return &projectConfig
 }
@@ -117,20 +94,6 @@ func loadAllModules(moduleSources []string) (map[string]moduleconfig.ModuleConfi
 		mappedSources[mod.Name] = moduleSource
 	}
 	return modules, mappedSources
-}
-
-// promptAllModules takes a map of all the modules and prompts the user for values for all the parameters
-func promptAllModules(modules map[string]moduleconfig.ModuleConfig, projectCredentials globalconfig.ProjectCredential) map[string]string {
-	parameterValues := map[string]string{"projectName": projectCredentials.ProjectName}
-	for _, config := range modules {
-		var err error
-
-		parameterValues, err = PromptModuleParams(config, parameterValues, projectCredentials)
-		if err != nil {
-			exit.Fatal("Exiting prompt:  %v\n", err)
-		}
-	}
-	return parameterValues
 }
 
 // Project name is prompt individually because the rest of the prompts
@@ -184,123 +147,6 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 	}
 
 	return handlers
-}
-
-func getCredentialPrompts(projectCredentials globalconfig.ProjectCredential, moduleConfigs map[string]moduleconfig.ModuleConfig) []CredentialPrompts {
-	var uniqueVendors []string
-	for _, module := range moduleConfigs {
-		uniqueVendors = appendToSet(uniqueVendors, module.RequiredCredentials)
-	}
-
-	// map is to keep track of which vendor they belong to, to fill them back into the projectConfig
-	prompts := []CredentialPrompts{}
-	for _, vendor := range AvailableVendorOrders {
-		if util.ItemInSlice(uniqueVendors, vendor) {
-			vendorPrompts := CredentialPrompts{vendor, mapVendorToPrompts(projectCredentials, vendor)}
-			prompts = append(prompts, vendorPrompts)
-		}
-	}
-	return prompts
-}
-
-func mapVendorToPrompts(projectCred globalconfig.ProjectCredential, vendor string) []PromptHandler {
-	var prompts []PromptHandler
-	profiles, err := project.GetAWSProfiles()
-	if err != nil {
-		profiles = []string{}
-	}
-
-	// if no profiles available, dont prompt use to pick profile
-	customAwsPickProfileCondition := func(param map[string]string) bool {
-		if len(profiles) == 0 {
-			flog.Infof(":warning: No AWS profiles found, please manually input AWS credentials")
-			return false
-		} else {
-			return true
-		}
-	}
-
-	// condition for prompting manual AWS credentials input
-	customAwsMustInputCondition := func(param map[string]string) bool {
-		toPickProfile := awsPickProfile
-		if val, ok := param["use_aws_profile"]; ok && val != toPickProfile {
-			return true
-		}
-		return false
-	}
-
-	switch vendor {
-	case "aws":
-		awsPrompts := []PromptHandler{
-			{
-				Parameter: moduleconfig.Parameter{
-					Field:   "use_aws_profile",
-					Label:   "Use credentials from existing AWS profiles?",
-					Options: []string{awsPickProfile, awsManualInputCredentials},
-				},
-				Condition: customAwsPickProfileCondition,
-				Validate:  NoValidation,
-			},
-			{
-				Parameter: moduleconfig.Parameter{
-					Field:   "aws_profile",
-					Label:   "Select AWS Profile",
-					Options: profiles,
-				},
-				Condition: KeyMatchCondition("use_aws_profile", awsPickProfile),
-				Validate:  NoValidation,
-			},
-			{
-				Parameter: moduleconfig.Parameter{
-					Field:   "accessKeyId",
-					Label:   "AWS Access Key ID",
-					Default: projectCred.AWSResourceConfig.AccessKeyID,
-					Info: `AWS Access Key ID/Secret: used for provisioning infrastructure in AWS
-The token can be generated at https://console.aws.amazon.com/iam/home?#/security_credentials`,
-				},
-				Condition: CustomCondition(customAwsMustInputCondition),
-				Validate:  ValidateAKID,
-			},
-			{
-				Parameter: moduleconfig.Parameter{
-					Field:   "secretAccessKey",
-					Label:   "AWS Secret access key",
-					Default: projectCred.AWSResourceConfig.SecretAccessKey,
-				},
-				Condition: CustomCondition(customAwsMustInputCondition),
-				Validate:  ValidateSAK,
-			},
-		}
-		prompts = append(prompts, awsPrompts...)
-	case "github":
-		githubPrompt := PromptHandler{
-			Parameter: moduleconfig.Parameter{
-				Field:   "accessToken",
-				Label:   "Github Personal Access Token with access to the above organization",
-				Default: projectCred.GithubResourceConfig.AccessToken,
-				Info: `Github personal access token: used for creating repositories for your project
-Requires the following permissions: [repo::public_repo, admin::orgread:org]
-The token can be created at https://github.com/settings/tokens`,
-			},
-			Condition: NoCondition,
-			Validate:  NoValidation,
-		}
-		prompts = append(prompts, githubPrompt)
-	case "circleci":
-		circleCiPrompt := PromptHandler{
-			Parameter: moduleconfig.Parameter{
-				Field:   "apiKey",
-				Label:   "Circleci api key for CI/CD",
-				Default: projectCred.CircleCiResourceConfig.ApiKey,
-				Info: `CircleCI api token: used for setting up CI/CD for your project
-The token can be created at https://app.circleci.com/settings/user/tokens`,
-			},
-			Condition: NoCondition,
-			Validate:  NoValidation,
-		}
-		prompts = append(prompts, circleCiPrompt)
-	}
-	return prompts
 }
 
 func chooseCloudProvider(projectConfig *projectconfig.ZeroProjectConfig) {

@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 	"text/template"
@@ -113,11 +114,16 @@ func ExecuteCommandOutput(cmd *exec.Cmd, pathPrefix string, envars []string) str
 	return string(out)
 }
 
-// AppendProjectEnvToCmdEnv will add all the keys and values from envMap
-// into envList as key-value pair strings (e.g.: "key=value")
-func AppendProjectEnvToCmdEnv(envMap map[string]string, envList []string) []string {
+// AppendProjectEnvToCmdEnv converts a key-value pair map into a slice of `key=value`s
+// allow module definition to use an alternative env-var-name than field while apply
+func AppendProjectEnvToCmdEnv(envMap map[string]string, envList []string, translationMap map[string]string) []string {
+
 	for key, val := range envMap {
 		if val != "" {
+			// overwrite key if exist in translation map
+			if val, ok := translationMap[key]; ok {
+				key = val
+			}
 			envList = append(envList, fmt.Sprintf("%s=%s", key, val))
 		}
 	}
@@ -141,4 +147,35 @@ func ItemInSlice(slice []string, target string) bool {
 		}
 	}
 	return false
+}
+
+// ReflectStructValueIntoMap receives a resource of struct type as
+// type AWSCreds struct{
+// 	AccessKeyID  string `yaml:"accessKeyId,omitempty"`
+// 	SecretAccessKey  string `yaml:"secretAccessKey,omitempty"`
+// }{
+// 	AccessKeyID: "FOO",
+// 	SecretAccessKey: "BAR",
+// }
+// It will base on the tag, fill in the value to supplied map[string]string
+func ReflectStructValueIntoMap(resource interface{}, tagName string, paramsToFill map[string]string) {
+	t := reflect.ValueOf(resource)
+
+	for i := 0; i < t.NumField(); i++ {
+
+		childStruct := t.Type().Field(i)
+		childValue := t.Field(i)
+		if childValue.Kind().String() != "string" {
+			continue
+		}
+		tag, _ := parseTag(childStruct.Tag.Get(tagName))
+		paramsToFill[tag] = childValue.String()
+	}
+}
+
+func parseTag(tag string) (string, string) {
+	if idx := strings.Index(tag, ","); idx != -1 {
+		return tag[:idx], tag[idx+1:]
+	}
+	return tag, ""
 }

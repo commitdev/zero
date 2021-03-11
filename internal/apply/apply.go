@@ -13,7 +13,6 @@ import (
 	"github.com/commitdev/zero/internal/util"
 	"github.com/hashicorp/terraform/dag"
 
-	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
@@ -87,11 +86,8 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 			exit.Fatal("Failed to load module config, credentials cannot be injected properly")
 		}
 
-		// Get project credentials for the makefile
-		credentials := globalconfig.GetProjectCredentials(projectConfig.Name)
-		credentialEnvs := credentials.SelectedVendorsCredentialsAsEnv(modConfig.RequiredCredentials)
-		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
-		envList = util.AppendProjectEnvToCmdEnv(credentialEnvs, envList)
+		envVarTranslationMap := modConfig.GetParamEnvVarTranslationMap()
+		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList, envVarTranslationMap)
 		flog.Debugf("Env injected: %#v", envList)
 		flog.Infof("Executing apply command for %s...", modConfig.Name)
 		util.ExecuteCommand(exec.Command("make"), modulePath, envList)
@@ -160,7 +156,12 @@ func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig, app
 		}
 		flog.Debugf("Loaded module: %s from %s", name, modulePath)
 
-		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList)
+		modConfig, err := module.ParseModuleConfig(modulePath)
+		if err != nil {
+			exit.Fatal("Failed to load module config, credentials cannot be injected properly")
+		}
+		envVarTranslationMap := modConfig.GetParamEnvVarTranslationMap()
+		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList, envVarTranslationMap)
 		flog.Debugf("Env injected: %#v", envList)
 		util.ExecuteCommand(exec.Command("make", "summary"), modulePath, envList)
 		return nil

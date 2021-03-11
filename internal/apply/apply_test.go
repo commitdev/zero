@@ -38,4 +38,11 @@ func TestApply(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "baz: qux\n", string(content))
 	})
+
+	t.Run("Zero apply honors the envVarName overwrite from module definition", func(t *testing.T) {
+		content, err := ioutil.ReadFile(filepath.Join(tmpDir, "project1/feature.out"))
+		assert.NoError(t, err)
+		assert.Equal(t, "envVarName of viaEnvVarName: baz\n", string(content))
+	})
+
 }

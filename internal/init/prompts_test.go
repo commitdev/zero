@@ -12,6 +12,7 @@ import (
 
 func TestGetParam(t *testing.T) {
 
+	envVarTranslationMap := map[string]string{}
 	projectParams := map[string]string{}
 	t.Run("Should execute params without prompt", func(t *testing.T) {
 		param := moduleconfig.Parameter{
@@ -25,8 +26,8 @@ func TestGetParam(t *testing.T) {
 			initPrompts.NoValidation,
 		}
 
-		result := prompt.GetParam(projectParams)
-		assert.Equal(t, "my-acconut-id", result)
+		prompt.RunPrompt(projectParams, envVarTranslationMap)
+		assert.Equal(t, "my-acconut-id", projectParams[param.Field])
 	})
 
 	t.Run("executes with project context", func(t *testing.T) {
@@ -41,10 +42,9 @@ func TestGetParam(t *testing.T) {
 			initPrompts.NoValidation,
 		}
 
-		result := prompt.GetParam(map[string]string{
-			"INJECTEDENV": "SOME_ENV_VAR_VALUE",
-		})
-		assert.Equal(t, "SOME_ENV_VAR_VALUE", result)
+		projectParams := map[string]string{"INJECTEDENV": "SOME_ENV_VAR_VALUE"}
+		prompt.RunPrompt(projectParams, envVarTranslationMap)
+		assert.Equal(t, "SOME_ENV_VAR_VALUE", projectParams[param.Field])
 	})
 
 	t.Run("Should return static value", func(t *testing.T) {
@@ -59,8 +59,125 @@ func TestGetParam(t *testing.T) {
 			initPrompts.NoValidation,
 		}
 
-		result := prompt.GetParam(projectParams)
-		assert.Equal(t, "lorem-ipsum", result)
+		prompt.RunPrompt(projectParams, envVarTranslationMap)
+		assert.Equal(t, "lorem-ipsum", projectParams[param.Field])
 	})
 
+	t.Run("Prompt value to retain existing params", func(t *testing.T) {
+		projectParams = map[string]string{
+			"existing_value": "foo",
+		}
+		param := moduleconfig.Parameter{
+			Field: "new_value",
+			Value: "bar",
+		}
+
+		prompt := initPrompts.PromptHandler{
+			param,
+			initPrompts.NoCondition,
+			initPrompts.NoValidation,
+		}
+
+		prompt.RunPrompt(projectParams, envVarTranslationMap)
+		assert.Equal(t, "foo", projectParams["existing_value"])
+		assert.Equal(t, "bar", projectParams[param.Field])
+	})
+
+	t.Run("Prompt to apply in order and allow EnvVarMapping", func(t *testing.T) {
+
+		projectParams = map[string]string{}
+		params := []moduleconfig.Parameter{
+			{
+				Field:      "param1",
+				Value:      "foo",
+				EnvVarName: "envvar1",
+			},
+			{
+				Field:      "param2",
+				Execute:    "echo $envvar1 bar",
+				EnvVarName: "envvar2",
+			},
+			{
+				Field:   "param3",
+				Execute: "echo $envvar2 baz",
+			},
+		}
+		module := moduleconfig.ModuleConfig{Parameters: params}
+
+		projectParams, _ = initPrompts.PromptModuleParams(module, projectParams)
+
+		assert.Equal(t, "foo", projectParams["param1"])
+		assert.Equal(t, "foo bar", projectParams["param2"], "should reference param1 via env-var")
+		assert.Equal(t, "foo bar baz", projectParams["param3"], "should reference param2 via env-var")
+	})
+
+	t.Run("Prompt conditions", func(t *testing.T) {
+
+		projectParams = map[string]string{}
+		params := []moduleconfig.Parameter{
+			{
+				Field: "param1",
+				Value: "pass",
+			},
+			{
+				Field: "passing_condition",
+				Value: "pass",
+				Conditions: []moduleconfig.Condition{
+					{
+						Action:     "KeyMatchCondition",
+						WhenValue:  "pass",
+						MatchField: "param1",
+					},
+				},
+			},
+			{
+				Field: "failing_condition",
+				Value: "pass",
+				Conditions: []moduleconfig.Condition{
+					{
+						Action:     "KeyMatchCondition",
+						WhenValue:  "not foo",
+						MatchField: "param1",
+					},
+				},
+			},
+			{
+				Field: "multiple_condition",
+				Value: "pass",
+				Conditions: []moduleconfig.Condition{
+					{
+						Action:     "KeyMatchCondition",
+						WhenValue:  "pass",
+						MatchField: "param1",
+					},
+					{
+						Action:     "KeyMatchCondition",
+						WhenValue:  "pass",
+						MatchField: "passing_condition",
+					},
+				},
+			},
+		}
+		module := moduleconfig.ModuleConfig{Parameters: params}
+		projectParams, _ = initPrompts.PromptModuleParams(module, projectParams)
+
+		assert.Equal(t, "pass", projectParams["param1"], "Value just hardcoded")
+		assert.Equal(t, "pass", projectParams["passing_condition"], "Expected to pass condition and set value")
+		assert.NotContains(t, projectParams, "failing_condition", "Expected to fail condition and not set value")
+		assert.Equal(t, "pass", projectParams["multiple_condition"], "Expected to pass multiple condition and set value")
+	})
+
+	t.Run("Should return error upon unsupported custom prompt type", func(t *testing.T) {
+
+		projectParams = map[string]string{}
+		params := []moduleconfig.Parameter{
+			{
+				Field: "param1",
+				Type:  "random-type",
+			},
+		}
+		module := moduleconfig.ModuleConfig{Parameters: params}
+		_, err := initPrompts.PromptModuleParams(module, projectParams)
+		assert.Equal(t, "Unsupported custom prompt type random-type.", err.Error())
+	})
 }

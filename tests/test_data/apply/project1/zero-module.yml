@@ -17,3 +17,5 @@ requiredCredentials:
 parameters:
   - field: foo
     label: foo
+  - field: param1
+    envVarName: viaEnvVarName

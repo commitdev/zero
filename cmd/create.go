@@ -5,7 +5,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/commitdev/zero/internal/config/globalconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/generate"
@@ -47,9 +46,12 @@ func Create(dir string, createConfigPath string) {
 	if projectConfig.ShouldPushRepositories {
 		flog.Infof(":up_arrow: Done Rendering - committing repositories to version control.")
 
-		globalConfig := globalconfig.GetProjectCredentials(projectConfig.Name)
 		for _, module := range projectConfig.Modules {
-			vcs.InitializeRepository(module.Files.Repository, globalConfig.GithubResourceConfig.AccessToken)
+			err, githubApiKey := projectconfig.ReadVendorCredentialsFromModule(module, "github")
+			if err != nil {
+				flog.Errorf(err.Error())
+			}
+			vcs.InitializeRepository(module.Files.Repository, githubApiKey)
 		}
 	} else {
 		flog.Infof(":up_arrow: Done Rendering - you will need to commit the created projects to version control.")

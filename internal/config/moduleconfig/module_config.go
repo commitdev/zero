@@ -9,6 +9,7 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/iancoleman/strcase"
 )
@@ -25,14 +26,18 @@ type ModuleConfig struct {
 }
 
 type Parameter struct {
-	Field           string
-	Label           string   `yaml:"label,omitempty"`
-	Options         []string `yaml:"options,omitempty"`
-	Execute         string   `yaml:"execute,omitempty"`
-	Value           string   `yaml:"value,omitempty"`
-	Default         string   `yaml:"default,omitempty"`
-	Info            string   `yaml:"info,omitempty"`
-	FieldValidation Validate `yaml:"fieldValidation,omitempty"`
+	Field               string
+	Label               string      `yaml:"label,omitempty"`
+	Options             []string    `yaml:"options,omitempty"`
+	Execute             string      `yaml:"execute,omitempty"`
+	Value               string      `yaml:"value,omitempty"`
+	Default             string      `yaml:"default,omitempty"`
+	Info                string      `yaml:"info,omitempty"`
+	FieldValidation     Validate    `yaml:"fieldValidation,omitempty"`
+	Type                string      `yaml:"type,omitempty"`
+	OmitFromProjectFile bool        `yaml:"omitFromProjectFile,omitempty"`
+	Conditions          []Condition `yaml:"conditions,omitempty"`
+	EnvVarName          string      `yaml:"envVarName,omitempty"`
 }
 
 type Condition struct {
@@ -61,6 +66,21 @@ func (cfg ModuleConfig) collectMissing() []string {
 	findMissing(reflect.ValueOf(cfg), "", "", &missing)
 
 	return missing
+}
+
+// GetParamEnvVarTranslationMap returns a map for translating parameter's `Field` into env-var keys
+// It loops through each parameter then adds to translation map if applicable
+// for zero apply / zero init's prompt execute,
+// this is useful for translating params like AWS credentials for running the AWS cli
+func (cfg ModuleConfig) GetParamEnvVarTranslationMap() map[string]string {
+	translationMap := make(map[string]string)
+	for i := 0; i < len(cfg.Parameters); i++ {
+		param := cfg.Parameters[i]
+		if param.EnvVarName != "" {
+			translationMap[param.Field] = param.EnvVarName
+		}
+	}
+	return translationMap
 }
 
 func LoadModuleConfig(filePath string) (ModuleConfig, error) {
@@ -157,4 +177,40 @@ func findMissing(obj reflect.Value, path, metadata string, missing *[]string) {
 			findMissing(fieldVal, prefix, fieldTags, missing)
 		}
 	}
+}
+
+// SummarizeParameters receives all parameters gathered from prompts during `Zero init`
+// and based on module definition to construct the parameters for each module for zero-project.yml
+// filters out parameters defined as OmitFromProjectFile: true
+func SummarizeParameters(module ModuleConfig, allParams map[string]string) map[string]string {
+	moduleParams := make(projectconfig.Parameters)
+	// Loop through all the prompted values and find the ones relevant to this module
+	for parameterKey, parameterValue := range allParams {
+		for _, moduleParameter := range module.Parameters {
+			if moduleParameter.Field == parameterKey {
+				if moduleParameter.OmitFromProjectFile {
+					flog.Debugf("Omitted %s from %s", parameterKey, module.Name)
+				} else {
+					moduleParams[parameterKey] = parameterValue
+				}
+			}
+		}
+	}
+	return moduleParams
+}
+
+// SummarizeConditions based on conditions from zero-module.yml
+// creates and returns slice of conditions for project config
+func SummarizeConditions(module ModuleConfig) []projectconfig.Condition {
+	moduleConditions := make([]projectconfig.Condition, len(module.Conditions))
+
+	for i, condition := range module.Conditions {
+		moduleConditions[i] = projectconfig.Condition{
+			Action:     condition.Action,
+			MatchField: condition.MatchField,
+			WhenValue:  condition.WhenValue,
+			Data:       condition.Data,
+		}
+	}
+	return moduleConditions
 }

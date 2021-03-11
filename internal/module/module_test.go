@@ -44,10 +44,39 @@ func TestParseModuleConfig(t *testing.T) {
 		}
 		assert.Equal(t, "platform", param.Field)
 		assert.Equal(t, "CI Platform", param.Label)
+
 	})
 
-	t.Run("requiredCredentials are loaded", func(t *testing.T) {
-		assert.Equal(t, []string{"aws", "circleci", "github"}, mod.RequiredCredentials)
+	t.Run("OmitFromProjectFile default", func(t *testing.T) {
+		param, err := findParameter(mod.Parameters, "platform")
+		if err != nil {
+			panic(err)
+		}
+		assert.Equal(t, false, param.OmitFromProjectFile, "OmitFromProjectFile should default to false")
+		useCredsParam, useCredsErr := findParameter(mod.Parameters, "useExistingAwsProfile")
+		if useCredsErr != nil {
+			panic(useCredsErr)
+		}
+		assert.Equal(t, true, useCredsParam.OmitFromProjectFile, "OmitFromProjectFile should be read from file")
+	})
+
+	t.Run("Parsing Conditions and Typed prompts from config", func(t *testing.T) {
+		param, err := findParameter(mod.Parameters, "profilePicker")
+		if err != nil {
+			panic(err)
+		}
+		assert.Equal(t, "AWSProfilePicker", param.Type)
+		assert.Equal(t, "KeyMatchCondition", param.Conditions[0].Action)
+		assert.Equal(t, "useExistingAwsProfile", param.Conditions[0].MatchField)
+		assert.Equal(t, "yes", param.Conditions[0].WhenValue)
+	})
+
+	t.Run("parsing envVarName from module config", func(t *testing.T) {
+		param, err := findParameter(mod.Parameters, "accessKeyId")
+		if err != nil {
+			panic(err)
+		}
+		assert.Equal(t, "AWS_ACCESS_KEY_ID", param.EnvVarName)
 	})
 
 	t.Run("TemplateConfig is unmarshaled", func(t *testing.T) {
