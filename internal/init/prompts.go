@@ -15,11 +15,11 @@ import (
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/manifoldco/promptui"
+	"gopkg.in/yaml.v2"
 )
 
-// Constant to maintain prompt orders so users can have the same flow,
-// modules get downloaded asynchronously therefore its easier to just hardcode an order
-var AvailableVendorOrders = []string{"aws", "github", "circleci"}
+const cyanArrow = "\033[36m\U000025B6\033[0m"
+const greenCheckMark = "\033[32m\U00002714\033[0m"
 
 const awsPickProfile = "Existing AWS Profiles"
 const awsManualInputCredentials = "Enter my own AWS credentials"
@@ -152,12 +152,24 @@ func promptParameter(prompt PromptHandler) (error, string) {
 	var err error
 	var result string
 	if len(param.Options) > 0 {
-		prompt := promptui.Select{
-			Label: label,
-			Items: param.Options,
+		var selectedIndex int
+		// Scope of selected does not have the label data, so we need a dynamic
+		// template with string format to put in the label in `selected`
+		optionTemplate := &promptui.SelectTemplates{
+			Label:    `{{ . }}`,
+			Active:   fmt.Sprintf("%s {{ .Value | cyan }}", cyanArrow),
+			Inactive: "  {{ .Value }}",
+			Selected: fmt.Sprintf("%s %s: {{ .Value }}", greenCheckMark, label),
 		}
-		_, result, err = prompt.Run()
 
+		prompt := promptui.Select{
+			Label:     label,
+			Items:     param.Options,
+			Templates: optionTemplate,
+		}
+
+		selectedIndex, _, err = prompt.Run()
+		result = param.Options[selectedIndex].Key.(string)
 	} else {
 		prompt := promptui.Prompt{
 			Label:     label,
@@ -168,7 +180,7 @@ func promptParameter(prompt PromptHandler) (error, string) {
 		result, err = prompt.Run()
 	}
 	if err != nil {
-		exit.Fatal("Exiting prompt:  %v\n", err)
+		return err, ""
 	}
 
 	return nil, result
@@ -286,4 +298,15 @@ func appendToSet(set []string, toAppend []string) []string {
 		}
 	}
 	return set
+}
+
+func listToPromptOptions(list []string) yaml.MapSlice {
+	mapSlice := make(yaml.MapSlice, len(list))
+	for i := 0; i < len(list); i++ {
+		mapSlice[i] = yaml.MapItem{
+			Key:   list[i],
+			Value: list[i],
+		}
+	}
+	return mapSlice
 }

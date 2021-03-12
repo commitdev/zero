@@ -27,17 +27,17 @@ type ModuleConfig struct {
 
 type Parameter struct {
 	Field               string
-	Label               string      `yaml:"label,omitempty"`
-	Options             []string    `yaml:"options,omitempty"`
-	Execute             string      `yaml:"execute,omitempty"`
-	Value               string      `yaml:"value,omitempty"`
-	Default             string      `yaml:"default,omitempty"`
-	Info                string      `yaml:"info,omitempty"`
-	FieldValidation     Validate    `yaml:"fieldValidation,omitempty"`
-	Type                string      `yaml:"type,omitempty"`
-	OmitFromProjectFile bool        `yaml:"omitFromProjectFile,omitempty"`
-	Conditions          []Condition `yaml:"conditions,omitempty"`
-	EnvVarName          string      `yaml:"envVarName,omitempty"`
+	Label               string        `yaml:"label,omitempty"`
+	Options             yaml.MapSlice `yaml:"options,omitempty"`
+	Execute             string        `yaml:"execute,omitempty"`
+	Value               string        `yaml:"value,omitempty"`
+	Default             string        `yaml:"default,omitempty"`
+	Info                string        `yaml:"info,omitempty"`
+	FieldValidation     Validate      `yaml:"fieldValidation,omitempty"`
+	Type                string        `yaml:"type,omitempty"`
+	OmitFromProjectFile bool          `yaml:"omitFromProjectFile,omitempty"`
+	Conditions          []Condition   `yaml:"conditions,omitempty"`
+	EnvVarName          string        `yaml:"envVarName,omitempty"`
 }
 
 type Condition struct {

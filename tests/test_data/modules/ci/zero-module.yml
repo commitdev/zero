@@ -29,8 +29,8 @@ parameters:
     label: CI Platform
     # default: github
     options:
-      - github
-      - circlci
+      github: Github
+      circleci: Circle CI
   - field: circleci_api_key
     label: "Circle CI API Key to setup your CI/CD for repositories"
     conditions:
@@ -40,8 +40,8 @@ parameters:
   - field: useExistingAwsProfile
     label: "Use credentials from an existing AWS profile?"
     options:
-      - "yes"
-      - "no"
+      "yes": "Yes"
+      "no": "No"
     omitFromProjectFile: yes
   - field: profilePicker
     omitFromProjectFile: yes
