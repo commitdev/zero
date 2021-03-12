@@ -47,12 +47,12 @@ Note: Default is supplied as the starting point of the user's manual input (Not 
 |-----------------------|-----------------|---------------------------------------------------------------------------------------------------------------------------|
 | `field`               | string          | key to store result for project definition                                                                                |
 | `label`               | string          | displayed name for the prompt                                                                                             |
-| `options`             | list(string)    | A list of values for users to pick from                                                                                   |
+| `options`             | map             | A map of `value: display name` pairs for users to pick from                                                               |
 | `default`             | string          | Defaults to this value during prompt                                                                                      |
 | `value`               | string          | Skips prompt entirely when set                                                                                            |
 | `info`                | string          | Displays during prompt as extra information guiding user's input                                                          |
 | `fieldValidation`     | Validation      | Validations for the prompt value                                                                                          |
-| `type`                | enum(string)    | Built in custom prompts: currently supports [`AWSProfilePicker`]                                                            |
+| `type`                | enum(string)    | Built in custom prompts: currently supports [`AWSProfilePicker`]                                                          |
 | `execute`             | string          | executes commands and takes stdout as prompt result                                                                       |
 | `omitFromProjectFile` | bool            | Field is skipped from adding to project definition                                                                        |
 | `conditions`          | list(Condition) | Conditions for prompt to run, if supplied all conditions must pass                                                        |
