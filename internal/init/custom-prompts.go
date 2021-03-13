@@ -36,7 +36,7 @@ func promptAWSProfilePicker(params map[string]string) error {
 		Parameter: moduleconfig.Parameter{
 			Field:   "aws_profile",
 			Label:   "Select AWS Profile",
-			Options: profiles,
+			Options: listToPromptOptions(profiles),
 		},
 		Condition: NoCondition,
 		Validate:  NoValidation,
