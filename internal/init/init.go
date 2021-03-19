@@ -13,6 +13,7 @@ import (
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/manifoldco/promptui"
+	"gopkg.in/yaml.v2"
 )
 
 // Create cloud provider context
@@ -114,9 +115,12 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 	handlers := map[string]PromptHandler{
 		"ShouldPushRepositories": {
 			Parameter: moduleconfig.Parameter{
-				Field:   "ShouldPushRepositories",
-				Label:   "Should the created projects be checked into github automatically? (y/n)",
-				Default: "y",
+				Field: "ShouldPushRepositories",
+				Label: "Should the created projects be checked into github automatically?",
+				Options: yaml.MapSlice{
+					yaml.MapItem{Key: "y", Value: "yes"},
+					yaml.MapItem{Key: "n", Value: "no"},
+				},
 			},
 			Condition: NoCondition,
 			Validate:  SpecificValueValidation("y", "n"),

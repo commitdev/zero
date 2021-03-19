@@ -27,6 +27,11 @@ var initCmd = &cobra.Command{
 
 		if projectConfigErr != nil {
 			exit.Fatal(fmt.Sprintf(" Init failed while creating the zero project config file %s", projectConfigErr.Error()))
+		} else {
+			flog.Infof(`:tada: Done - Your project definition file has been initialized with your choices. Please review it, make any required changes and then create your project.
+cd %s
+cat zero-project.yml
+zero create`, projectContext.Name)
 		}
 	},
 }
