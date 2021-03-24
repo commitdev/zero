@@ -1,7 +1,7 @@
 VERSION = 0.0.1
 BUILD ?=$(shell git rev-parse --short HEAD)
 PKG ?=github.com/commitdev/zero
-BUILD_ARGS=-v -trimpath -ldflags=all="-X ${PKG}/cmd.appVersion=${VERSION} -X ${PKG}/cmd.appBuild=${BUILD}"
+BUILD_ARGS=-v -trimpath -ldflags=all="-X ${PKG}/version.AppVersion=${VERSION} -X ${PKG}/version.AppBuild=${BUILD}"
 
 deps:
 	go mod download

@@ -2,12 +2,14 @@ package module_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/commitdev/zero/internal/module"
+	"github.com/commitdev/zero/version"
 )
 
 func TestGetSourceDir(t *testing.T) {
@@ -33,6 +35,7 @@ func TestParseModuleConfig(t *testing.T) {
 
 	t.Run("Loading module from source", func(t *testing.T) {
 		mod, _ = module.ParseModuleConfig(testModuleSource)
+		moduleconfig.ValidateZeroVersion(mod)
 
 		assert.Equal(t, "CI templates", mod.Name)
 	})
@@ -84,6 +87,57 @@ func TestParseModuleConfig(t *testing.T) {
 		assert.Equal(t, ".circleci", mod.TemplateConfig.OutputDir)
 		assert.Equal(t, "templates", mod.TemplateConfig.InputDir)
 		assert.Equal(t, []string{"<%", "%>"}, mod.TemplateConfig.Delimiters)
+	})
+
+	t.Run("Parsing zero version constraints", func(t *testing.T) {
+		moduleConstraints := mod.ZeroVersion.Constraints.String()
+		assert.Equal(t, ">= 3.0.0, < 4.0.0", moduleConstraints)
+	})
+
+	t.Run("Should Fail against old zero version", func(t *testing.T) {
+		moduleConstraints := mod.ZeroVersion.Constraints.String()
+
+		// Mocking zero's version, testing against ">= 3.0.0, <= 4.0.0"
+		originalVersion := version.AppVersion
+		version.AppVersion = "2.0.0"
+		defer func() { version.AppVersion = originalVersion }()
+		// end of mock
+
+		isValid := moduleconfig.ValidateZeroVersion(mod)
+		assert.Equal(t, false, isValid, fmt.Sprintf("Version should satisfy %s", moduleConstraints))
+	})
+
+	t.Run("Should Fail against too new zero version", func(t *testing.T) {
+		moduleConstraints := mod.ZeroVersion.Constraints.String()
+
+		// Mocking zero's version, testing against ">= 3.0.0, <= 4.0.0"
+		originalVersion := version.AppVersion
+		version.AppVersion = "4.0.0"
+		defer func() { version.AppVersion = originalVersion }()
+		// end of mock
+
+		isValid := moduleconfig.ValidateZeroVersion(mod)
+		assert.Equal(t, false, isValid, fmt.Sprintf("Version should satisfy %s", moduleConstraints))
+	})
+
+	t.Run("Should validate against valid versions", func(t *testing.T) {
+		moduleConstraints := mod.ZeroVersion.Constraints.String()
+
+		// Mocking zero's version, testing against ">= 3.0.0, <= 4.0.0"
+		const newZeroVersion = "3.0.5"
+		originalVersion := version.AppVersion
+		version.AppVersion = newZeroVersion
+		defer func() { version.AppVersion = originalVersion }()
+		// end of mock
+
+		isValid := moduleconfig.ValidateZeroVersion(mod)
+		assert.Equal(t, true, isValid, fmt.Sprintf("Version should satisfy %s", moduleConstraints))
+	})
+
+	t.Run("default to SNAPSHOT version passes tests", func(t *testing.T) {
+		assert.Equal(t, "SNAPSHOT", version.AppVersion)
+		isValid := moduleconfig.ValidateZeroVersion(mod)
+		assert.Equal(t, true, isValid, "default test run should pass version constraint")
 	})
 
 }

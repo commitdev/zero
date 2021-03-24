@@ -9,6 +9,7 @@ require (
 	github.com/google/go-cmp v0.3.1
 	github.com/google/uuid v1.1.1
 	github.com/hashicorp/go-getter v1.4.2-0.20200106182914-9813cbd4eb02
+	github.com/hashicorp/go-version v1.2.1
 	github.com/hashicorp/terraform v0.12.26
 	github.com/iancoleman/strcase v0.1.2
 	github.com/juju/ansiterm v0.0.0-20180109212912-720a0952cc2a // indirect
