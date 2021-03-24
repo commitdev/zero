@@ -13,4 +13,5 @@ const (
 	MaxPnameLength     = 16
 	RegexValidation    = "regex"
 	FunctionValidation = "function"
+	ZeroReleaseURL     = "https://github.com/commitdev/zero/releases"
 )

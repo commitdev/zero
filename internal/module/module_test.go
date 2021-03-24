@@ -142,6 +142,23 @@ func TestParseModuleConfig(t *testing.T) {
 
 }
 
+func TestModuleWithNoVersionConstraint(t *testing.T) {
+	testModuleSource := "../../tests/test_data/modules/no-version-constraint"
+	var mod moduleconfig.ModuleConfig
+	var err error
+
+	t.Run("Parsing Module with no version constraint", func(t *testing.T) {
+		mod, err = module.ParseModuleConfig(testModuleSource)
+		assert.Equal(t, "", mod.ZeroVersion.String())
+		assert.Nil(t, err)
+	})
+
+	t.Run("Should pass Validation if constraint not specified", func(t *testing.T) {
+		isValid := moduleconfig.ValidateZeroVersion(mod)
+		assert.Equal(t, true, isValid, "Module with no constraint should pass version validation")
+	})
+}
+
 func findParameter(params []moduleconfig.Parameter, field string) (moduleconfig.Parameter, error) {
 	for _, v := range params {
 		if v.Field == field {

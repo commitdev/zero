@@ -12,6 +12,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/commitdev/zero/internal/config/projectconfig"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/commitdev/zero/version"
 	"github.com/iancoleman/strcase"
@@ -41,6 +42,10 @@ func checkVersionAgainstConstrains(vc VersionConstraints, versionString string) 
 // ValidateZeroVersion receives a module config, and returns whether the running zero's binary
 // is compatible with the module
 func ValidateZeroVersion(mc ModuleConfig) bool {
+	if mc.ZeroVersion.String() == "" {
+		return true
+	}
+
 	zeroVersion := version.AppVersion
 	flog.Debugf("Checking Zero version (%s) against %s", zeroVersion, mc.ZeroVersion)
 
@@ -140,7 +145,10 @@ func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 
 	if !ValidateZeroVersion(config) {
 		constraint := config.ZeroVersion.Constraints.String()
-		return config, errors.New(fmt.Sprintf("Module's zero requirement not satisfied: expected %s  received: %s", constraint, version.AppVersion))
+		errTpl := `Module(%s) requires Zero to be version %s. Your current Zero version is: %s
+Please update your Zero version to %s.
+Please check %s for available releases.`
+		return config, errors.New(fmt.Sprintf(errTpl, config.Name, constraint, version.AppVersion, constraint, constants.ZeroReleaseURL))
 	}
 	return config, nil
 }
@@ -257,14 +265,15 @@ func (semVer *VersionConstraints) UnmarshalYAML(unmarshal func(interface{}) erro
 	if err != nil {
 		return err
 	}
+	if versionString != "" {
+		constraints, constErr := goVerson.NewConstraint(versionString)
+		// If an invalid constraint is declared in a module
+		// instead of erroring out we just print a warning message
+		if constErr != nil {
+			flog.Warnf("Zero version constraint invalid format: %s", constErr)
+		}
 
-	constraints, constErr := goVerson.NewConstraint(versionString)
-	// If an invalid constraint is declared in a module
-	// instead of erroring out we just print a warning message
-	if constErr != nil {
-		flog.Warnf("Zero version constraint invalid format: %s", constErr)
+		*semVer = VersionConstraints{constraints}
 	}
-
-	*semVer = VersionConstraints{constraints}
 	return nil
 }

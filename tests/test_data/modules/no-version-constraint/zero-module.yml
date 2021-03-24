@@ -1,0 +1,19 @@
+name: "Test module"
+description: "a module for testing, with no zero version requirement"
+author: "Test module author"
+icon: ""
+thumbnail: ""
+
+template:
+  delimiters:
+    - "<%"
+    - "%>"
+  inputDir: templates
+  outputDir: test-module-output
+
+requiredCredentials:
+  - aws
+  - circleci
+  - github
+
+parameters:
