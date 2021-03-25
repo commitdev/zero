@@ -2,14 +2,15 @@
 This file is the definition of a Zero module. It contains a list of all the required parameters to be able to prompt a user for choices during `zero init`, information about how to template the contents of the module during `zero create`, and the information needed for the module to run (`zero apply`).
 It also declares the module's  dependencies to determine the order of execution in relation to other modules.
 
-| Parameters    | type            | Description                                      |
-|---------------|-----------------|--------------------------------------------------|
-| `name`        | string          | Name of module                                   |
-| `description` | string          | Description of the module                        |
-| `template`    | template        | default settings for templating out the module   |
-| `author`      | string          | Author of the module                             |
-| `icon`        | string          | Path to logo image                               |
-| `parameters`  | list(Parameter) | Parameters to prompt users                       |
+| Parameters    | type               | Description                                      |
+|---------------|--------------------|--------------------------------------------------|
+| `name`        | string             | Name of module                                   |
+| `description` | string             | Description of the module                        |
+| `template`    | template           | default settings for templating out the module   |
+| `author`      | string             | Author of the module                             |
+| `icon`        | string             | Path to logo image                               |
+| `parameters`  | list(Parameter)    | Parameters to prompt users                       |
+| `zeroVersion` | string([go-semver])| Zero versions its compatible with                |
 
 
 ### Template
@@ -77,3 +78,5 @@ For example if a user decide to not use circleCI, condition can be used to skip 
 | `type`         | enum(string) | Currently supports [`regex`]          |
 | `value`        | string       | Regular expression string           |
 | `errorMessage` | string       | Error message when validation fails |
+
+[go-semver]: https://github.com/hashicorp/go-version/blob/master/README.md

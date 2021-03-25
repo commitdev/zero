@@ -6,7 +6,7 @@ builds:
 - env:
   - CGO_ENABLED=0
   ldflags:
-    - -X github.com/commitdev/zero/cmd.appVersion={{.Version}} -X github.com/commitdev/zero/cmd.appBuild={{.ShortCommit}}
+    - -X github.com/commitdev/zero/version.AppVersion={{.Version}} -X github.com/commitdev/zero/version.AppBuild={{.ShortCommit}}
 archives:
 - replacements:
     darwin: Darwin

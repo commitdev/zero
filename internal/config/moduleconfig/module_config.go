@@ -1,16 +1,20 @@
 package moduleconfig
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"reflect"
 	"strings"
 
+	goVerson "github.com/hashicorp/go-version"
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/commitdev/zero/internal/config/projectconfig"
+	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/pkg/util/flog"
+	"github.com/commitdev/zero/version"
 	"github.com/iancoleman/strcase"
 )
 
@@ -20,9 +24,37 @@ type ModuleConfig struct {
 	Author              string
 	DependsOn           []string `yaml:"dependsOn,omitempty"`
 	TemplateConfig      `yaml:"template"`
-	RequiredCredentials []string `yaml:"requiredCredentials"`
+	RequiredCredentials []string           `yaml:"requiredCredentials"`
+	ZeroVersion         VersionConstraints `yaml:"zeroVersion,omitempty"`
 	Parameters          []Parameter
 	Conditions          []Condition `yaml:"conditions,omitempty"`
+}
+
+func checkVersionAgainstConstrains(vc VersionConstraints, versionString string) bool {
+	v, err := goVerson.NewVersion(versionString)
+	if err != nil {
+		return false
+	}
+
+	return vc.Check(v)
+}
+
+// ValidateZeroVersion receives a module config, and returns whether the running zero's binary
+// is compatible with the module
+func ValidateZeroVersion(mc ModuleConfig) bool {
+	if mc.ZeroVersion.String() == "" {
+		return true
+	}
+
+	zeroVersion := version.AppVersion
+	flog.Debugf("Checking Zero version (%s) against %s", zeroVersion, mc.ZeroVersion)
+
+	// Unreleased versions or test runs, defaults to SNAPSHOT when not declared
+	if zeroVersion == "SNAPSHOT" {
+		return true
+	}
+
+	return checkVersionAgainstConstrains(mc.ZeroVersion, zeroVersion)
 }
 
 type Parameter struct {
@@ -58,6 +90,10 @@ type TemplateConfig struct {
 	Delimiters []string
 	InputDir   string `yaml:"inputDir"`
 	OutputDir  string `yaml:"outputDir"`
+}
+
+type VersionConstraints struct {
+	goVerson.Constraints
 }
 
 // A "nice" wrapper around findMissing()
@@ -107,6 +143,13 @@ func LoadModuleConfig(filePath string) (ModuleConfig, error) {
 		log.Fatal("")
 	}
 
+	if !ValidateZeroVersion(config) {
+		constraint := config.ZeroVersion.Constraints.String()
+		errTpl := `Module(%s) requires Zero to be version %s. Your current Zero version is: %s
+Please update your Zero version to %s.
+Please check %s for available releases.`
+		return config, errors.New(fmt.Sprintf(errTpl, config.Name, constraint, version.AppVersion, constraint, constants.ZeroReleaseURL))
+	}
 	return config, nil
 }
 
@@ -213,4 +256,24 @@ func SummarizeConditions(module ModuleConfig) []projectconfig.Condition {
 		}
 	}
 	return moduleConditions
+}
+
+// UnmarshalYAML Parses a version constraint string into go-version constraint during yaml parsing
+func (semVer *VersionConstraints) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var versionString string
+	err := unmarshal(&versionString)
+	if err != nil {
+		return err
+	}
+	if versionString != "" {
+		constraints, constErr := goVerson.NewConstraint(versionString)
+		// If an invalid constraint is declared in a module
+		// instead of erroring out we just print a warning message
+		if constErr != nil {
+			flog.Warnf("Zero version constraint invalid format: %s", constErr)
+		}
+
+		*semVer = VersionConstraints{constraints}
+	}
+	return nil
 }
