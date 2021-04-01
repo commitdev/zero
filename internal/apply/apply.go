@@ -35,7 +35,7 @@ Only a single environment may be suitable for an initial test, but for a real sy
 		environments = promptEnvironments()
 	}
 
-	flog.Infof(":tada: checking project %s. Please use the zero-project.yml file to modify the project as needed.", projectConfig.Name)
+	flog.Infof(":mag: checking project %s's module requirements.", projectConfig.Name)
 
 	err = modulesWalkCmd("check", rootDir, projectConfig, []string{"make", "check"}, environments)
 	if err != nil {
@@ -65,10 +65,10 @@ Only a single environment may be suitable for an initial test, but for a real sy
 	return err
 }
 
-func modulesWalkCmd(lifecycleName string, dir string, projectConfig *projectconfig.ZeroProjectConfig, cmdArgs []string, applyEnvironments []string) error {
+func modulesWalkCmd(lifecycleName string, dir string, projectConfig *projectconfig.ZeroProjectConfig, cmdArgs []string, environments []string) error {
 	graph := projectConfig.GetDAG()
 	root := []dag.Vertex{projectconfig.GraphRootName}
-	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ","))
+	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(environments, ","))
 	err := graph.DepthFirstWalk(root, func(v dag.Vertex, depth int) error {
 		// Don't process the root
 		if depth == 0 {
