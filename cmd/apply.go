@@ -29,6 +29,9 @@ var applyCmd = &cobra.Command{
 			log.Println(err)
 			rootDir = projectconfig.RootDir
 		}
-		apply.Apply(rootDir, applyConfigPath, applyEnvironments)
+		applyErr := apply.Apply(rootDir, applyConfigPath, applyEnvironments)
+		if applyErr != nil {
+			log.Fatal(applyErr)
+		}
 	},
 }

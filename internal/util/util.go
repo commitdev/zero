@@ -48,7 +48,7 @@ func GetCwd() string {
 	return dir
 }
 
-func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
+func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) error {
 
 	cmd.Dir = pathPrefix
 	if !filepath.IsAbs(pathPrefix) {
@@ -68,7 +68,7 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 
 	err := cmd.Start()
 	if err != nil {
-		panic(fmt.Sprintf("Starting command failed: %v\n", err))
+		return err
 	}
 
 	go func() {
@@ -80,7 +80,7 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 
 	err = cmd.Wait()
 	if err != nil {
-		panic(fmt.Sprintf("Executing command failed: %v\n", err))
+		return err
 	}
 
 	if errStdout != nil {
@@ -90,6 +90,7 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 	if errStderr != nil {
 		log.Printf("Failed to capture stderr: %v\n", errStderr)
 	}
+	return nil
 }
 
 // ExecuteCommandOutput runs the command and returns its

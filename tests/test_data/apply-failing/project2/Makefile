@@ -4,4 +4,5 @@ current_dir:
 summary:
 
 check:
-	exit 1
+	@echo "Expected failure from test fixture"
+	@exit 1

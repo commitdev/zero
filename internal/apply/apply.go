@@ -1,6 +1,7 @@
 package apply
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 
@@ -19,7 +20,8 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-func Apply(rootDir string, configPath string, environments []string) {
+func Apply(rootDir string, configPath string, environments []string) error {
+	var err error
 	if strings.Trim(configPath, " ") == "" {
 		exit.Fatal("config path cannot be empty!")
 	}
@@ -34,7 +36,11 @@ Only a single environment may be suitable for an initial test, but for a real sy
 	}
 
 	flog.Infof(":tada: checking project %s. Please use the zero-project.yml file to modify the project as needed.", projectConfig.Name)
-	checkAll(rootDir, *projectConfig, environments)
+
+	err = modulesWalkCmd("check", rootDir, projectConfig, []string{"make", "check"}, environments)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Module checks failed: %s", err.Error()))
+	}
 
 	flog.Infof(":tada: Bootstrapping project %s. Please use the zero-project.yml file to modify the project as needed.", projectConfig.Name)
 
@@ -44,21 +50,26 @@ Only a single environment may be suitable for an initial test, but for a real sy
 
 	flog.Infof("Infrastructure executor: %s", "Terraform")
 
-	applyAll(rootDir, *projectConfig, environments)
+	err = modulesWalkCmd("apply", rootDir, projectConfig, []string{"make"}, environments)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Module Apply failed: %s", err.Error()))
+	}
 
 	flog.Infof(":check_mark_button: Done.")
 
-	summarizeAll(rootDir, *projectConfig, environments)
+	flog.Infof("Your projects and infrastructure have been successfully created.  Here are some useful links and commands to get you started:")
+	err = modulesWalkCmd("summary", rootDir, projectConfig, []string{"make", "summary"}, environments)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Module summary failed: %s", err.Error()))
+	}
+	return err
 }
 
-func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
-	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ","))
-
+func modulesWalkCmd(lifecycleName string, dir string, projectConfig *projectconfig.ZeroProjectConfig, cmdArgs []string, applyEnvironments []string) error {
 	graph := projectConfig.GetDAG()
-
-	// Walk the graph of modules and run `make`
 	root := []dag.Vertex{projectconfig.GraphRootName}
-	graph.DepthFirstWalk(root, func(v dag.Vertex, depth int) error {
+	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ","))
+	err := graph.DepthFirstWalk(root, func(v dag.Vertex, depth int) error {
 		// Don't process the root
 		if depth == 0 {
 			return nil
@@ -92,10 +103,20 @@ func applyAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEn
 		envVarTranslationMap := modConfig.GetParamEnvVarTranslationMap()
 		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList, envVarTranslationMap)
 		flog.Debugf("Env injected: %#v", envList)
-		flog.Infof("Executing apply command for %s...", modConfig.Name)
-		util.ExecuteCommand(exec.Command("make"), modulePath, envList)
+
+		// only print msg for apply, or else it gets a little spammy
+		if lifecycleName == "apply" {
+			flog.Infof("Executing %s command for %s...", lifecycleName, modConfig.Name)
+		}
+
+		execErr := util.ExecuteCommand(exec.Command(cmdArgs[0], cmdArgs[1:]...), modulePath, envList)
+		if execErr != nil {
+			return errors.New(fmt.Sprintf("Module (%s) %s", modConfig.Name, execErr.Error()))
+		}
 		return nil
 	})
+
+	return err
 }
 
 // promptEnvironments Prompts the user for the environments to apply against and returns a slice of strings representing the environments
@@ -127,94 +148,4 @@ func validateEnvironments(applyEnvironments []string) {
 			exit.Fatal("The currently supported environments are \"staging\" and \"production\"")
 		}
 	}
-}
-
-func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
-	flog.Infof("Your projects and infrastructure have been successfully created.  Here are some useful links and commands to get you started:")
-
-	graph := projectConfig.GetDAG()
-
-	// Walk the graph of modules and run `make summary`
-	root := []dag.Vertex{projectconfig.GraphRootName}
-	graph.DepthFirstWalk(root, func(v dag.Vertex, depth int) error {
-		// Don't process the root
-		if depth == 0 {
-			return nil
-		}
-
-		name := v.(string)
-		mod := projectConfig.Modules[name]
-		// Add env vars for the makefile
-		envList := []string{
-			fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ",")),
-			fmt.Sprintf("REPOSITORY=%s", mod.Files.Repository),
-			fmt.Sprintf("PROJECT_NAME=%s", projectConfig.Name),
-		}
-
-		modulePath := module.GetSourceDir(mod.Files.Source)
-		// Passed in `dir` will only be used to find the project path, not the module path,
-		// unless the module path is relative
-		if module.IsLocal(mod.Files.Source) && !filepath.IsAbs(modulePath) {
-			modulePath = filepath.Join(dir, modulePath)
-		}
-		flog.Debugf("Loaded module: %s from %s", name, modulePath)
-
-		modConfig, err := module.ParseModuleConfig(modulePath)
-		if err != nil {
-			exit.Fatal("Failed to load module config, credentials cannot be injected properly")
-		}
-		envVarTranslationMap := modConfig.GetParamEnvVarTranslationMap()
-		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList, envVarTranslationMap)
-		flog.Debugf("Env injected: %#v", envList)
-		util.ExecuteCommand(exec.Command("make", "summary"), modulePath, envList)
-		return nil
-	})
-
-	flog.Infof("Happy coding! :smile:")
-}
-
-func checkAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
-	flog.Infof("Checking module requirements.")
-
-	graph := projectConfig.GetDAG()
-
-	// Walk the graph of modules and run `make summary`
-	root := []dag.Vertex{projectconfig.GraphRootName}
-	graph.DepthFirstWalk(root, func(v dag.Vertex, depth int) error {
-		// Don't process the root
-		if depth == 0 {
-			return nil
-		}
-
-		name := v.(string)
-		mod := projectConfig.Modules[name]
-		// Add env vars for the makefile
-		envList := []string{
-			fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ",")),
-			fmt.Sprintf("REPOSITORY=%s", mod.Files.Repository),
-			fmt.Sprintf("PROJECT_NAME=%s", projectConfig.Name),
-		}
-
-		modulePath := module.GetSourceDir(mod.Files.Source)
-		// Passed in `dir` will only be used to find the project path, not the module path,
-		// unless the module path is relative
-		if module.IsLocal(mod.Files.Source) && !filepath.IsAbs(modulePath) {
-			modulePath = filepath.Join(dir, modulePath)
-		}
-		flog.Debugf("Loaded module: %s from %s", name, modulePath)
-
-		modConfig, err := module.ParseModuleConfig(modulePath)
-		if err != nil {
-			exit.Fatal("Failed to load module config, credentials cannot be injected properly")
-		}
-
-		envVarTranslationMap := modConfig.GetParamEnvVarTranslationMap()
-		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList, envVarTranslationMap)
-		flog.Debugf("Env injected: %#v", envList)
-
-		util.ExecuteCommand(exec.Command("make", "check"), modulePath, envList)
-		return nil
-	})
-
-	flog.Infof("Happy coding! :smile:")
 }

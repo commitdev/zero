@@ -19,7 +19,7 @@ func TestApply(t *testing.T) {
 
 	t.Run("Should run apply and execute make on each folder module", func(t *testing.T) {
 		tmpDir = setupTmpDir(t, "../../tests/test_data/apply/")
-		apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
+		err := apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
 		assert.FileExists(t, filepath.Join(tmpDir, "project1/project.out"))
 		assert.FileExists(t, filepath.Join(tmpDir, "project2/project.out"))
 
@@ -41,9 +41,8 @@ func TestApply(t *testing.T) {
 	t.Run("Moudles with failing checks should return error", func(t *testing.T) {
 		tmpDir = setupTmpDir(t, "../../tests/test_data/apply-failing/")
 
-		assert.Panics(t, func() {
-			apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
-		})
+		err := apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
+		assert.Regexp(t, "^Module checks failed:", err.Error())
 	})
 }
 
