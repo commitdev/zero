@@ -4,3 +4,4 @@ current_dir:
 summary:
 
 check:
+	exit 1

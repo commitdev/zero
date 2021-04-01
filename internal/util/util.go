@@ -68,7 +68,7 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 
 	err := cmd.Start()
 	if err != nil {
-		log.Fatalf("Starting command failed: %v\n", err)
+		panic(fmt.Sprintf("Starting command failed: %v\n", err))
 	}
 
 	go func() {
@@ -80,7 +80,7 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 
 	err = cmd.Wait()
 	if err != nil {
-		log.Fatalf("Executing command failed: %v\n", err)
+		panic(fmt.Sprintf("Executing command failed: %v\n", err))
 	}
 
 	if errStdout != nil {

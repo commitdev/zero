@@ -33,6 +33,9 @@ Only a single environment may be suitable for an initial test, but for a real sy
 		environments = promptEnvironments()
 	}
 
+	flog.Infof(":tada: checking project %s. Please use the zero-project.yml file to modify the project as needed.", projectConfig.Name)
+	checkAll(rootDir, *projectConfig, environments)
+
 	flog.Infof(":tada: Bootstrapping project %s. Please use the zero-project.yml file to modify the project as needed.", projectConfig.Name)
 
 	flog.Infof("Cloud provider: %s", "AWS") // will this come from the config?
@@ -164,6 +167,52 @@ func summarizeAll(dir string, projectConfig projectconfig.ZeroProjectConfig, app
 		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList, envVarTranslationMap)
 		flog.Debugf("Env injected: %#v", envList)
 		util.ExecuteCommand(exec.Command("make", "summary"), modulePath, envList)
+		return nil
+	})
+
+	flog.Infof("Happy coding! :smile:")
+}
+
+func checkAll(dir string, projectConfig projectconfig.ZeroProjectConfig, applyEnvironments []string) {
+	flog.Infof("Checking module requirements.")
+
+	graph := projectConfig.GetDAG()
+
+	// Walk the graph of modules and run `make summary`
+	root := []dag.Vertex{projectconfig.GraphRootName}
+	graph.DepthFirstWalk(root, func(v dag.Vertex, depth int) error {
+		// Don't process the root
+		if depth == 0 {
+			return nil
+		}
+
+		name := v.(string)
+		mod := projectConfig.Modules[name]
+		// Add env vars for the makefile
+		envList := []string{
+			fmt.Sprintf("ENVIRONMENT=%s", strings.Join(applyEnvironments, ",")),
+			fmt.Sprintf("REPOSITORY=%s", mod.Files.Repository),
+			fmt.Sprintf("PROJECT_NAME=%s", projectConfig.Name),
+		}
+
+		modulePath := module.GetSourceDir(mod.Files.Source)
+		// Passed in `dir` will only be used to find the project path, not the module path,
+		// unless the module path is relative
+		if module.IsLocal(mod.Files.Source) && !filepath.IsAbs(modulePath) {
+			modulePath = filepath.Join(dir, modulePath)
+		}
+		flog.Debugf("Loaded module: %s from %s", name, modulePath)
+
+		modConfig, err := module.ParseModuleConfig(modulePath)
+		if err != nil {
+			exit.Fatal("Failed to load module config, credentials cannot be injected properly")
+		}
+
+		envVarTranslationMap := modConfig.GetParamEnvVarTranslationMap()
+		envList = util.AppendProjectEnvToCmdEnv(mod.Parameters, envList, envVarTranslationMap)
+		flog.Debugf("Env injected: %#v", envList)
+
+		util.ExecuteCommand(exec.Command("make", "check"), modulePath, envList)
 		return nil
 	})
 

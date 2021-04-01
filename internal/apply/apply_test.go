@@ -13,19 +13,12 @@ import (
 )
 
 func TestApply(t *testing.T) {
-	dir := "../../tests/test_data/apply/"
 	applyConfigPath := constants.ZeroProjectYml
 	applyEnvironments := []string{"staging", "production"}
-
-	tmpDir := filepath.Join(os.TempDir(), "apply")
-
-	err := os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
-
-	err = shutil.CopyTree(dir, tmpDir, nil)
-	assert.NoError(t, err)
+	var tmpDir string
 
 	t.Run("Should run apply and execute make on each folder module", func(t *testing.T) {
+		tmpDir = setupTmpDir(t, "../../tests/test_data/apply/")
 		apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
 		assert.FileExists(t, filepath.Join(tmpDir, "project1/project.out"))
 		assert.FileExists(t, filepath.Join(tmpDir, "project2/project.out"))
@@ -45,4 +38,23 @@ func TestApply(t *testing.T) {
 		assert.Equal(t, "envVarName of viaEnvVarName: baz\n", string(content))
 	})
 
+	t.Run("Moudles with failing checks should return error", func(t *testing.T) {
+		tmpDir = setupTmpDir(t, "../../tests/test_data/apply-failing/")
+
+		assert.Panics(t, func() {
+			apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
+		})
+	})
+}
+
+func setupTmpDir(t *testing.T, exampleDirPath string) string {
+	var err error
+	tmpDir := filepath.Join(os.TempDir(), "apply")
+
+	err = os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	err = shutil.CopyTree(exampleDirPath, tmpDir, nil)
+	assert.NoError(t, err)
+	return tmpDir
 }
