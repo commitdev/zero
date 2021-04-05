@@ -3,6 +3,8 @@ package util
 // @TODO split up and move into /pkg directory
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -11,8 +13,10 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 	"text/template"
 
 	"github.com/google/uuid"
@@ -60,6 +64,7 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) error {
 	stderrPipe, _ := cmd.StderrPipe()
 
 	var errStdout, errStderr error
+	errContent := new(bytes.Buffer)
 
 	cmd.Env = os.Environ()
 	if envars != nil {
@@ -75,11 +80,27 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) error {
 		_, errStdout = io.Copy(os.Stdout, stdoutPipe)
 	}()
 	go func() {
-		_, errStderr = io.Copy(os.Stderr, stderrPipe)
+		stdErr := io.MultiWriter(errContent, os.Stderr)
+		_, errStderr = io.Copy(stdErr, stderrPipe)
 	}()
 
 	err = cmd.Wait()
 	if err != nil {
+		// Detecting and returning the makefile error to cmd
+		// Passing alone makefile stderr as error message, otherwise it just says "exit status 2"
+		if exitError, ok := err.(*exec.ExitError); ok {
+			ws := exitError.Sys().(syscall.WaitStatus)
+			exitCode := ws.ExitStatus()
+			if exitCode == 2 {
+				stderrOut := errContent.String()
+				isMissingTarget, _ := regexp.MatchString("No rule to make target", stderrOut)
+				if isMissingTarget {
+					return errors.New("Module missing mandatory targets, this is likely an issue with the module itself.")
+				}
+				return errors.New(stderrOut)
+			}
+		}
+
 		return err
 	}
 

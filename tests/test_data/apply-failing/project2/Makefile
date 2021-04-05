@@ -1,8 +1,10 @@
+REQUIRED_BINS := ls nonexisting-binary
+
 current_dir:
 	@echo "baz: ${baz}" > project.out
 
 summary:
 
 check:
-	@echo "Expected failure from test fixture"
-	@exit 1
+		$(foreach bin, $(REQUIRED_BINS),\
+			$(if $(shell command -v $(bin) 2> /dev/null),$(info Found `$(bin)`),$(error Please install `$(bin)`)))
