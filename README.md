@@ -106,12 +106,12 @@ ___
 ### Project Definition:
 Each project is defined by this project definition file, this manifest contains your project details, and is the source of truth for the templating(`zero create`) and provision(`zero apply`) steps.
 
-See [`zero-project.yml` reference](./docs/project-definition.md) for details. 
+See [`zero-project.yml` reference](./docs/project-definition.md) for details.
 ### Module Definition
 Module definition defines the information needed for the module to run (`zero apply`).
 Also declares dependency used to determine the order of execution with other modules.
 
-See [`zero-module.yml` reference](./docs/module-definition.md) for details. 
+See [`zero-module.yml` reference](./docs/module-definition.md) for details.
 ___
 ## Using zero to spin up your own stack
 
@@ -262,6 +262,7 @@ ___
 
 Zero welcomes collaboration from the community; you can open new issues in our GitHub repo, Submit PRs' for bug fixes or browse through the tickets currently open to see what you can contribute too.
 
+We use Zenhub to show us the entire project across all repositories, so if you are interested in seeing that or participating, you can can [check out our workspace](https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?repos=203630543,247773730,257676371,258369081,291818252,293942410,285931648,317656612)
 ### Building this tool
 
 ```shell
