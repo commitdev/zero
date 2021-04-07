@@ -104,7 +104,7 @@ func modulesWalkCmd(lifecycleName string, dir string, projectConfig *projectconf
 		// and we should redownload the module for the user
 		modConfig, err := module.ParseModuleConfig(modulePath)
 		if err != nil {
-			exit.Fatal("Failed to load module config, credentials cannot be injected properly")
+			exit.Fatal("Failed to load Module: %s", err)
 		}
 
 		envVarTranslationMap := modConfig.GetParamEnvVarTranslationMap()
