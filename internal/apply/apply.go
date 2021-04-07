@@ -142,19 +142,19 @@ func getModuleOperationCommand(mod moduleconfig.ModuleConfig, operation string) 
 	switch operation {
 	case "check":
 		if mod.Commands.Check != "" {
-			operationCommand = strings.Split(mod.Commands.Check, " ")
+			operationCommand = []string{"sh", "-c", mod.Commands.Check}
 		} else {
 			operationCommand = defaultCheck
 		}
 	case "apply":
 		if mod.Commands.Apply != "" {
-			operationCommand = strings.Split(mod.Commands.Apply, " ")
+			operationCommand = []string{"sh", "-c", mod.Commands.Apply}
 		} else {
 			operationCommand = defaultApply
 		}
 	case "summary":
 		if mod.Commands.Summary != "" {
-			operationCommand = strings.Split(mod.Commands.Summary, " ")
+			operationCommand = []string{"sh", "-c", mod.Commands.Summary}
 		} else {
 			operationCommand = defaultSummary
 		}
