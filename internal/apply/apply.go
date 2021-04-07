@@ -43,9 +43,9 @@ Only a single environment may be suitable for an initial test, but for a real sy
 	if len(errs) > 0 {
 		msg := ""
 		for i := 0; i < len(errs); i++ {
-			msg += "\t" + errs[i].Error()
+			msg += "- " + errs[i].Error()
 		}
-		return errors.New(fmt.Sprintf("Module checks failed: \n%s", msg))
+		return errors.New(fmt.Sprintf("The following Module check(s) failed: \n%s", msg))
 	}
 
 	flog.Infof(":tada: Bootstrapping project %s. Please use the zero-project.yml file to modify the project as needed.", projectConfig.Name)
