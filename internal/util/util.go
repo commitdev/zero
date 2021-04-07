@@ -80,11 +80,11 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string, shouldPip
 		_, errStdout = io.Copy(os.Stdout, stdoutPipe)
 	}()
 	go func() {
-		strErrStreams := []io.Writer{errContent}
+		stderrStreams := []io.Writer{errContent}
 		if shouldPipeStdErr {
-			strErrStreams = append(strErrStreams, os.Stderr)
+			stderrStreams = append(stderrStreams, os.Stderr)
 		}
-		stdErr := io.MultiWriter(strErrStreams...)
+		stdErr := io.MultiWriter(stderrStreams...)
 		_, errStderr = io.Copy(stdErr, stderrPipe)
 	}()
 
