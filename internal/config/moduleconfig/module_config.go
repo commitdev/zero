@@ -22,12 +22,19 @@ type ModuleConfig struct {
 	Name                string
 	Description         string
 	Author              string
-	DependsOn           []string `yaml:"dependsOn,omitempty"`
+	Commands            ModuleCommands `yaml:"commands,omitempty"`
+	DependsOn           []string       `yaml:"dependsOn,omitempty"`
 	TemplateConfig      `yaml:"template"`
 	RequiredCredentials []string           `yaml:"requiredCredentials"`
 	ZeroVersion         VersionConstraints `yaml:"zeroVersion,omitempty"`
 	Parameters          []Parameter
 	Conditions          []Condition `yaml:"conditions,omitempty"`
+}
+
+type ModuleCommands struct {
+	Apply   string `yaml:"apply,omitempty"`
+	Check   string `yaml:"check,omitempty"`
+	Summary string `yaml:"summary,omitempty"`
 }
 
 func checkVersionAgainstConstrains(vc VersionConstraints, versionString string) bool {

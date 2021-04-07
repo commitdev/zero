@@ -101,7 +101,7 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) error {
 			}
 		}
 
-		return err
+		return errors.New(errContent.String())
 	}
 
 	if errStdout != nil {

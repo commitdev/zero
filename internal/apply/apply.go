@@ -14,6 +14,7 @@ import (
 	"github.com/commitdev/zero/internal/util"
 	"github.com/hashicorp/terraform/dag"
 
+	"github.com/commitdev/zero/internal/config/moduleconfig"
 	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/pkg/util/exit"
 	"github.com/commitdev/zero/pkg/util/flog"
@@ -21,7 +22,7 @@ import (
 )
 
 func Apply(rootDir string, configPath string, environments []string) error {
-	var err error
+	var errs []error
 	if strings.Trim(configPath, " ") == "" {
 		exit.Fatal("config path cannot be empty!")
 	}
@@ -37,9 +38,14 @@ Only a single environment may be suitable for an initial test, but for a real sy
 
 	flog.Infof(":mag: checking project %s's module requirements.", projectConfig.Name)
 
-	err = modulesWalkCmd("check", rootDir, projectConfig, []string{"make", "check"}, environments)
-	if err != nil {
-		return errors.New(fmt.Sprintf("Module checks failed: %s", err.Error()))
+	errs = modulesWalkCmd("check", rootDir, projectConfig, "check", environments, false)
+	// Check operation walks through all modules and can return multiple errors
+	if len(errs) > 0 {
+		msg := ""
+		for i := 0; i < len(errs); i++ {
+			msg += "\t" + errs[i].Error()
+		}
+		return errors.New(fmt.Sprintf("Module checks failed: \n%s", msg))
 	}
 
 	flog.Infof(":tada: Bootstrapping project %s. Please use the zero-project.yml file to modify the project as needed.", projectConfig.Name)
@@ -50,22 +56,23 @@ Only a single environment may be suitable for an initial test, but for a real sy
 
 	flog.Infof("Infrastructure executor: %s", "Terraform")
 
-	err = modulesWalkCmd("apply", rootDir, projectConfig, []string{"make"}, environments)
-	if err != nil {
-		return errors.New(fmt.Sprintf("Module Apply failed: %s", err.Error()))
+	errs = modulesWalkCmd("apply", rootDir, projectConfig, "apply", environments, true)
+	if len(errs) > 0 {
+		return errors.New(fmt.Sprintf("Module Apply failed: %s", errs[0]))
 	}
 
 	flog.Infof(":check_mark_button: Done.")
 
 	flog.Infof("Your projects and infrastructure have been successfully created.  Here are some useful links and commands to get you started:")
-	err = modulesWalkCmd("summary", rootDir, projectConfig, []string{"make", "summary"}, environments)
-	if err != nil {
-		return errors.New(fmt.Sprintf("Module summary failed: %s", err.Error()))
+	errs = modulesWalkCmd("summary", rootDir, projectConfig, "summary", environments, true)
+	if len(errs) > 0 {
+		return errors.New(fmt.Sprintf("Module summary failed: %s", errs[0]))
 	}
-	return err
+	return nil
 }
 
-func modulesWalkCmd(lifecycleName string, dir string, projectConfig *projectconfig.ZeroProjectConfig, cmdArgs []string, environments []string) error {
+func modulesWalkCmd(lifecycleName string, dir string, projectConfig *projectconfig.ZeroProjectConfig, operation string, environments []string, bailOnError bool) []error {
+	var moduleErrors []error
 	graph := projectConfig.GetDAG()
 	root := []dag.Vertex{projectconfig.GraphRootName}
 	environmentArg := fmt.Sprintf("ENVIRONMENT=%s", strings.Join(environments, ","))
@@ -108,15 +115,53 @@ func modulesWalkCmd(lifecycleName string, dir string, projectConfig *projectconf
 		if lifecycleName == "apply" {
 			flog.Infof("Executing %s command for %s...", lifecycleName, modConfig.Name)
 		}
-
-		execErr := util.ExecuteCommand(exec.Command(cmdArgs[0], cmdArgs[1:]...), modulePath, envList)
+		operationCommand := getModuleOperationCommand(modConfig, operation)
+		execErr := util.ExecuteCommand(exec.Command(operationCommand[0], operationCommand[1:]...), modulePath, envList)
 		if execErr != nil {
-			return errors.New(fmt.Sprintf("Module (%s) %s", modConfig.Name, execErr.Error()))
+			formatedErr := errors.New(fmt.Sprintf("Module (%s) %s", modConfig.Name, execErr.Error()))
+			if bailOnError {
+				return formatedErr
+			} else {
+				moduleErrors = append(moduleErrors, formatedErr)
+			}
 		}
 		return nil
 	})
+	if err != nil {
+		moduleErrors = append(moduleErrors, err)
+	}
 
-	return err
+	return moduleErrors
+}
+
+func getModuleOperationCommand(mod moduleconfig.ModuleConfig, operation string) (operationCommand []string) {
+	defaultCheck := []string{"make", "check"}
+	defaultApply := []string{"make"}
+	defaultSummary := []string{"make", "summary"}
+
+	switch operation {
+	case "check":
+		if mod.Commands.Check != "" {
+			operationCommand = strings.Split(mod.Commands.Check, " ")
+		} else {
+			operationCommand = defaultCheck
+		}
+	case "apply":
+		if mod.Commands.Apply != "" {
+			operationCommand = strings.Split(mod.Commands.Apply, " ")
+		} else {
+			operationCommand = defaultApply
+		}
+	case "summary":
+		if mod.Commands.Summary != "" {
+			operationCommand = strings.Split(mod.Commands.Summary, " ")
+		} else {
+			operationCommand = defaultSummary
+		}
+	default:
+		panic("Unexpected operation")
+	}
+	return operationCommand
 }
 
 // promptEnvironments Prompts the user for the environments to apply against and returns a slice of strings representing the environments

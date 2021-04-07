@@ -5,3 +5,4 @@ current_dir:
 summary:
 
 check:
+	@$(error "Failure 1 of 2")

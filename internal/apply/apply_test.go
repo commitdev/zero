@@ -30,6 +30,13 @@ func TestApply(t *testing.T) {
 		content, err = ioutil.ReadFile(filepath.Join(tmpDir, "project2/project.out"))
 		assert.NoError(t, err)
 		assert.Equal(t, "baz: qux\n", string(content))
+
+	})
+
+	t.Run("Moudles runs command overides", func(t *testing.T) {
+		content, err := ioutil.ReadFile(filepath.Join(tmpDir, "project2/check.out"))
+		assert.NoError(t, err)
+		assert.Equal(t, "custom check\n", string(content))
 	})
 
 	t.Run("Zero apply honors the envVarName overwrite from module definition", func(t *testing.T) {
@@ -43,7 +50,11 @@ func TestApply(t *testing.T) {
 
 		err := apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
 		assert.Regexp(t, "^Module checks failed:", err.Error())
+		assert.Regexp(t, "Module \\(project1\\)", err.Error())
+		assert.Regexp(t, "Module \\(project2\\)", err.Error())
+		assert.Regexp(t, "Module \\(project3\\)", err.Error())
 	})
+
 }
 
 func setupTmpDir(t *testing.T, exampleDirPath string) string {

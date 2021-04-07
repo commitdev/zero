@@ -15,3 +15,8 @@ modules:
             dir: project2
             repo: github.com/commitdev/project2
             source: project2
+    project3:
+        files:
+            dir: project3
+            repo: github.com/commitdev/project3
+            source: project3

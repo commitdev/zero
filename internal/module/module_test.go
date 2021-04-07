@@ -89,6 +89,11 @@ func TestParseModuleConfig(t *testing.T) {
 		assert.Equal(t, []string{"<%", "%>"}, mod.TemplateConfig.Delimiters)
 	})
 
+	t.Run("Parsing commands", func(t *testing.T) {
+		checkCommand := mod.Commands.Check
+		assert.Equal(t, "ls", checkCommand)
+	})
+
 	t.Run("Parsing zero version constraints", func(t *testing.T) {
 		moduleConstraints := mod.ZeroVersion.Constraints.String()
 		assert.Equal(t, ">= 3.0.0, < 4.0.0", moduleConstraints)

@@ -6,5 +6,5 @@ current_dir:
 summary:
 
 check:
-		$(foreach bin, $(REQUIRED_BINS),\
-			$(if $(shell command -v $(bin) 2> /dev/null),$(info Found `$(bin)`),$(error Please install `$(bin)`)))
+	$(foreach bin, $(REQUIRED_BINS),\
+		$(if $(shell command -v $(bin) 2> /dev/null),$(info Found `$(bin)`),$(error Please install `$(bin)`)))

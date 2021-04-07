@@ -4,6 +4,8 @@ author: "CI author"
 icon: ""
 thumbnail: ""
 zeroVersion: ">= 3.0.0, < 4.0.0"
+commands:
+  check: ls
 
 requiredCredentials:
   - aws
