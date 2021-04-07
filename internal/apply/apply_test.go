@@ -49,7 +49,7 @@ func TestApply(t *testing.T) {
 		tmpDir = setupTmpDir(t, "../../tests/test_data/apply-failing/")
 
 		err := apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
-		assert.Regexp(t, "^Module checks failed:", err.Error())
+		assert.Regexp(t, "^The following Module check\\(s\\) failed:", err.Error())
 		assert.Regexp(t, "Module \\(project1\\)", err.Error())
 		assert.Regexp(t, "Module \\(project2\\)", err.Error())
 		assert.Regexp(t, "Module \\(project3\\)", err.Error())
