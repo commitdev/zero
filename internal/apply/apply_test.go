@@ -33,7 +33,7 @@ func TestApply(t *testing.T) {
 
 	})
 
-	t.Run("Moudles runs command overides", func(t *testing.T) {
+	t.Run("Modules runs command overides", func(t *testing.T) {
 		content, err := ioutil.ReadFile(filepath.Join(tmpDir, "project2/check.out"))
 		assert.NoError(t, err)
 		assert.Equal(t, "custom check\n", string(content))
@@ -45,7 +45,7 @@ func TestApply(t *testing.T) {
 		assert.Equal(t, "envVarName of viaEnvVarName: baz\n", string(content))
 	})
 
-	t.Run("Moudles with failing checks should return error", func(t *testing.T) {
+	t.Run("Modules with failing checks should return error", func(t *testing.T) {
 		tmpDir = setupTmpDir(t, "../../tests/test_data/apply-failing/")
 
 		err := apply.Apply(tmpDir, applyConfigPath, applyEnvironments)

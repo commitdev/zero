@@ -38,7 +38,7 @@ Only a single environment may be suitable for an initial test, but for a real sy
 
 	flog.Infof(":mag: checking project %s's module requirements.", projectConfig.Name)
 
-	errs = modulesWalkCmd("check", rootDir, projectConfig, "check", environments, false)
+	errs = modulesWalkCmd("check", rootDir, projectConfig, "check", environments, false, false)
 	// Check operation walks through all modules and can return multiple errors
 	if len(errs) > 0 {
 		msg := ""
@@ -56,7 +56,7 @@ Only a single environment may be suitable for an initial test, but for a real sy
 
 	flog.Infof("Infrastructure executor: %s", "Terraform")
 
-	errs = modulesWalkCmd("apply", rootDir, projectConfig, "apply", environments, true)
+	errs = modulesWalkCmd("apply", rootDir, projectConfig, "apply", environments, true, true)
 	if len(errs) > 0 {
 		return errors.New(fmt.Sprintf("Module Apply failed: %s", errs[0]))
 	}
@@ -64,14 +64,14 @@ Only a single environment may be suitable for an initial test, but for a real sy
 	flog.Infof(":check_mark_button: Done.")
 
 	flog.Infof("Your projects and infrastructure have been successfully created.  Here are some useful links and commands to get you started:")
-	errs = modulesWalkCmd("summary", rootDir, projectConfig, "summary", environments, true)
+	errs = modulesWalkCmd("summary", rootDir, projectConfig, "summary", environments, true, true)
 	if len(errs) > 0 {
 		return errors.New(fmt.Sprintf("Module summary failed: %s", errs[0]))
 	}
 	return nil
 }
 
-func modulesWalkCmd(lifecycleName string, dir string, projectConfig *projectconfig.ZeroProjectConfig, operation string, environments []string, bailOnError bool) []error {
+func modulesWalkCmd(lifecycleName string, dir string, projectConfig *projectconfig.ZeroProjectConfig, operation string, environments []string, bailOnError bool, shouldPipeStderr bool) []error {
 	var moduleErrors []error
 	graph := projectConfig.GetDAG()
 	root := []dag.Vertex{projectconfig.GraphRootName}
@@ -116,7 +116,7 @@ func modulesWalkCmd(lifecycleName string, dir string, projectConfig *projectconf
 			flog.Infof("Executing %s command for %s...", lifecycleName, modConfig.Name)
 		}
 		operationCommand := getModuleOperationCommand(modConfig, operation)
-		execErr := util.ExecuteCommand(exec.Command(operationCommand[0], operationCommand[1:]...), modulePath, envList)
+		execErr := util.ExecuteCommand(exec.Command(operationCommand[0], operationCommand[1:]...), modulePath, envList, shouldPipeStderr)
 		if execErr != nil {
 			formatedErr := errors.New(fmt.Sprintf("Module (%s) %s", modConfig.Name, execErr.Error()))
 			if bailOnError {

@@ -52,7 +52,7 @@ func GetCwd() string {
 	return dir
 }
 
-func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) error {
+func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string, shouldPipeStdErr bool) error {
 
 	cmd.Dir = pathPrefix
 	if !filepath.IsAbs(pathPrefix) {
@@ -80,7 +80,11 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) error {
 		_, errStdout = io.Copy(os.Stdout, stdoutPipe)
 	}()
 	go func() {
-		stdErr := io.MultiWriter(errContent, os.Stderr)
+		strErrStreams := []io.Writer{errContent}
+		if shouldPipeStdErr {
+			strErrStreams = append(strErrStreams, os.Stderr)
+		}
+		stdErr := io.MultiWriter(strErrStreams...)
 		_, errStderr = io.Copy(stdErr, stderrPipe)
 	}()
 
