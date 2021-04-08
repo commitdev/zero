@@ -13,20 +13,13 @@ import (
 )
 
 func TestApply(t *testing.T) {
-	dir := "../../tests/test_data/apply/"
 	applyConfigPath := constants.ZeroProjectYml
 	applyEnvironments := []string{"staging", "production"}
-
-	tmpDir := filepath.Join(os.TempDir(), "apply")
-
-	err := os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
-
-	err = shutil.CopyTree(dir, tmpDir, nil)
-	assert.NoError(t, err)
+	var tmpDir string
 
 	t.Run("Should run apply and execute make on each folder module", func(t *testing.T) {
-		apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
+		tmpDir = setupTmpDir(t, "../../tests/test_data/apply/")
+		err := apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
 		assert.FileExists(t, filepath.Join(tmpDir, "project1/project.out"))
 		assert.FileExists(t, filepath.Join(tmpDir, "project2/project.out"))
 
@@ -37,6 +30,13 @@ func TestApply(t *testing.T) {
 		content, err = ioutil.ReadFile(filepath.Join(tmpDir, "project2/project.out"))
 		assert.NoError(t, err)
 		assert.Equal(t, "baz: qux\n", string(content))
+
+	})
+
+	t.Run("Modules runs command overides", func(t *testing.T) {
+		content, err := ioutil.ReadFile(filepath.Join(tmpDir, "project2/check.out"))
+		assert.NoError(t, err)
+		assert.Equal(t, "custom check\n", string(content))
 	})
 
 	t.Run("Zero apply honors the envVarName overwrite from module definition", func(t *testing.T) {
@@ -45,4 +45,26 @@ func TestApply(t *testing.T) {
 		assert.Equal(t, "envVarName of viaEnvVarName: baz\n", string(content))
 	})
 
+	t.Run("Modules with failing checks should return error", func(t *testing.T) {
+		tmpDir = setupTmpDir(t, "../../tests/test_data/apply-failing/")
+
+		err := apply.Apply(tmpDir, applyConfigPath, applyEnvironments)
+		assert.Regexp(t, "^The following Module check\\(s\\) failed:", err.Error())
+		assert.Regexp(t, "Module \\(project1\\)", err.Error())
+		assert.Regexp(t, "Module \\(project2\\)", err.Error())
+		assert.Regexp(t, "Module \\(project3\\)", err.Error())
+	})
+
+}
+
+func setupTmpDir(t *testing.T, exampleDirPath string) string {
+	var err error
+	tmpDir := filepath.Join(os.TempDir(), "apply")
+
+	err = os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	err = shutil.CopyTree(exampleDirPath, tmpDir, nil)
+	assert.NoError(t, err)
+	return tmpDir
 }

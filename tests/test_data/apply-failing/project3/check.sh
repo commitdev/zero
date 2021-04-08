@@ -1,0 +1,1 @@
+>&2 echo "Check script erroring out";exit 1;

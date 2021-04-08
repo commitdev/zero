@@ -3,6 +3,8 @@ package util
 // @TODO split up and move into /pkg directory
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -11,8 +13,10 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 	"text/template"
 
 	"github.com/google/uuid"
@@ -48,7 +52,7 @@ func GetCwd() string {
 	return dir
 }
 
-func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
+func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string, shouldPipeStdErr bool) error {
 
 	cmd.Dir = pathPrefix
 	if !filepath.IsAbs(pathPrefix) {
@@ -60,6 +64,7 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 	stderrPipe, _ := cmd.StderrPipe()
 
 	var errStdout, errStderr error
+	errContent := new(bytes.Buffer)
 
 	cmd.Env = os.Environ()
 	if envars != nil {
@@ -68,19 +73,39 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 
 	err := cmd.Start()
 	if err != nil {
-		log.Fatalf("Starting command failed: %v\n", err)
+		return err
 	}
 
 	go func() {
 		_, errStdout = io.Copy(os.Stdout, stdoutPipe)
 	}()
 	go func() {
-		_, errStderr = io.Copy(os.Stderr, stderrPipe)
+		stderrStreams := []io.Writer{errContent}
+		if shouldPipeStdErr {
+			stderrStreams = append(stderrStreams, os.Stderr)
+		}
+		stdErr := io.MultiWriter(stderrStreams...)
+		_, errStderr = io.Copy(stdErr, stderrPipe)
 	}()
 
 	err = cmd.Wait()
 	if err != nil {
-		log.Fatalf("Executing command failed: %v\n", err)
+		// Detecting and returning the makefile error to cmd
+		// Passing alone makefile stderr as error message, otherwise it just says "exit status 2"
+		if exitError, ok := err.(*exec.ExitError); ok {
+			ws := exitError.Sys().(syscall.WaitStatus)
+			exitCode := ws.ExitStatus()
+			if exitCode == 2 {
+				stderrOut := errContent.String()
+				isMissingTarget, _ := regexp.MatchString("No rule to make target", stderrOut)
+				if isMissingTarget {
+					return errors.New("Module missing mandatory targets, this is likely an issue with the module itself.")
+				}
+				return errors.New(stderrOut)
+			}
+		}
+
+		return errors.New(errContent.String())
 	}
 
 	if errStdout != nil {
@@ -90,6 +115,7 @@ func ExecuteCommand(cmd *exec.Cmd, pathPrefix string, envars []string) {
 	if errStderr != nil {
 		log.Printf("Failed to capture stderr: %v\n", errStderr)
 	}
+	return nil
 }
 
 // ExecuteCommandOutput runs the command and returns its

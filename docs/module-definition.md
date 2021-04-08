@@ -10,9 +10,17 @@ It also declares the module's  dependencies to determine the order of execution 
 | `author`      | string             | Author of the module                             |
 | `icon`        | string             | Path to logo image                               |
 | `parameters`  | list(Parameter)    | Parameters to prompt users                       |
+| `commands`    | Commands           | Commands to use instead of makefile defaults     |
 | `zeroVersion` | string([go-semver])| Zero versions its compatible with                |
 
 
+### Commands
+Commands are the lifecycle of `zero apply`, it will run all module's `check phase`, then once satisfied run in sequence `apply phase` then if successful run `summary phase`.
+| Parameters | Type   | Default        | Description                                                              |
+|------------|--------|----------------|--------------------------------------------------------------------------|
+| `check`    | string | `make check`   | Command to check module requirements. check is satisfied if exit code is 0 eg: `sh check-token.sh`, `zero apply` will check all modules before executing |
+| `apply`    | string | `make`         | Command to execute the project provisioning.                             |
+| `summary`  | string | `make summary` | Command to summarize to users the module's output and next steps.        |
 ### Template
 | Parameters   | Type    | Description                                                           |
 |--------------|---------|-----------------------------------------------------------------------|
