@@ -1,4 +1,6 @@
-![zero](https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo-small.png)
+<p align="center" width="100%">
+    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo-small.png">
+</p>
 
 ## What is Zero
 
@@ -6,6 +8,7 @@ Zero is an open source tool which makes it quick and easy for startup technical 
 
 Zero sets up everything you need so you can immediately start building your product.
 
+Zero was created by [Commit](https://commit.dev).
 ## Why is Zero good for startups
 
 As a technical founder or the first technical hire at a startup, your sole focus is to build the logic for your application and get it into customers’ hands as quickly and reliably as possible. Yet you immediately face multiple hurdles before even writing the first line of code. You’re forced to make many tech trade-offs, leading to decision fatigue. You waste countless hours building boilerplate SaaS features not adding direct value to your customers. You spend precious time picking up unfamiliar tech, make wrong choices that result in costly refactoring or rebuilding in the future, and are unaware of tools and best practices that would speed up your product iteration.
