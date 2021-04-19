@@ -1,5 +1,8 @@
+[![Tests](https://circleci.com/gh/commitdev/zero.svg?style=shield)](https://app.circleci.com/pipelines/github/commitdev/zero)
+[![Go Report Card](https://goreportcard.com/badge/commitdev/zero)](https://goreportcard.com/report/commitdev/zero)
+
 <p align="center" width="100%">
-    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo-small.png">
+    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo.png">
 </p>
 
 ## What is Zero
@@ -266,7 +269,8 @@ ___
 Zero welcomes collaboration from the community; you can open new issues in our GitHub repo, Submit PRs' for bug fixes or browse through the tickets currently open to see what you can contribute too.
 
 We use Zenhub to show us the entire project across all repositories, so if you are interested in seeing that or participating, you can can [check out our workspace](https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?repos=203630543,247773730,257676371,258369081,291818252,293942410,285931648,317656612)
-### Building this tool
+
+### Building the tool
 
 ```shell
 $ git clone git@github.com:commitdev/zero.git
@@ -307,22 +311,7 @@ Why is my deployed application not yet accessible?
 
 - It takes about 20 - 35 mins for your deployed application to be globally available through AWS CloudFront CDN.
 
-___
-
-## Planning and Process
-
-Zero's documents are stored in the [Commit Zero Google Drive][drive]
-
-- [UX Design Components][ux]
-- [Zeros Vision]
-- [Project Board]
-
-License: N/A
-
 <!-- links -->
-[drive]:    https://drive.google.com/drive/u/0/folders/1_b8qqy5iN5envfWvIYPW5SNR_ektt5kJ
-[ux]:       https://docs.google.com/document/d/1yQ4bZ5z0slL9PpmduItEiCXYKIor0nX-nnGT3J-JOFw
-[old]:      https://github.com/commitdev/zero-old
 [git]:      https://git-scm.com
 [kubectl]:  https://kubernetes.io/docs/tasks/tools/install-kubectl/
 [terraform]:https://www.terraform.io/downloads.html
@@ -332,10 +321,7 @@ License: N/A
 [vpc]:      https://aws.amazon.com/vpc/
 [iam]:      https://aws.amazon.com/iam/
 [asg]:      https://aws.amazon.com/autoscaling/
-[press-release]: https://docs.google.com/document/d/1YNRNgCfCHCxmIpD5ZsLYG2xCBxJLFd6CBI0DS_NFqoY/edit
-[zero binary]: https://github.com/commitdev/zero/releases/tag/v0.0.1
-[zeros vision]: https://docs.google.com/document/d/1YNRNgCfCHCxmIpD5ZsLYG2xCBxJLFd6CBI0DS_NFqoY/edit
-[project board]: [https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?filterLogic=any&repos=203630543,247773730,257676371,258369081]
+[zero binary]: https://github.com/commitdev/zero/releases/
 [Wget]: https://stackoverflow.com/questions/33886917/how-to-install-wget-in-macos
 [and more]: https://github.com/commitdev/zero-aws-eks-stack/blob/master/docs/resources.md
 [terraform]: https://terraform.io

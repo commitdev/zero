@@ -1,4 +1,6 @@
-![zero](https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo-small.png)
+<p align="center" width="100%">
+    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo.png">
+</p>
 
 ## Technology Choices
 As we add features to Zero, we rely heavily on our years of experience with founding and growing startups, and judge tools and technologies based on the axes of:
