@@ -1,4 +1,6 @@
-![zero](https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo-small.png)
+<p align="center" width="100%">
+    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo.png">
+</p>
 
 ## Learning resources
 
