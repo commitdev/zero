@@ -9,6 +9,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/commitdev/zero/internal/util"
+	"github.com/commitdev/zero/pkg/util/flog"
 )
 
 type AWSResourceConfig struct {
@@ -45,9 +46,13 @@ func FillAWSProfile(pathToCredentialsFile string, profileName string, paramsToFi
 
 	err, awsCreds := fetchAWSConfig(pathToCredentialsFile, profileName)
 	if err != nil {
-		return err
+		// If profile is a reference sharedCredentials.Get will return error
+		// but this is still valid for terraform to use profile to run instead
+		flog.Warnf(err.Error())
+		paramsToFill["awsProfile"] = profileName
+	} else {
+		util.ReflectStructValueIntoMap(awsCreds, "key", paramsToFill)
 	}
-	util.ReflectStructValueIntoMap(awsCreds, "key", paramsToFill)
 	return nil
 }
 
