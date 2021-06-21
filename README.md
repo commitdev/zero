@@ -1,5 +1,6 @@
 [![Tests](https://circleci.com/gh/commitdev/zero.svg?style=shield)](https://app.circleci.com/pipelines/github/commitdev/zero)
 [![Go Report Card](https://goreportcard.com/badge/commitdev/zero)](https://goreportcard.com/report/commitdev/zero)
+[![Slack](https://img.shields.io/badge/slack-join-brightgreen?logo=slack&style=social)](https://slack.getzero.dev)
 
 <p align="center" width="100%">
     <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo.png">
