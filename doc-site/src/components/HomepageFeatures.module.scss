@@ -1,0 +1,29 @@
+.features {
+  background: white;
+  display: flex;
+  align-items: center;
+
+  &>div{
+    row-gap: 3rem;
+  }
+
+  h3 {
+    line-height: 250%;
+    color: var(--ifm-color-secondary);
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: var(--ifm-landing-page-inverse-font-color);
+    font-size: 0.8rem;
+    padding: 0 calc(var(--ifm-spacing-horizontal)*2);
+  }
+
+  .featureSvg {
+    height: 2.5rem;
+  }
+  .featureSvg path {
+    fill: var(--ifm-color-secondary);
+  }
+}
+
