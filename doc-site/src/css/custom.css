@@ -193,3 +193,7 @@ html[data-theme='light'] .header-docs-link:before  {
   --ifm-alert-color: var(--ifm-color-gray-900);
   --ra-admonition-icon-color: var(--ifm-color-gray-900);
 }
+
+.docs-main-toc .toc-item {
+  margin: 2rem 1rem;
+}

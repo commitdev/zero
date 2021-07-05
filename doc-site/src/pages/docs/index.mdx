@@ -1,0 +1,66 @@
+import { Redirect } from 'react-router-dom';
+
+export const data = {
+  zero: {
+    target : "_self",
+    repo: "commitdev/zero",
+    name: "Zero CLI",
+    path: "/docs/zero"
+  },
+  modules : [
+    {
+      repo: "commitdev/zero-aws-eks-stack",
+      name: "AWS EKS stack",
+      path: "/docs/modules/aws-eks-stack"
+    },
+    {
+      repo: "commitdev/zero-deployable-backend",
+      name: "Backend Application - GoLang",
+      path: "/docs/modules/backend-go"
+    },
+    {
+      repo: "commitdev/zero-deployable-node-backend",
+      name: "Backend Application - Node.js",
+      path: "/docs/modules/backend-nodejs"
+    },
+    {
+      repo: "commitdev/zero-deployable-react-frontend",
+      name: "Frontend Application - Reactjs",
+      path: "/docs/modules/frontend-react"
+    },
+  ],
+};
+
+export const Entry = ({entry}) => {
+  return <div className="toc-item">
+    <h2>{entry.name}</h2>
+    <div>
+      <span>Documentation: </span>
+      <a href={`${entry.path}`} target={entry.target || "_blank"}>Link</a>
+    </div>
+    <div>
+      <span>Github Repository: </span>
+      <a href={`https://github.com/${entry.repo}`} target="_blank">Link</a>
+    </div>
+</div>
+}
+
+export const Modules = () => {
+  return (<>
+    {data.modules.map(entry=> <Entry entry={entry} />)}
+  </>
+  )
+};
+//TODO: This is essentially the Doc's landing page, make this prettier
+//and add some short description for each
+
+<div className="docs-main-toc">
+
+  ## Main
+
+  <Entry entry={data.zero} />
+
+  ## Modules
+
+  <Modules />
+</div>
