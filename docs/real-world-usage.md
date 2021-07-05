@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo.png">
+    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo.png"/>
 </p>
 
 ## Real-world Usage Scenarios
