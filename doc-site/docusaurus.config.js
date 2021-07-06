@@ -1,15 +1,17 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
+const { stylesheets, misc } = require('@commitdev/zero-doc-site-common-elements');
+
+const siteUrl = process.env.BUILD_DOMAIN ? `https://${process.env.BUILD_DOMAIN}` : 'https://staging.getzero.dev';
+const baseUrl = '/';
+const repositoryName = 'zero';
 
 module.exports = {
   title: 'Zero',
   tagline: 'Opinionated infrastructure to take you from idea to production on day one',
-  url: process.env.BUILD_DOMAIN ? `https://${process.env.BUILD_DOMAIN}` : 'https://staging.getzero.dev',
-  baseUrl: '/',
-  onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
-  organizationName: 'commitdev',
-  projectName: 'zero',
+  url: siteUrl,
+  baseUrl,
+  ...misc(),
+  projectName: repositoryName,
   themeConfig: {
 
     colorMode: {
@@ -77,8 +79,7 @@ module.exports = {
           path: 'docs',
           routeBasePath: 'docs/zero/',
           include: ['**/*.md', '**/*.mdx'],
-          // editUrl: 'https://github.com/commitdev/zero/blob/main/doc-site/',
-          editUrl: 'https://github.com/commitdev/zero/blob/doc-site/doc-site/',
+          editUrl: 'https://github.com/commitdev/zero/blob/main/doc-site/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -90,7 +91,5 @@ module.exports = {
   plugins: [
     'docusaurus-plugin-sass'
   ],
-  stylesheets: [
-    "https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@400;600;700;800&display=swap",
-  ]
+  stylesheets: stylesheets(),
 };
