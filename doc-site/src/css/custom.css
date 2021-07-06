@@ -1,0 +1,199 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+ /* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary-dark: rgb(33, 175, 144);
+  --ifm-color-primary-darker: rgb(31, 165, 136);
+  --ifm-color-primary-darkest: rgb(26, 136, 112);
+  --ifm-color-primary-light: rgb(70, 203, 174);
+  --ifm-color-primary-lighter: rgb(102, 212, 189);
+  --ifm-color-primary-lightest: rgb(146, 224, 208);
+  --ifm-navbar-link-hover-color: rgb(33, 175, 144);
+  --ifm-code-font-size: 95%;
+  --ifm-footer-padding-vertical: 20px;
+  --ifm-footer-padding-horizontal: 10px;
+  --ifm-footer-background-color: transparent;
+  --ifm-color-secondary: rgb(255, 106, 185);
+  --ifm-button-cta-background: linear-gradient(294.55deg, #F2BD6D 17.88%, #F17F84 65.95%, #FF3EA7 93.96%);
+  --ifm--hero--text-background-gradient: linear-gradient(234.45deg, #12C6FF 0%, #6184C9 68.23%);
+  --ifm-landing-page-inverse-font-color: #333;
+  --ifm-color-dark-active: rgba(5, 6, 55, 1);
+  --ifm-spacing-vertical: 0px;
+  --ifm-navbar-sidebar-width: 15rem;
+  --ifm-alert-padding-vertical: 1rem;
+  --ifm-alert-padding-horizontal: 1rem;
+}
+
+html[data-theme='dark'] {
+  --ifm-color-primary: #edc281;
+  --ifm-font-color-base-inverse: white;
+  --ifm-navbar-background-color: transparent;
+  --ifm-background-color: linear-gradient(90deg, rgba(15, 16, 17, 1) 0%, rgba(1, 2, 66, 1) 100%);
+  --ifm-color-info: rgba(255, 166, 0, 0.4);
+  --ifm-menu-color-active: #edc281;
+  --ifm-navbar-link-hover-color: #edc281;
+  --ifm-link-color: #edc281;
+  --ifm-code-background: rgba(140,140,140,0.5);
+}
+
+html[data-theme='light'] {
+  --ifm-heading-color: navy;
+  --ifm-font-color-base-inverse: navy;
+  --ifm-color-secondary: #6184C9;
+  --ifm-background-color: #fefefe;
+}
+html[data-theme='light'] .navbar--fixed-top, html[data-theme='light'] .navbar-sidebar__brand{
+  background: linear-gradient(90deg, rgba(15, 16, 17, 0.3) 0%, rgba(1, 2, 66, 0.4) 100%);
+}
+
+/** PAGE BACKGROUND **/
+html{
+  background: var(--ifm-background-color);
+}
+
+.hero--primary{
+  background: none;
+}
+
+/** FONTS **/
+.navbar {
+  font-family: 'lato';
+  font-weight: 900;
+}
+.menu__list .menu__link--sublist {
+  font-weight: 900;
+}
+.menu__list .menu__list-item {
+  font-weight: 400;
+}
+.featured-sections h3{
+  font-family: 'Montserrat';
+  font-weight: 800;
+}
+.button-cta{
+  font-family: 'Montserrat';
+  font-weight: 700;
+}
+.description {
+  font-family: 'lato';
+  font-weight: 400;
+}
+
+/** Small screen hamburger menu slideout background **/
+.navbar-sidebar--show .navbar-sidebar {
+  background-color: var(--ifm-code-background);
+}
+.navbar-sidebar__brand .navbar__brand {
+  height: 1rem;
+}
+.navbar-sidebar__brand .navbar__brand img{
+  margin: 1rem;
+}
+.navbar-sidebar__items .menu__link{
+  column-gap: 1rem;
+  justify-content: flex-start;
+}
+.navbar__brand img{
+  height: 80%;
+  margin-left: 0.6rem;
+}
+
+/** Docs sidebar - folder name capitalize */
+.menu__link--sublist{
+  text-transform: capitalize;
+}
+
+/** FLATTEN FOOTER ITEMS **/
+.footer__items{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer__item{
+  padding:0 var(--ifm-spacing-horizontal);
+}
+
+/** LANDING PAGE SECTION **/
+.featured-sections {
+  text-align: center;
+  padding: 6rem;
+}
+
+.featured-sections h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  padding: 0;
+  margin: 0 auto 3rem auto;
+}
+
+/**
+NAV BAR Icons
+flattens footer icons
+ */
+.header-logo-24.navbar__link, .footer__item .header-logo-24 {
+  display:flex;
+  line-height: 24px;
+  text-transform: uppercase;
+  color: var(--ifm-font-color-base-inverse);
+  font-weight: 700;
+}
+
+.header-logo-24:hover{
+  text-decoration: none;
+}
+
+.header-logo-24:before{
+  content: "";
+  display: flex;
+  height: 24px;
+  width: 24px;
+  margin: 0 3px;
+  background-size: cover;
+}
+
+html[data-theme='dark'] .header-github-link:before {
+  background: url(../../static/img/icons/octocat.svg) no-repeat;
+}
+
+html[data-theme='light'] .header-github-link:before  {
+  background: url(../../static/img/icons/octocat-navy.svg) no-repeat;
+}
+
+html[data-theme='dark'] .header-slack-link:before {
+  background: url(../../static/img/icons/slack.svg) no-repeat;
+}
+
+html[data-theme='light'] .header-slack-link:before  {
+  background: url(../../static/img/icons/slack-navy.svg) no-repeat;
+}
+
+html[data-theme='dark'] .header-docs-link:before {
+  background: url(../../static/img/icons/notes.svg) no-repeat;
+}
+
+html[data-theme='light'] .header-docs-link:before  {
+  background: url(../../static/img/icons/notes-navy.svg) no-repeat;
+}
+
+/* alert - note */
+.alert--secondary{
+  --ifm-alert-background-color: rgb(200, 212, 226);
+  --ifm-alert-border-color: rgb(200, 212, 226);
+  --ifm-alert-color: var(--ifm-color-gray-900);
+  --ra-admonition-icon-color: var(--ifm-color-gray-900);
+}
+/* alert - info */
+.alert--info{
+  --ifm-alert-background-color: rgb(117, 157, 209);
+  --ifm-alert-border-color: rgb(117, 157, 209);
+  --ifm-alert-color: var(--ifm-color-gray-900);
+  --ra-admonition-icon-color: var(--ifm-color-gray-900);
+}
+
+.docs-main-toc .toc-item {
+  margin: 2rem 1rem;
+}

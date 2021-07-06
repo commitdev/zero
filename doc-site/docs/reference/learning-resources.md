@@ -1,8 +1,9 @@
-<p align="center" width="100%">
-    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo.png"/>
-</p>
+---
+title: Learning Resources
+sidebar_label: Learning Resources
+sidebar_position: 3
+---
 
-## Learning resources
 
 ### AWS
 - [Getting started with AWS](https://aws.amazon.com/getting-started/)

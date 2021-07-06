@@ -1,0 +1,77 @@
+## The is a combination of sites where
+## Zero serves on the root of the domain /
+## and module serves on /docs/modules/<path>/
+# from the same S3 bucket
+
+name: "Build Documentation Site"
+on:
+  push:
+    branches:
+      - main
+      - doc-site
+    paths:
+      - doc-site/**
+
+env:
+  region: us-west-2
+  s3_sync_path_to_exclude: docs/modules/*
+  s3_sync_path: ""
+  BUILD_DOMAIN: staging.getzero.dev
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      # - name: Documentaiton site folder
+      #   run: cd doc-site
+      - name: Install Dependencies
+        working-directory: doc-site
+        run: npm install
+      - name: Build website
+        working-directory: doc-site
+        run: |
+          npm run build
+          pwd
+          ls -la
+      - name: Upload build artifact to Github
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifact
+          path: doc-site/build
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    # Once github action supports nested composite actions (anything `uses` is a composite action)
+    # Therefore we cannot reuse the code as a separate composite action until it supports it,
+    # current the deploy logic is in this file twice because of it
+    ## https://github.com/actions/runner/issues/862
+    - uses: actions/checkout@v2
+    - name: Configure AWS credentials for S3 sync
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.ZERO_DOC_SITE_AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.ZERO_DOC_SITE_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.region }}
+    - name: Download build artifact from Github
+      uses: actions/download-artifact@v1
+      with:
+        name: build-artifact
+        path: build/
+    - name: Sync with S3
+      shell: bash
+      run: |
+        cd build
+        aws s3 sync . "s3://${{ secrets.ZERO_DOC_SITE_BUCKET_NAME }}${{ env.s3_sync_path }}" --exclude "${{ env.s3_sync_path_to_exclude }}" --delete
+    - name: Invalidate Cloudfront
+      shell: bash
+      run: |
+        export DIST_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[?@=='${{ secrets.ZERO_DOC_SITE_BUCKET_NAME }}']].Id | [0]" | tr -d '"')
+        aws cloudfront create-invalidation --distribution-id ${DIST_ID} --paths "/*"

@@ -1,0 +1,32 @@
+.reasons_container{
+  background: rgba(232, 237, 244, 1);
+  text-align: center;
+  color: black;
+}
+
+.reasons {
+  display: flex;
+  flex-direction: column;
+  row-gap: 3rem;
+}
+
+.reason {
+  display: flex;
+
+  .description{
+    flex: 6 3 80%;
+    font-size: 0.8rem;
+    align-self: center;
+    text-align: left;
+  }
+
+  .reason_logo {
+    height: 3rem;
+    flex: 1 1 auto;
+    align-self: center;
+
+    path {
+      fill: var(--ifm-color-secondary);
+    }
+  }
+}

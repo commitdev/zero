@@ -1,10 +1,10 @@
-<p align="center" width="100%">
-    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo.png"/>
-</p>
+---
+title: Real-world Usage Scenarios
+sidebar_label: Real-world Usage
+sidebar_position: 4
+---
 
-## Real-world Usage Scenarios
-
-### Developing and deploying application changes
+## Developing and deploying application changes
 1. Clone your git repository.
 2. Make a branch, start working on your code.
 3. If using the Telepresence dev experience, run the `start-dev-env.sh` script to allow you to use the hybrid cloud environment as you work, to run and test your code in a realistic environment.
@@ -12,7 +12,7 @@
 4. Merge your branch to the main branch. A build will start automatically.
 5. The pipeline will build an artifact, run tests, deploy your change to staging, then wait for your input to deploy to production.
 
-### Debugging a problem on production
+## Debugging a problem on production
 1. Check the logs of your service:
     - If using cloudwatch, log into the AWS console and go to the [Logs Insights tool](https://us-west-2.console.aws.amazon.com/cloudwatch/home#logsV2:logs-insights). Choose the log group for your production environment ending in `/application` and hit the "Run query" button.
     - If using kibana, make sure you are on the VPN and open the Kibana URL in your browser. Click the "Discover" tab and try searching for logs based on the name of your service.
@@ -32,7 +32,7 @@ $ kubectl exec -it your-service-6c5f6b56b7-2w447 sh
 ```
 
 
-### Adding support for a new subdomain or site
+## Adding support for a new subdomain or site
 1. Check the currently configured ingresses in your cluster:
 ```shell
 $ kubectl get ingress -A

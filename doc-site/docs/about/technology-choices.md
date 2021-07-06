@@ -1,8 +1,9 @@
-<p align="center" width="100%">
-    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo.png"/>
-</p>
+---
+title: Technology Choices
+sidebar_label: Technology Choices
+sidebar_position: 4
+---
 
-## Technology Choices
 As we add features to Zero, we rely heavily on our years of experience with founding and growing startups, and judge tools and technologies based on the axes of:
 - Quality - Is it the best tool for the job? Will it allow a project to start small and scale big?
 - Simplicity - Is it easy to set up automatically and in a way that is easy to understand and maintain for the developers and operators of the project?
