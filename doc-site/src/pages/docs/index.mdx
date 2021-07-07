@@ -1,32 +1,34 @@
-import { Redirect } from 'react-router-dom';
-
 export const data = {
   zero: {
-    target : "_self",
     repo: "commitdev/zero",
+    desc: "CLI tool to step by step setup and provision your infrastructure and application",
     name: "Zero CLI",
     path: "/docs/zero"
   },
   modules : [
     {
       repo: "commitdev/zero-aws-eks-stack",
+      desc: "Infrastructure as Code Template on top of AWS EKS with all the best practices we have accumulated",
       name: "AWS EKS stack",
-      path: "/docs/modules/aws-eks-stack"
+      path: '/docs/modules/aws-eks-stack',
     },
     {
       repo: "commitdev/zero-deployable-backend",
+      desc: "Business logic agnostic Backend template in GoLang, set up a service which can be deployed to Zero's infrastructure",
       name: "Backend Application - GoLang",
-      path: "/docs/modules/backend-go"
+      path: '/docs/modules/backend-go',
     },
     {
       repo: "commitdev/zero-deployable-node-backend",
+      desc: "Business logic agnostic Backend template in Node.js, set up a service which can be deployed to Zero's infrastructure",
       name: "Backend Application - Node.js",
-      path: "/docs/modules/backend-nodejs"
+      path: '/docs/modules/backend-nodejs',
     },
     {
       repo: "commitdev/zero-deployable-react-frontend",
+      desc: "Business logic agnostic Frontend template using React, ships with CI/CD pipeline deployed to AWS S3 and Cloudfront",
       name: "Frontend Application - Reactjs",
-      path: "/docs/modules/frontend-react"
+      path: '/docs/modules/frontend-react',
     },
   ],
 };
@@ -34,20 +36,25 @@ export const data = {
 export const Entry = ({entry}) => {
   return <div className="toc-item">
     <h2>{entry.name}</h2>
+    <sub>{entry.desc}</sub>
     <div>
       <span>Documentation: </span>
-      <a href={`${entry.path}`} target={entry.target || "_blank"}>Link</a>
+      <a
+        href={ `${entry.path}` }
+        target={ entry.target || "_self" }
+        replace
+      >Link</a>
     </div>
     <div>
       <span>Github Repository: </span>
-      <a href={`https://github.com/${entry.repo}`} target="_blank">Link</a>
+      <a href={`https://github.com/${entry.repo}`} target="_self">Link</a>
     </div>
 </div>
 }
 
 export const Modules = () => {
   return (<>
-    {data.modules.map(entry=> <Entry entry={entry} />)}
+    {data.modules.map((entry, idx)=> <Entry key={idx} entry={entry} />)}
   </>
   )
 };
@@ -56,7 +63,7 @@ export const Modules = () => {
 
 <div className="docs-main-toc">
 
-  ## Main
+  ## Zero
 
   <Entry entry={data.zero} />
 
