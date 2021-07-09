@@ -197,3 +197,7 @@ html[data-theme='light'] .header-docs-link:before  {
 .docs-main-toc .toc-item {
   margin: 2rem 1rem;
 }
+
+.header-logo-24 span svg {
+  display: none;
+}
