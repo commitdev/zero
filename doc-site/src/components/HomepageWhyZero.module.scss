@@ -36,6 +36,12 @@
         background-size: cover;
       }
     }
+    &.expanded a{
+      &:after {
+        background:  url(../../static/img/icons/icon-minus.svg);
+        background-size: cover;
+      }
+    }
   }
 }
 
@@ -48,10 +54,7 @@
 }
 
 .reason {
-  display: flex;
-  flex-direction: column;
   max-width: 10rem;
-  flex: 1;
 
   .title{
     color: var(--ifm-color-secondary);
@@ -60,9 +63,11 @@
   }
 
   .description{
-    flex: 6 3 80%;
     font-size: 0.8rem;
     align-self: center;
+  }
+  ul.description {
+    margin-top: 2rem;
   }
   .description li{
     text-align: left;

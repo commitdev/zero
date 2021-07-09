@@ -41,7 +41,7 @@ const Reasons = ({ data, expanded, setExpanded }) => (
           <i.logo className={styles.reason_logo} alt="logo" />
           <h4 className={styles.title}>{i.title}</h4>
 
-          {!expanded && <p className={`${styles.description} description`}>{i.text}</p>}
+          <p className={`${styles.description} description`}>{i.text}</p>
           {expanded && <ul className={`${styles.description} description`}>{i.details.map(content=> <li>{content}</li>)}</ul>}
         </div>
       ))
@@ -60,7 +60,7 @@ return <div className={`${styles.reasons_container} featured-sections`}>
       </h5>
     </h2>
     <Reasons data={reasons} expanded={expanded} setExpanded={setExpanded} />
-    <div className={styles.expand}>
+    <div className={`${styles.expand} ${expanded && styles.expanded}`}>
       <a href="javascript:void(0);" onClick={()=>{setExpanded(!expanded)}}>{expanded ? "Less" : "More" } Details</a>
     </div>
   </div>
