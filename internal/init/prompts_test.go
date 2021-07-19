@@ -17,7 +17,7 @@ func TestGetParam(t *testing.T) {
 	t.Run("Should execute params without prompt", func(t *testing.T) {
 		param := moduleconfig.Parameter{
 			Field:   "account-id",
-			Execute: "echo \"my-acconut-id\"",
+			Execute: "echo \"my-account-id\"",
 		}
 
 		prompt := initPrompts.PromptHandler{
@@ -27,7 +27,7 @@ func TestGetParam(t *testing.T) {
 		}
 
 		prompt.RunPrompt(projectParams, envVarTranslationMap)
-		assert.Equal(t, "my-acconut-id", projectParams[param.Field])
+		assert.Equal(t, "my-account-id", projectParams[param.Field])
 	})
 
 	t.Run("executes with project context", func(t *testing.T) {
