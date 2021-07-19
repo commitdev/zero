@@ -133,7 +133,6 @@ func (p PromptHandler) RunPrompt(projectParams map[string]string, envVarTranslat
 			tm.Clear()
 			currentLine = infoBoxHeight
 		}
-		showInfoBox(p.Parameter.Info)
 
 		// TODO: figure out scope of projectParams per project
 		// potentially dangerous to have cross module env leaking
@@ -146,6 +145,7 @@ func (p PromptHandler) RunPrompt(projectParams map[string]string, envVarTranslat
 		} else if p.Parameter.Value != "" {
 			result = p.Parameter.Value
 		} else {
+			showInfoBox(p.Parameter.Info)
 			// Move down to the next line to show the prompt
 			currentLine++
 			tm.MoveCursor(1, currentLine)
