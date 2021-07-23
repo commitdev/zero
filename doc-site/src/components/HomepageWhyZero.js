@@ -58,9 +58,9 @@ const title = "Why is Zero good for startups ?"
 return <div className={`${styles.reasons_container} featured-sections`}>
     <h2 className={styles.title}>
       {title}
-      <h5 className={styles.subtitle}>
+      <h4 className={styles.subtitle}>
         As engineer #1, your sole priority is to build the logic for your application and get it into customers’ hands as quickly and reliably as possible.
-      </h5>
+      </h4>
     </h2>
     <Reasons data={reasons} expanded={expanded} setExpanded={setExpanded} />
     <div className={`${styles.expand} ${expanded && styles.expanded}`}>
