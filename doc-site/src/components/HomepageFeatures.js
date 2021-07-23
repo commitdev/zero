@@ -8,11 +8,10 @@ const FeatureList = [
     Svg: require('../../static/img/icons/attr-reliable.svg').default,
     description: (
       <>
-        Your infrastructure will be highly available and fault tolerant. 
-        Production workloads will be self-healing, with all traffic load 
-        balanced to multiple instances of your application. All the 
-        infrastructure is represented with code to be reproducible, 
-        auditable, and easy to configure.
+        Fault-tolerant infrastructure. Production workloads will be 
+        highly available, with traffic load balanced to multiple 
+        instances of your application. All the infrastructure is 
+        represented with code to be reproducible and easy to configure.
       </>
     ),
   },
@@ -21,9 +20,9 @@ const FeatureList = [
     Svg: require('../../static/img/icons/attr-scalable.svg').default,
     description: (
       <>
-        Everything in your system will scale automatically based on the needs 
-        of your application. For frontend assets, using a CDN will ensure global 
-        scale, so you don’t need to worry about it.
+        Your system will scale automatically based on your application’s 
+        needs. For frontend assets, using a CDN will ensure availability 
+        at global scale.
       </>
     ),
   },
@@ -32,25 +31,11 @@ const FeatureList = [
     Svg: require('../../static/img/icons/attr-secure.svg').default,
     description: (
       <>
-        All your systems will follow security best practices backed up
+        All your systems will follow security best practices backed up 
         by multiple security audits and penetration tests, and will be 
-        properly configured to make sure access is controlled to 
-        private networks, secrets, and data. Built-in application 
-        features help you bullet-proof your application by using 
-        existing, tested tools rather than reinventing the wheel.
-      </>
-    ),
-  },
-  {
-    title: 'Modular',
-    Svg: require('../../static/img/icons/attr-modular.svg').default,
-    description: (
-      <>
-        Everything built by Zero is yours. After Zero generates your 
-        infrastructure, backend, and frontend, all the code is checked 
-        into your source control repositories and becomes the basis for 
-        your new system. You can customize as much as you like. We 
-        provide constant updates and new modules.
+        properly configured to limit access to private networks, 
+        secrets, and data. Bullet-proof your application by default 
+        using existing, tested tools.
       </>
     ),
   },

@@ -1,9 +1,8 @@
 .features {
-  background: white;
   align-items: center;
 
   .title {
-    color: var(--ifm-landing-page-inverse-font-color);
+    color: white;
     font-weight: 400;
     text-transform: inherit;
     max-width: 34rem;
@@ -24,8 +23,8 @@
   }
 
   p {
-    color: var(--ifm-landing-page-inverse-font-color);
-    font-size: 0.8rem;
+    color: white;
+    font-size: 0.9rem;
     padding: 0 calc(var(--ifm-spacing-horizontal)*2);
   }
 

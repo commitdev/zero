@@ -59,8 +59,8 @@ export default function Home() {
         <HomepageVideo />
         <HomePageCallToAction />
         <HomepageTrustedBy />
-        <HomepageFeatures />
         <HomepageWhyZero />
+        <HomepageFeatures />
         <HomepageOfferings />
         <HomePageCallToAction />
       </main>
