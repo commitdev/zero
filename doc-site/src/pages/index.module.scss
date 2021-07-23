@@ -37,6 +37,10 @@
 
 @media screen and (max-width: 966px) {
   .heroBanner {
-    padding: 2rem;
+    padding: 0 2rem;
+
+    .hero__subtitle {
+      font-size: max(2.3vh, 3vw);
+    }
   }
 }

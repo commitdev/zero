@@ -36,3 +36,12 @@
   }
 }
 
+/* Text to be legible even if someone stumbled across the homepage in light-theme*/
+html[data-theme='light'] {
+  .title {
+    color: var(--ifm-color-secondary);
+  }
+  p {
+    color: var(--ifm-color-secondary);
+  }
+}

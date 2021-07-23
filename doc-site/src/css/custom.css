@@ -45,9 +45,11 @@ html[data-theme='light'] {
   --ifm-font-color-base-inverse: navy;
   --ifm-color-secondary: #6184C9;
   --ifm-background-color: #fefefe;
+  /* NavSidebar in small screen*/
+  --ifm-code-background: #fefefe;
 }
 html[data-theme='light'] .navbar--fixed-top, html[data-theme='light'] .navbar-sidebar__brand{
-  background: linear-gradient(90deg, rgba(15, 16, 17, 0.3) 0%, rgba(1, 2, 66, 0.4) 100%);
+  background: linear-gradient(90deg, rgba(115, 116, 117, 0.5) 0%, rgba(111, 112, 166, 0.6) 100%);
 }
 
 /** PAGE BACKGROUND **/
@@ -120,7 +122,7 @@ html{
 /** LANDING PAGE SECTION **/
 .featured-sections {
   text-align: center;
-  padding: 6rem;
+  padding: 6% 8%;
 }
 
 .featured-sections h3, .featured-sections h2 {
@@ -134,10 +136,15 @@ html{
   margin: 0 auto 5rem auto;
 }
 
-/**
-NAV BAR Icons
-flattens footer icons
- */
+/** NAV BAR */
+/* small screen navigation menu button */
+.button--secondary:not(.button--outline) {
+  --ifm-button-background-color: #edc281;
+  --ifm-button-border-color: #e2a74d;
+}
+
+/* NavBar Icons
+flattens footer icons */
 .header-logo-24.navbar__link, .footer__item .header-logo-24 {
   display:flex;
   line-height: 24px;
@@ -157,6 +164,12 @@ flattens footer icons
   width: 24px;
   margin: 0 3px;
   background-size: cover;
+}
+
+@media (max-width: 750px) {
+  .header-logo-24.navbar__link{
+      display: none;
+  }
 }
 
 html[data-theme='dark'] .header-github-link:before {

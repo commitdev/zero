@@ -41,7 +41,7 @@ export default function Home() {
     padding: 0 3rem;
   }
   .navbar__brand img{
-    height: 130%;
+    height: min(130%, 3.8vh);
   }
   .react-toggle{
     display: none;
