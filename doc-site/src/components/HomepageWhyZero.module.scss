@@ -1,7 +1,7 @@
 .reasons_container{
-  // background: rgba(232, 237, 244, 1);
   text-align: center;
-  color: white;
+  background: white;
+  color: var(--ifm-landing-page-inverse-font-color);
 
   .title {
     margin-bottom: 5rem;
@@ -24,7 +24,7 @@
 
       &:active, &:link, &:visited{
         text-decoration: none;
-        color:#7A8AA9;;
+        color: var(--ifm-landing-page-inverse-font-color);
       }
       &:after {
         align-self: center;
@@ -63,11 +63,13 @@
   }
 
   .description{
+    min-height: 2.5rem;
     font-size: 0.8rem;
     align-self: center;
   }
   ul.description {
     margin-top: 2rem;
+    padding-left: 1rem;
   }
   .description li{
     text-align: left;
