@@ -13,6 +13,9 @@ module.exports = {
   ...misc(),
   projectName: repositoryName,
   themeConfig: {
+    gtag: {
+      trackingID: 'G-6FN66NMDES',
+    },
 
     colorMode: {
       defaultMode: 'dark',
