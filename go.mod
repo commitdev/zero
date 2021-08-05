@@ -35,3 +35,7 @@ require (
 	gopkg.in/yaml.v2 v2.2.2
 
 )
+
+// Tencent cloud unpublished their version v3.0.82 and became v1.0.191
+// https://github.com/hashicorp/terraform/issues/29021
+replace github.com/tencentcloud/tencentcloud-sdk-go v3.0.82+incompatible => github.com/tencentcloud/tencentcloud-sdk-go v1.0.191
