@@ -167,12 +167,11 @@ func getModuleOperationCommand(mod moduleconfig.ModuleConfig, operation string) 
 // promptEnvironments Prompts the user for the environments to apply against and returns a slice of strings representing the environments
 func promptEnvironments() []string {
 	items := map[string][]string{
-		"Staging":                     {"stage"},
-		"Production":                  {"prod"},
-		"Both Staging and Production": {"stage", "prod"},
+		"Staging":    {"stage"},
+		"Production": {"prod"},
 	}
 
-	labels := []string{"Staging", "Production", "Both Staging and Production"}
+	labels := []string{"Staging", "Production"}
 
 	providerPrompt := promptui.Select{
 		Label: "Environments",
