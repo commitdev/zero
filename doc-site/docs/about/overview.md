@@ -71,9 +71,9 @@ Security: Properly configured access-control to resources/security groups, using
 [technology-choices]: ./technology-choices
 [learning-resources]: ../reference/learning-resources
 [docs-infra]: /docs/modules/aws-eks-stack/
-[docs-backend-go]: /docs/modules/backend-go/
-[docs-backend-nodejs]: /docs/modules/backend-nodejs/
-[docs-frontend-react]: /docs/modules/frontend-react/
+[docs-backend-go]: https://getzero.dev/docs/modules/backend-go/
+[docs-backend-nodejs]: https://getzero.dev/docs/modules/backend-nodejs/
+[docs-frontend-react]: https://getzero.dev/docs/modules/frontend-react/
 <!-- links -->
 
 
