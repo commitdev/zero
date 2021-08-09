@@ -70,7 +70,7 @@ Security: Properly configured access-control to resources/security groups, using
 [real-world-usage]: ./real-world-usage
 [technology-choices]: ./technology-choices
 [learning-resources]: ../reference/learning-resources
-[docs-infra]: /docs/modules/aws-eks-stack/
+[docs-infra]: https://getzero.dev/docs/modules/aws-eks-stack/
 [docs-backend-go]: https://getzero.dev/docs/modules/backend-go/
 [docs-backend-nodejs]: https://getzero.dev/docs/modules/backend-nodejs/
 [docs-frontend-react]: https://getzero.dev/docs/modules/frontend-react/
