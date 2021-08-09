@@ -27,9 +27,6 @@ func GetRegistry(path string) Registry {
 				path + "/zero-deployable-react-frontend",
 			},
 		},
-		{
-			"Custom", []string{},
-		},
 	}
 }
 
