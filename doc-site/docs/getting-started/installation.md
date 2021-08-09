@@ -18,7 +18,7 @@ brew install zero
 
 - Install Zero by downloading the binary.
 
-Download the latest [Zero binary] for your systems architecture. Unzip your downloaded package and copy the Zero binary to the desired location and add it to your system PATH.
+Download the latest [Zero binary](https://github.com/commitdev/zero/releases) for your systems architecture. Unzip your downloaded package and copy the Zero binary to the desired location and add it to your system PATH.
 
 Zero currently supports:
 
