@@ -5,13 +5,13 @@ sidebar_position: 1
 ---
 
 ## Project
-A project defines a set of **modules** along with the module's parameters input by the user, and these information are stored in `zero-project.yml`. Which you can generated using `zero init`.
+A project defines a set of **modules** to use, along with a full set of config parameters for each module which were entered by the user during the `zero init` step. These config options are stored in `zero-project.yml`.
 
-The Project manifest(`zero-project.yml`) is the source of truth for the commands (`create` and `apply`). It determines where to fetch the modules, the execution order of modules, whether it will push your project to version control, and other project information. You can provision both staging and production environment using the same manifest to ensure the environments are reproducible and controlled.
+The project manifest (`zero-project.yml`) is the source of truth for the commands `create` and `apply`. It determines from where to fetch the modules, the execution order of modules, whether it will push your project to version control, module configuration, and other project information. Both staging and production environments are provisioned using the same manifest to ensure the environments are reproducible and controlled.
 
 ## Module
-A module is useful bundle of code and/or resources that can be templated out with the Project Manifest, then executes a provision flow, this could be templating out terraform infrastructure as code then provisioning the resources, or creating a backend application and deploying it.
+A module is a useful bundle of code and/or resources that can be templated out during the `create` step, then executes a provisioning flow. This could be templating out terraform infrastructure as code then provisioning the resources, or creating a backend application, making API calls to set up a build pipeline, and then deploying it.
 
-A module is defined by it's **Module manifest**(`zero-module.yml`) in it's root folder, it contains all the parameters it requires, and declares it's requirements and execution.
+A module is defined by the **module manifest** (`zero-module.yml`) in its root folder. It contains all the parameters required to render the templated files (during `zero create`) and execute any provisioning steps, and declares it's requirements and the commands to execute during provisioning (`zero apply`).
 
-Modules can declare it's dependencies, for example a backend that will be deployed can declare its dependency on the infrastructure repository, so that it will execute the infrastructure module's flow before the backend itself.
+Modules can declare their dependencies, for example a backend that will be deployed can declare its dependency on the infrastructure repository so that the infrastructure will already exist by the time we want to deploy to it.
