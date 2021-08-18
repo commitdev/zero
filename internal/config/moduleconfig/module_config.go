@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 
-	goVerson "github.com/hashicorp/go-version"
+	goVersion "github.com/hashicorp/go-version"
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/commitdev/zero/internal/config/projectconfig"
@@ -38,7 +38,7 @@ type ModuleCommands struct {
 }
 
 func checkVersionAgainstConstrains(vc VersionConstraints, versionString string) bool {
-	v, err := goVerson.NewVersion(versionString)
+	v, err := goVersion.NewVersion(versionString)
 	if err != nil {
 		return false
 	}
@@ -100,7 +100,7 @@ type TemplateConfig struct {
 }
 
 type VersionConstraints struct {
-	goVerson.Constraints
+	goVersion.Constraints
 }
 
 // A "nice" wrapper around findMissing()
@@ -273,7 +273,7 @@ func (semVer *VersionConstraints) UnmarshalYAML(unmarshal func(interface{}) erro
 		return err
 	}
 	if versionString != "" {
-		constraints, constErr := goVerson.NewConstraint(versionString)
+		constraints, constErr := goVersion.NewConstraint(versionString)
 		// If an invalid constraint is declared in a module
 		// instead of erroring out we just print a warning message
 		if constErr != nil {
