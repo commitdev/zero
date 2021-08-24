@@ -6,7 +6,10 @@ sidebar_position: 5
 
 The `zero apply` command takes the templated modules generated based on your input and spins up a scalable & performant infrastructure for you!
 
-_Note that this can take 20 minutes or more depending on your choices, as it is waiting for all the provisioned infrastructure to be created_
+:::note
+This can take 20 minutes or more depending on your choices, as it must wait for all the provisioned infrastructure to be created
+:::
+
 ```shell
 $ zero apply
 
@@ -33,12 +36,12 @@ zero-aws-eks-stack:
 - for production use: kubectl config use-context arn:aws:eks:us-west-2:123456789:cluster/myapp-infra-production-us-west-2
 
 - To inspect the selected cluster, run 'kubectl get node,service,deployment,pods'
-zero-deployable-react-frontend:
+zero-frontend-react:
 - Repository URL: github.com/myapp-org/frontend
 - Deployment Pipeline URL: https://app.circleci.com/pipelines/github/myapp-org/frontend
 - Production Landing Page: app.commitzero.com
 
-zero-deployable-backend:
+zero-backend-go:
 - Repository URL: github.com/myapp-org/backend-service
 - Deployment Pipeline URL: https://app.circleci.com/pipelines/github/myapp-org/backend-service
 - Production API: api.commitzero.com

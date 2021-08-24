@@ -36,7 +36,9 @@ The token can be created at https://app.circleci.com/settings/user/tokens
 ✔ Staging Frontend Host Name (e.g. app.): app.
 ✔ Staging Backend Host Name (e.g. api.): api.
 ✔ What do you want to call the zero-aws-eks-stack project?: infrastructure
-✔ What do you want to call the zero-deployable-backend project?: backend-service
-✔ What do you want to call the zero-deployable-react-frontend project?: frontend
+✔ What do you want to call the zero-backend-go project?: backend-service
+✔ What do you want to call the zero-frontend-react project?: frontend
 
 ```
+
+After this step you will be able to examine the `zero-project.yml` file to ensure your settings are correct before proceeding to `zero create`.

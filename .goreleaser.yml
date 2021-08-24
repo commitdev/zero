@@ -7,6 +7,9 @@ builds:
   - CGO_ENABLED=0
   ldflags:
     - -X github.com/commitdev/zero/version.AppVersion={{.Version}} -X github.com/commitdev/zero/version.AppBuild={{.ShortCommit}}
+  goarch:
+    - amd64
+    - 386
 archives:
 - replacements:
     darwin: Darwin
