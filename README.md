@@ -71,7 +71,7 @@ ___
 
 ## Getting Started
 
-(See the getting started guide at the Zero docs site.)[https://getzero.dev/docs/zero/getting-started/installation]
+[See the getting started guide at the Zero docs site.](https://getzero.dev/docs/zero/getting-started/installation)
 
 ### Building blocks of Zero
 
