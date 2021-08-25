@@ -28,3 +28,5 @@ $ zero create
 
 
 ```
+
+After this step you will be able to examine the created repositories before proceeding to `zero apply`. If you chose not to have zero create a repository for you, you can still use the `zero apply` command to create the infrastructure but you will need to check these repositories into your version control system of choice.

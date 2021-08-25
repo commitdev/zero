@@ -40,9 +40,9 @@ func TestLoadConfig(t *testing.T) {
 func eksGoReactSampleModules() projectconfig.Modules {
 	parameters := projectconfig.Parameters{"a": "b"}
 	return projectconfig.Modules{
-		"aws-eks-stack":             projectconfig.NewModule(parameters, "zero-aws-eks-stack", "github.com/something/repo1", "github.com/commitdev/zero-aws-eks-stack", []string{}, []projectconfig.Condition{}),
-		"deployable-backend":        projectconfig.NewModule(parameters, "zero-deployable-backend", "github.com/something/repo2", "github.com/commitdev/zero-deployable-backend", []string{}, []projectconfig.Condition{}),
-		"deployable-react-frontend": projectconfig.NewModule(parameters, "zero-deployable-react-frontend", "github.com/something/repo3", "github.com/commitdev/zero-deployable-react-frontend", []string{}, []projectconfig.Condition{}),
+		"aws-eks-stack":  projectconfig.NewModule(parameters, "zero-aws-eks-stack", "github.com/something/repo1", "github.com/commitdev/zero-aws-eks-stack", []string{}, []projectconfig.Condition{}),
+		"backend-go":     projectconfig.NewModule(parameters, "zero-backend-go", "github.com/something/repo2", "github.com/commitdev/zero-backend-go", []string{}, []projectconfig.Condition{}),
+		"frontend-react": projectconfig.NewModule(parameters, "zero-frontend-react", "github.com/something/repo3", "github.com/commitdev/zero-frontend-react", []string{}, []projectconfig.Condition{}),
 	}
 }
 
@@ -61,20 +61,20 @@ modules:
       dir: zero-aws-eks-stack
       repo: github.com/something/repo1
       source: github.com/commitdev/zero-aws-eks-stack
-  deployable-backend:
+  backend-go:
     parameters:
       a: b
     files:
-      dir: zero-deployable-backend
+      dir: zero-backend-go
       repo: github.com/something/repo2
-      source: github.com/commitdev/zero-deployable-backend
-  deployable-react-frontend:
+      source: github.com/commitdev/zero-backend-go
+  frontend-react:
     parameters:
       a: b
     files:
-      dir: zero-deployable-react-frontend
+      dir: zero-frontend-react
       repo: github.com/something/repo3
-      source: github.com/commitdev/zero-deployable-react-frontend
+      source: github.com/commitdev/zero-frontend-react
 `
 }
 

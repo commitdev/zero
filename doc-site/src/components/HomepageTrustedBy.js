@@ -12,7 +12,7 @@ const trustedByData = [
   },
   {
     img: "img/partners/atlasone.png",
-    src: "https://atlasone.ca/",
+    src: "https://www.atlasone.ca/",
   },
   {
     img: "img/partners/placeholder.png",
