@@ -35,6 +35,18 @@
   }
 }
 
+.hiring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4rem auto 4rem;
+  a {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+  }
+}
+
 @media screen and (max-width: 966px) {
   .heroBanner {
     padding: 2rem;
