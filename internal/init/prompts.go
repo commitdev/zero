@@ -11,6 +11,7 @@ import (
 
 	tm "github.com/buger/goterm"
 	"github.com/commitdev/zero/internal/config/moduleconfig"
+	"github.com/commitdev/zero/internal/config/projectconfig"
 	"github.com/commitdev/zero/internal/constants"
 	"github.com/commitdev/zero/internal/util"
 	"github.com/commitdev/zero/pkg/util/exit"
@@ -276,8 +277,8 @@ func PromptModuleParams(moduleConfig moduleconfig.ModuleConfig, parameters map[s
 // promptAllModules takes a map of all the modules and prompts the user for values for all the parameters
 // Important: This is done here because in this step we share the parameter across modules,
 // meaning if module A and B both asks for region, it will reuse the response for both (and is deduped during runtime)
-func promptAllModules(modules map[string]moduleconfig.ModuleConfig) map[string]string {
-	parameterValues := map[string]string{}
+func promptAllModules(modules map[string]moduleconfig.ModuleConfig, projectConfig *projectconfig.ZeroProjectConfig) map[string]string {
+	parameterValues := availableProjectContext(projectConfig)
 	for _, config := range modules {
 		var err error
 
@@ -287,6 +288,13 @@ func promptAllModules(modules map[string]moduleconfig.ModuleConfig) map[string]s
 		}
 	}
 	return parameterValues
+}
+
+// availableProjectContext declares a list of variables usable in modules parameter prompt's execute step
+func availableProjectContext(projectConfig *projectconfig.ZeroProjectConfig) map[string]string {
+	return map[string]string{
+		"projectName": projectConfig.Name,
+	}
 }
 
 func paramConditionsMapper(conditions []moduleconfig.Condition) CustomConditionSignature {
