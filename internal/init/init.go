@@ -51,7 +51,7 @@ func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfi
 	// Prompting for push-up stream, then conditionally prompting for github
 	prompts["GithubRootOrg"].RunPrompt(initParams, emptyEnvVarTranslationMap)
 
-	projectData := promptAllModules(moduleConfigs)
+	projectData := promptAllModules(moduleConfigs, &projectConfig)
 
 	// Map parameter values back to specific modules
 	for moduleName, module := range moduleConfigs {
