@@ -30,6 +30,14 @@ function HomePageCallToAction () {
   </div>
 }
 
+function HiringCallToAction () {
+  return <div className={styles.hiring}>
+    <Link to="https://commit.dev/career_opportunities/developer-advocate/">
+      We're hiring a developer advocate!
+    </Link>
+  </div>
+}
+
 export default function Home() {
   const landingPageOnlyGlobalItemStyle = `
   .navbar  {
@@ -63,6 +71,7 @@ export default function Home() {
         <HomepageFeatures />
         <HomepageOfferings />
         <HomePageCallToAction />
+        <HiringCallToAction />
       </main>
     </Layout>
   );
