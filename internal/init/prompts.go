@@ -26,39 +26,40 @@ const greenCheckMark = "\033[32m\U00002714\033[0m"
 const awsPickProfile = "Existing AWS Profiles"
 const awsManualInputCredentials = "Enter my own AWS credentials"
 
+// PromptHandler defines how a user is prompted for a parameter, containing information about the parameter, conditions, and value validation
 type PromptHandler struct {
 	moduleconfig.Parameter
 	Condition CustomConditionSignature
 	Validate  func(string) error
 }
 
+// CredentialPrompts is a list of prompts for sensitive credentials
 type CredentialPrompts struct {
 	Vendor  string
 	Prompts []PromptHandler
 }
 
+// CustomConditionSignature is the function signature of a custom condition. It takes a map of parameters and returns a boolean
 type CustomConditionSignature func(map[string]string) bool
 
+// NoCondition is a no-op condition check function that always returns true
 func NoCondition(map[string]string) bool {
 	return true
 }
 
+// KeyMatchCondition is a condition that checks if the key matches the value
 func KeyMatchCondition(key string, value string) CustomConditionSignature {
 	return func(param map[string]string) bool {
 		return param[key] == value
 	}
 }
 
-func CustomCondition(fn CustomConditionSignature) CustomConditionSignature {
-	return func(param map[string]string) bool {
-		return fn(param)
-	}
-}
-
+// NoValidation is a no-op validation function
 func NoValidation(string) error {
 	return nil
 }
 
+// SpecificValueValidation is a validation function that checks if the value is in the list of options
 func SpecificValueValidation(values ...string) func(string) error {
 	return func(checkValue string) error {
 		for _, allowedValue := range values {
@@ -70,6 +71,7 @@ func SpecificValueValidation(values ...string) func(string) error {
 	}
 }
 
+// ValidateAKID checks if the input is a valid AWS Access Key ID
 func ValidateAKID(input string) error {
 	// 20 uppercase alphanumeric characters
 	var awsAccessKeyIDPat = regexp.MustCompile(`^[A-Z0-9]{20}$`)
@@ -79,6 +81,7 @@ func ValidateAKID(input string) error {
 	return nil
 }
 
+// ValidateSAK checks if the input is a valid AWS Secret Access Key
 func ValidateSAK(input string) error {
 	// 40 base64 characters
 	var awsSecretAccessKeyPat = regexp.MustCompile(`^[A-Za-z0-9/+=]{40}$`)
@@ -161,7 +164,13 @@ func (p PromptHandler) RunPrompt(projectParams map[string]string, envVarTranslat
 		// Append the result to parameter map
 		projectParams[p.Field] = sanitizeParameterValue(result)
 	} else {
-		flog.Debugf("Skipping prompt(%s) due to condition failed", p.Field)
+		elseValue := moduleconfig.GetFirstConditionElseValue(p.Parameter)
+		if elseValue != "" {
+			flog.Debugf("Skipping prompt(%s) due to condition failed but assigning default value \"%s\"", p.Field, elseValue)
+			projectParams[p.Field] = elseValue
+		} else {
+			flog.Debugf("Skipping prompt(%s) due to condition failed", p.Field)
+		}
 	}
 	return nil
 }
@@ -297,6 +306,7 @@ func availableProjectContext(projectConfig *projectconfig.ZeroProjectConfig) map
 	}
 }
 
+// paramConditionsMapper returns a condition checking function that checks if all the conditions are met
 func paramConditionsMapper(conditions []moduleconfig.Condition) CustomConditionSignature {
 	if len(conditions) == 0 {
 		return NoCondition
@@ -314,6 +324,8 @@ func paramConditionsMapper(conditions []moduleconfig.Condition) CustomConditionS
 		}
 	}
 }
+
+// conditionHandler is a helper that accepts condition config and returns a function that checks if the condition is met
 func conditionHandler(cond moduleconfig.Condition) CustomConditionSignature {
 	if cond.Action == "KeyMatchCondition" {
 		return KeyMatchCondition(cond.MatchField, cond.WhenValue)

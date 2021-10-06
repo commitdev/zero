@@ -6,7 +6,7 @@ orbs:
 
 variables:
   - &workspace /home/circleci/project
-  - &build-image circleci/golang:1.13.8
+  - &build-image circleci/golang:1.16.8
 
 aliases:
   # Shallow Clone - this allows us to cut the 2 minute repo clone down to about 10 seconds for repos with 50,000 commits+

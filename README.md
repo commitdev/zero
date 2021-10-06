@@ -3,7 +3,7 @@
 [![Slack](https://img.shields.io/badge/slack-join-brightgreen?logo=slack&style=social)](https://slack.getzero.dev)
 
 <p align="center" width="100%">
-    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs/img/logo.png">
+    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs-site/logo.png">
 </p>
 
 ## What is Zero
@@ -23,7 +23,7 @@ Everything built by Zero is yours. After using Zero to generate your infrastruct
 
 It's easy to get started, the only thing you'll need is an AWS account. Just enter your AWS CLI tokens or choose your existing profile during the setup process and everything is built for you automatically using infrastructure-as-code so you can see exactly what's happening and easily modify it if necessary.
 
-[Read about the day-to-day experience of using a system set up using Zero](docs/real-world-usage.md)
+[Read about the day-to-day experience of using a system set up using Zero](https://getzero.dev/docs/zero/about/real-world-usage)
 
 
 ## Why is Zero Reliable, Scalable, Performant, and Secure
@@ -36,9 +36,9 @@ Security: Properly configured access-control to resources/security groups, using
 
 
 ## What do you get out of the box?
-[Read about why we made these technology choices and where they are most applicable.](docs/technology-choices.md)
+[Read about why we made these technology choices and where they are most applicable.](https://getzero.dev/docs/zero/about/technology-choices)
 
-[Check out some resources for learning more about these technologies.](docs/learning-resources.md)
+[Check out some resources for learning more about these technologies.](https://getzero.dev/docs/zero/reference/learning-resources)
 
 ### Infrastructure
 - Fully configured infrastructure-as-code AWS environment including:
@@ -78,12 +78,12 @@ ___
 ### Project Definition:
 Each project is defined by this project definition file, this manifest contains your project details, and is the source of truth for the templating(`zero create`) and provision(`zero apply`) steps.
 
-See [`zero-project.yml` reference](./docs/project-definition.md) for details.
+See [`zero-project.yml` reference](https://getzero.dev/docs/zero/reference/project-definition) for details.
 ### Module Definition
 Module definition defines the information needed for the module to run (`zero apply`).
 Also declares dependency used to determine the order of execution with other modules.
 
-See [`zero-module.yml` reference](./docs/module-definition.md) for details.
+See [`zero-module.yml` reference](https://getzero.dev/docs/zero/reference/module-definition) for details.
 ___
 
 

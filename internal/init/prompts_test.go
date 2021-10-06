@@ -125,8 +125,8 @@ func TestGetParam(t *testing.T) {
 				Conditions: []moduleconfig.Condition{
 					{
 						Action:     "KeyMatchCondition",
-						WhenValue:  "pass",
 						MatchField: "param1",
+						WhenValue:  "pass",
 					},
 				},
 			},
@@ -136,8 +136,8 @@ func TestGetParam(t *testing.T) {
 				Conditions: []moduleconfig.Condition{
 					{
 						Action:     "KeyMatchCondition",
-						WhenValue:  "not foo",
 						MatchField: "param1",
+						WhenValue:  "not pass",
 					},
 				},
 			},
@@ -147,13 +147,25 @@ func TestGetParam(t *testing.T) {
 				Conditions: []moduleconfig.Condition{
 					{
 						Action:     "KeyMatchCondition",
-						WhenValue:  "pass",
 						MatchField: "param1",
+						WhenValue:  "pass",
 					},
 					{
 						Action:     "KeyMatchCondition",
-						WhenValue:  "pass",
 						MatchField: "passing_condition",
+						WhenValue:  "pass",
+					},
+				},
+			},
+			{
+				Field: "condition_with_default",
+				Value: "pass",
+				Conditions: []moduleconfig.Condition{
+					{
+						Action:     "KeyMatchCondition",
+						MatchField: "param1",
+						WhenValue:  "not pass",
+						ElseValue:  "itsadefault",
 					},
 				},
 			},
@@ -165,6 +177,7 @@ func TestGetParam(t *testing.T) {
 		assert.Equal(t, "pass", projectParams["passing_condition"], "Expected to pass condition and set value")
 		assert.NotContains(t, projectParams, "failing_condition", "Expected to fail condition and not set value")
 		assert.Equal(t, "pass", projectParams["multiple_condition"], "Expected to pass multiple condition and set value")
+		assert.Equal(t, "itsadefault", projectParams["condition_with_default"], "Expected to set a default value for a condition that failed")
 	})
 
 	t.Run("Should return error upon unsupported custom prompt type", func(t *testing.T) {
