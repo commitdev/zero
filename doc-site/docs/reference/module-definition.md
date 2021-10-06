@@ -17,13 +17,11 @@ It also declares the module's dependencies to determine the order of execution i
 | `icon`        | `string`             | Path to logo image                               |
 | `parameters`  | `list(Parameter)`    | Parameters to prompt users                       |
 | `commands`    | `Commands`           | Commands to use instead of makefile defaults     |
-| `zeroVersion` | string([go-semver])  | Zero versions it's compatible with               |
+| `zeroVersion` | string([go-semver])  | Zero binary versions it's compatible with        |
 
 
 ### Commands
-:::note
 Commands are the lifecycle of `zero apply`, it will run all modules' `check` phase, then once satisfied, run in sequence the `apply` phase, then if successful run the `summary` phase.
-:::
 
 | Parameters | Type     | Default        | Description                                                              |
 |------------|----------|----------------|--------------------------------------------------------------------------|
@@ -42,7 +40,7 @@ Control how module templates will be parsed during the `zero create` command.
 | `outputDir`  | `string`  | local directory name for the module, gets commited to version control |
 
 ### Condition (module)
-Module conditions are considered during the templatint phase (`zero create`), based on parameters supplied from the project definition.
+Module conditions are considered during the templating phase (`zero create`), based on parameters supplied from the project definition.
 Modules can decide to have specific files or directories excluded from the user's project.
 For example if the user picks `userAuth: no`, we can exclude all the auth resources via templating.
 
