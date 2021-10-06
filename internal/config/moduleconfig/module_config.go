@@ -84,6 +84,7 @@ type Condition struct {
 	MatchField string   `yaml:"matchField"`
 	WhenValue  string   `yaml:"whenValue"`
 	Data       []string `yaml:"data,omitempty"`
+	ElseValue  string   `yaml:"elseValue,omitempty"`
 }
 
 type Validate struct {
@@ -263,6 +264,16 @@ func SummarizeConditions(module ModuleConfig) []projectconfig.Condition {
 		}
 	}
 	return moduleConditions
+}
+
+// GetFirstConditionElseValue returns the default value of the first condition that has a default
+func GetFirstConditionElseValue(parameter Parameter) string {
+	for _, condition := range parameter.Conditions {
+		if condition.ElseValue != "" {
+			return condition.ElseValue
+		}
+	}
+	return ""
 }
 
 // UnmarshalYAML Parses a version constraint string into go-version constraint during yaml parsing
