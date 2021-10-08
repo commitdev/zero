@@ -3,7 +3,7 @@
 [![Slack](https://img.shields.io/badge/slack-join-brightgreen?logo=slack&style=social)](https://slack.getzero.dev)
 
 <p align="center" width="100%">
-    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/docs-site/logo.png">
+    <img width="66%" src="https://raw.githubusercontent.com/commitdev/zero/main/doc-site/logo.png">
 </p>
 
 ## What is Zero
