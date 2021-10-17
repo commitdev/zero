@@ -154,9 +154,26 @@ type initialCommands struct {
 	args        []string
 }
 
+// getInitDefaultBranch return init.defaultBranch value in git config.
+// If init.defaultBranch isn't set,  getInitDefaultBranch return 'main'.
+func getInitDefaultBranch() string {
+	cmd := exec.Command("git", "config", "--get", "init.defaultBranch")
+
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		return "main"
+	}
+
+	return string(output)
+}
+
 // doInitialCommit runs the git commands that initialize and do the first commit to a repository.
 func doInitialCommit(ownerName string, repositoryName string) error {
 	remoteOrigin := fmt.Sprintf("git@github.com:%s/%s.git", ownerName, repositoryName)
+
+	initDefaultBranch := getInitDefaultBranch()
+
 	commands := []initialCommands{
 		{
 			description: "git init",
@@ -179,9 +196,9 @@ func doInitialCommit(ownerName string, repositoryName string) error {
 			args:        []string{"remote", "add", "origin", remoteOrigin},
 		},
 		{
-			description: "git push -u origin master",
+			description: fmt.Sprintf("git push -u origin %s", initDefaultBranch),
 			command:     "git",
-			args:        []string{"push", "-u", "origin", "master"},
+			args:        []string{"push", "-u", "origin", initDefaultBranch},
 		},
 	}
 
