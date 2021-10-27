@@ -3,12 +3,13 @@ package projectconfig
 import (
 	"errors"
 	"io/ioutil"
-	"log"
 
-	"github.com/commitdev/zero/pkg/util/flog"
 	"github.com/hashicorp/terraform/dag"
 	"github.com/k0kubun/pp"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
+
+	"github.com/commitdev/zero/pkg/util/exit"
+	"github.com/commitdev/zero/pkg/util/flog"
 )
 
 // GraphRootName represents the root of the graph of modules in a project
@@ -67,11 +68,11 @@ func LoadConfig(filePath string) *ZeroProjectConfig {
 	config := &ZeroProjectConfig{}
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Panicf("failed to read config: %v", err)
+		exit.Fatal("failed to read config: %v", err)
 	}
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		log.Panicf("failed to parse config: %v", err)
+		exit.Fatal("failed to parse config: %v", err)
 	}
 	flog.Debugf("Loaded project config: %s from %s", config.Name, filePath)
 	return config

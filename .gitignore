@@ -7,3 +7,4 @@ tmp
 example/
 test-reports/
 .circleci/config-compiled.yml
+.idea/
