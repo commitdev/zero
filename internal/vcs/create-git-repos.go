@@ -17,14 +17,14 @@ func InitializeRepository(repositoryUrl string, githubApiKey string) {
 	var err error
 	ownerName, repositoryName, err := parseRepositoryUrl(repositoryUrl)
 	if err != nil {
-		fmt.Printf("error creating repository: %s\n", err.Error())
+		fmt.Printf("error creating repository: %s", err.Error())
 		return
 	}
 	flog.Debugf("Initialized repo: %s/%s", ownerName, repositoryName)
 
 	isOrgOwned, ownerId, err := isOrganizationOwned(ownerName, githubApiKey)
 	if err != nil {
-		fmt.Printf("error creating repository: %s\n", err.Error())
+		fmt.Printf("error creating repository: %s", err.Error())
 		return
 	}
 
@@ -36,7 +36,7 @@ func InitializeRepository(repositoryUrl string, githubApiKey string) {
 		r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", githubApiKey))
 
 		if err := createRepository(r); err != nil {
-			fmt.Printf("error creating repository: %s\n", err.Error())
+			fmt.Printf("error creating repository: %s", err.Error())
 			return
 		}
 	} else {
@@ -46,13 +46,13 @@ func InitializeRepository(repositoryUrl string, githubApiKey string) {
 		r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", githubApiKey))
 
 		if err := createRepository(r); err != nil {
-			fmt.Printf("error creating repository: %s\n", err.Error())
+			fmt.Printf("error creating repository: %s", err.Error())
 			return
 		}
 	}
 
 	if err := doInitialCommit(ownerName, repositoryName); err != nil {
-		fmt.Printf("error initializing repository: %s\n", err.Error())
+		fmt.Printf("error initializing repository: %s", err.Error())
 		return
 	}
 
@@ -204,14 +204,14 @@ func doInitialCommit(ownerName string, repositoryName string) error {
 
 	for _, command := range commands {
 		// TODO: Debug-level logging?
-		// fmt.Printf(">> %s\n", command.description)
+		// fmt.Printf(">> %s", command.description)
 
 		cmd := exec.Command(command.command, command.args...)
 		cmd.Dir = "./" + repositoryName
 		flog.Debugf("Running (%s) command in %s, %#v", command.command, cmd.Dir, command.args)
 		_, err := cmd.CombinedOutput()
 		if err != nil {
-			fmt.Printf("ERROR: failed to run %s: %s\n", command.description, err.Error())
+			fmt.Printf("ERROR: failed to run %s: %s", command.description, err.Error())
 			// this is a partial failure.  some commands may have exec'ed successfully.
 			break
 		} //else {
