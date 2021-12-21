@@ -57,7 +57,7 @@ const offerings = [
         name: 'Github Actions',
         logo: 'img/tools/github-actions.svg',
         noCrop: true,
-        url: 'https://google.ca',
+        url: 'https://github.com/features/actions',
       },
       {
         name: 'CircleCI',
