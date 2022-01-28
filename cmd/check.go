@@ -120,6 +120,14 @@ var checkCmd = &cobra.Command{
 				docsURL:    "https://kubernetes.io/docs/tasks/tools/install-kubectl/",
 			},
 			{
+				name:       "Docker\t\t",
+				command:    "docker",
+				args:       []string{"--version"},
+				regexStr:   `Docker version (0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*), build ([a-f0-9]{7})`,
+				minVersion: "18.0.0",
+				docsURL:    "https://docs.docker.com/get-docker/",
+			},
+			{
 				name:       "Terraform\t",
 				command:    "terraform",
 				args:       []string{"version"},
