@@ -193,6 +193,9 @@ func executeTemplates(templates []*fileConfig, data interface{}, delimiters []st
 		// @TODO if strict mode then only copy file
 		name := path.Base(source)
 		template, err := template.New(name).Delims(leftDelim, rightDelim).Funcs(util.FuncMap).ParseFiles(source)
+		if err != nil {
+			flog.Errorf("Error in template '%s': %v", source, err)
+		}
 		err = template.Execute(f, data)
 
 		if err != nil {
