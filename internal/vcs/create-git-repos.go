@@ -165,7 +165,8 @@ func getInitDefaultBranch() string {
 		return "main"
 	}
 
-	return string(output)
+	branchName := strings.TrimSuffix(string(output), "\n")
+	return branchName
 }
 
 // doInitialCommit runs the git commands that initialize and do the first commit to a repository.
