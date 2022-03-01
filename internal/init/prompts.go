@@ -110,11 +110,11 @@ func ValidateOrganizationName(input string) error {
 	// the first 62 char out of base64 and -
 	var organizationName = strings.TrimLeft(input, "github.com/")
 	var oName = regexp.MustCompile(`^[A-Za-z0-9-]{1,39}$`)
+	// error if char len is greater than 39
+	if len(organizationName) > constants.MaxOnameLength {
+		return errors.New("Invalid, Organization Name: (cannot exceed a max length of 39)")
+	}
 	if !oName.MatchString(organizationName) {
-		// error if char len is greater than 39
-		if len(organizationName) > constants.MaxPnameLength {
-			return errors.New("Invalid, Organization Name: (cannot exceed a max length of 39)")
-		}
 		return errors.New("Invalid, Organization Name: (can only contain alphanumeric chars & '-')")
 	}
 	return nil
