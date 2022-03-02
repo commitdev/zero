@@ -11,6 +11,7 @@ const (
 	// prompt constants
 
 	MaxPnameLength     = 16
+	MaxOnameLength     = 39
 	RegexValidation    = "regex"
 	FunctionValidation = "function"
 	ZeroReleaseURL     = "https://github.com/commitdev/zero/releases"

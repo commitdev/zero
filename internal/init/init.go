@@ -130,12 +130,12 @@ func getProjectPrompts(projectName string, modules map[string]moduleconfig.Modul
 		"GithubRootOrg": {
 			Parameter: moduleconfig.Parameter{
 				Field:   "GithubRootOrg",
-				Label:   "What's the root of the github org to create repositories in?",
+				Label:   "What's the root of the github organization that will own these repositories?",
 				Info:    "This should be github.com/<your-organization-name>",
 				Default: "github.com/",
 			},
-			Condition: KeyMatchCondition("ShouldPushRepositories", "y"),
-			Validate:  NoValidation,
+			Condition: NoCondition,
+			Validate:  ValidateOrganizationName,
 		},
 	}
 
