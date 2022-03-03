@@ -89,7 +89,7 @@ const createPersonalRepositoryMutation = `mutation ($repoName: String!, $repoDes
 		}
 	}`
 
-const createOrganizationRepositoryMutation = `mutation ($repoName: String!, $repoDescription: String!, $ownerId: String!) {
+const createOrganizationRepositoryMutation = `mutation ($repoName: String!, $repoDescription: String!, $ownerId: ID) {
 		createRepository(
 			input: {
 				name:$repoName,
