@@ -1,0 +1,13 @@
+- name: EKS + Go + React + Gatsby
+  moduleSources:
+  - /zero-aws-eks-stack
+  - /zero-static-site-gatsby
+  - /zero-backend-go
+  - /zero-frontend-react
+
+- name: EKS + NodeJS + React + Gatsby
+  moduleSources:
+  - /zero-aws-eks-stack
+  - /zero-static-site-gatsby
+  - /zero-backend-node
+  - /zero-frontend-react
