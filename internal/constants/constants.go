@@ -1,6 +1,7 @@
 package constants
 
 const (
+	TmpRegistryYml    = "tmp/registry.yaml"
 	TemplatesDir      = "tmp/templates"
 	ZeroProjectYml    = "zero-project.yml"
 	ZeroModuleYml     = "zero-module.yml"

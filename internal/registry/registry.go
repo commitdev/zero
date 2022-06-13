@@ -1,33 +1,46 @@
 package registry
 
+import (
+	"io/ioutil"
+
+	"github.com/commitdev/zero/internal/constants"
+	"github.com/hashicorp/go-getter"
+
+	yaml "gopkg.in/yaml.v2"
+)
+
 type Registry []Stack
+
 type Stack struct {
-	Name          string
-	ModuleSources []string
+	Name          string   `yaml:"name"`
+	ModuleSources []string `yaml:"moduleSources"`
 }
 
-func GetRegistry(path string) Registry {
-	return Registry{
-		// TODO: better place to store these options as configuration file or any source
-		{
-			"EKS + Go + React + Gatsby",
-			[]string{
-				path + "/zero-aws-eks-stack",
-				path + "/zero-static-site-gatsby",
-				path + "/zero-backend-go",
-				path + "/zero-frontend-react",
-			},
-		},
-		{
-			"EKS + NodeJS + React + Gatsby",
-			[]string{
-				path + "/zero-aws-eks-stack",
-				path + "/zero-static-site-gatsby",
-				path + "/zero-backend-node",
-				path + "/zero-frontend-react",
-			},
-		},
+func GetRegistry(localModulePath, registryFilePath string) (Registry, error) {
+	registry := Registry{}
+
+	err := getter.GetFile(constants.TmpRegistryYml, registryFilePath)
+	if err != nil {
+		return nil, err
 	}
+
+	data, err := ioutil.ReadFile(constants.TmpRegistryYml)
+	if err != nil {
+		return nil, err
+	}
+
+	err = yaml.Unmarshal(data, &registry)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := 0; i < len(registry); i++ {
+		for j := 0; j < len(registry[i].ModuleSources); j++ {
+			registry[i].ModuleSources[j] = localModulePath + registry[i].ModuleSources[j]
+		}
+	}
+
+	return registry, nil
 }
 
 func GetModulesByName(registry Registry, name string) []string {
