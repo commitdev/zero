@@ -17,7 +17,7 @@ import (
 )
 
 // Create cloud provider context
-func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfig {
+func Init(outDir, localModulePath, registryFilePath string) *projectconfig.ZeroProjectConfig {
 	projectConfig := defaultProjConfig()
 
 	projectRootParams := map[string]string{}
@@ -36,7 +36,13 @@ func Init(outDir string, localModulePath string) *projectconfig.ZeroProjectConfi
 		exit.Fatal("Error creating root: %v ", err)
 	}
 
-	moduleSources := chooseStack(registry.GetRegistry(localModulePath))
+	registry, err := registry.GetRegistry(localModulePath, registryFilePath)
+
+	if err != nil {
+		exit.Fatal("Error getting registry: %v ", err)
+	}
+
+	moduleSources := chooseStack(registry)
 	moduleConfigs, mappedSources := loadAllModules(moduleSources)
 
 	prompts := getProjectPrompts(projectConfig.Name, moduleConfigs)
