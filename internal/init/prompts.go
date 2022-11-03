@@ -94,13 +94,13 @@ func ValidateSAK(input string) error {
 // ValidateProjectName validates Project Name field user input.
 func ValidateProjectName(input string) error {
 	// the first 62 char out of base64 and -
-	var pName = regexp.MustCompile(`^[A-Za-z0-9-]{1,16}$`)
+	var pName = regexp.MustCompile(`^[a-zA-Z][A-Za-z0-9-]{1,16}$`)
 	if !pName.MatchString(input) {
 		// error if char len is greater than 16
 		if len(input) > constants.MaxPnameLength {
 			return errors.New("Invalid, Project Name: (cannot exceed a max length of 16)")
 		}
-		return errors.New("Invalid, Project Name: (can only contain alphanumeric chars & '-')")
+		return errors.New("invalid, Project Name: (can only contain alphanumeric chars & '-') and must start with a letter")
 	}
 	return nil
 }

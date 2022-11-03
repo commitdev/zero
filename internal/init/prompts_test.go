@@ -194,3 +194,20 @@ func TestGetParam(t *testing.T) {
 		assert.Equal(t, "Unsupported custom prompt type random-type.", err.Error())
 	})
 }
+
+func TestValidateProjectNam(t *testing.T) {
+	t.Run("Should return error upon invalid project name", func(t *testing.T) {
+		err := initPrompts.ValidateProjectName("0invalid")
+		assert.Error(t, err, "Project name should not start with a number")
+	})
+
+	t.Run("Should return error upon invalid project name length", func(t *testing.T) {
+		err := initPrompts.ValidateProjectName("invalid name with more than 30 characters")
+		assert.Error(t, err, "Project name should not be longer than 30 characters")
+	})
+
+	t.Run("Should return nil upon valid project name", func(t *testing.T) {
+		err := initPrompts.ValidateProjectName("valid-name")
+		assert.Nil(t, err)
+	})
+}
