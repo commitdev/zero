@@ -11,9 +11,11 @@ sidebar_position: 3
 ### Kubernetes
 - [Kubernetes Basics](https://kubernetes.io/docs/tutorials/kubernetes-basics/)
 - [Kubernetes Training and Certification](https://kubernetes.io/training/)
+- [Kubernetes Tutorial for Beginners – Basic Concepts and Examples](https://spacelift.io/blog/kubernetes-tutorial)
 
 ### Terraform
 - [Getting started with Terraform in AWS](https://learn.hashicorp.com/collections/terraform/aws-get-started)
+- [Terraform Tutorial – Getting Started With Terraform on AWS](https://spacelift.io/blog/terraform-tutorial)
 
 ### Golang
 - [A Tour of Go](https://tour.golang.org)
