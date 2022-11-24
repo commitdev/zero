@@ -22,9 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 16
       # - name: Documentaiton site folder
       #   run: cd doc-site
       - name: Install Dependencies
