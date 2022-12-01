@@ -45,6 +45,11 @@ export default function Home() {
     box-shadow: none;
     background: linear-gradient(90deg, rgba(15, 16, 17, 0.6) 0%, rgba(1, 2, 66, 0.6) 100%);
   }
+  @media only screen and (max-width: 641px) {
+    .navbar__items--right {
+      display: none;
+    }
+  }
   .navbar__inner {
     padding: 0 3rem;
   }

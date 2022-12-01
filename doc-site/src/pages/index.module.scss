@@ -40,10 +40,16 @@
   align-items: center;
   justify-content: center;
   margin: 4rem auto 4rem;
+  text-align: center;
   a {
     font-size: 2rem;
     font-weight: bold;
     color: #ffffff;
+  }
+  @media only screen and (max-width: 600px) {
+    a {
+      padding: 0 2rem;
+    }
   }
 }
 

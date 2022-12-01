@@ -117,10 +117,16 @@ html{
   padding:0 var(--ifm-spacing-horizontal);
 }
 
+@media only screen and (max-width: 400px) {
+  .footer {
+    display: none;
+  }
+}
+
 /** LANDING PAGE SECTION **/
 .featured-sections {
   text-align: center;
-  padding: 6rem;
+  padding: 6rem 0;
 }
 
 .featured-sections h3, .featured-sections h2 {
