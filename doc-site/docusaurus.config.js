@@ -13,10 +13,6 @@ module.exports = {
   ...misc(),
   projectName: repositoryName,
   themeConfig: {
-    gtag: {
-      trackingID: 'G-6FN66NMDES',
-    },
-
     colorMode: {
       defaultMode: 'dark',
     },
@@ -86,6 +82,9 @@ module.exports = {
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
+        },
+        gtag: {
+          trackingID: 'G-6FN66NMDES',
         },
         debug: true,
       },
