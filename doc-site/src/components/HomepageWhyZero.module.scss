@@ -2,6 +2,10 @@
   text-align: center;
   background: white;
   color: var(--ifm-landing-page-inverse-font-color);
+  @media only screen and (max-width: 641px) {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
 
   .title {
     margin-bottom: 5rem;

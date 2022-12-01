@@ -81,7 +81,6 @@
   border-radius: 12px;
   display: flex;
   padding: 2rem;
-  flex: 0 0 330px;
 
   ul{
     height: 100%;
@@ -130,6 +129,11 @@
         font-weight: 600;
         white-space: nowrap;
       }
+      @media only screen and (max-width: 400px) {
+        p {
+          font-size: 0.8rem;
+        }
+      }
     }
   }
 }
@@ -138,7 +142,7 @@
   box becomes stacked when screen is small
   and the dotted line is vertical instead of horizontal
 **/
-@media screen and (max-width: 919px) {
+@media screen and (max-width: 967px) {
   .offerings_container {
     padding: 5rem 2rem;
     min-height: 62rem;
