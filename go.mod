@@ -31,7 +31,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/termie/go-shutil v0.0.0-20140729215957-bcacb06fecae
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
-	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/tools v0.0.0-20191127201027-ecd32218bd7f // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.4.0
